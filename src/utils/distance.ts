@@ -1,4 +1,4 @@
-import type { Entity } from "./entities/types";
+import type { Entity } from "../entities/Entity";
 
 export function distance(a: Entity, b: Entity) {
   const dx = a.x - b.x;
