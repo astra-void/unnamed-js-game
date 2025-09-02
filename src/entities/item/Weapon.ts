@@ -1,5 +1,5 @@
+import { Projectile } from "../projectiles";
 import { Item } from "./Item";
-import type { Projectile } from "../projectiles/Projectile";
 
 export abstract class Weapon extends Item {
     damage: number;

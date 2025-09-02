@@ -42,7 +42,7 @@ export class Game {
     this.player.update(dt);
 
     // All projectiles update
-    this.projectiles.forEach(p => p.update());
+    this.projectiles.forEach(p => p.update(dt));
 
     // Enemy spawn
     this.spawnTimer -= dt;

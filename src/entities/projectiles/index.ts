@@ -1,2 +1,2 @@
-export * from "./Knife";
+export * from "./KnifeProjectile";
 export * from "./Projectile";
