@@ -6,6 +6,17 @@ export class Enemy extends LivingEntity {
     damage: number;
     target: LivingEntity;
     
+    /**
+     * 
+     * @param x 
+     * @param y 
+     * @param maxHp 
+     * @param radius 
+     * @param speed 
+     * @param damage 
+     * @param target 
+     * @constructor
+     */
     constructor(x: number, y: number, maxHp: number, radius = 12, speed = 200, damage: number, target: LivingEntity) {
         super(x, y, maxHp);
         this.radius = radius;

@@ -1,6 +1,5 @@
 # Introduction
-This project is based with pnpm.
-You can run with npm too.
+> This project is builded with pnpm.
 
 # Install
 ```

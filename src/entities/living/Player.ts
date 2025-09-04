@@ -1,43 +1,70 @@
-import { keys } from "../../main";
+import type { Game } from "../../Game";
 import type { Weapon } from "../item";
 import { LivingEntity } from "./LivingEntity";
 
+/**
+ * Player 클래스
+ * 플레이어 캐릭터 나타내는 클래스임
+ */
 export class Player extends LivingEntity {
     radius: number;
     speed: number;
     exp: number;
     level: number;
     weapons: Weapon[];
+    fireCooldown: number;
+    game: Game;
 
-    constructor(x: number, y: number, maxHp: number, radius = 16, speed = 200, exp = 0, level = 1, weapons: Weapon[]) {
+    /**
+     * 
+     * @param x 
+     * @param y 
+     * @param maxHp 
+     * @param radius 
+     * @param speed 
+     * @param exp 
+     * @param level 
+     * @param weapons 
+     * @param game 
+     * @constructor
+     */
+    constructor(x: number, y: number, maxHp: number, radius = 16, speed = 200, exp = 0, level = 1, weapons: Weapon[], game: Game) {
         super(x, y, maxHp);
         this.radius = radius;
         this.speed = speed;
         this.exp = exp;
         this.level = level;
         this.weapons = weapons;
+        this.game = game;
+        this.fireCooldown = 0;
     }
 
+    /**
+     * 상태 업데이트
+     * @param dt - 프레임 간 시간(초)
+     */
     update(dt: number): void {
-        if (keys["ArrowUp"] || keys["w"]) this.y -= this.speed * dt;
-        if (keys["ArrowDown"] || keys["s"]) this.y += this.speed * dt;
-        if (keys["ArrowLeft"] || keys["a"]) this.x -= this.speed * dt;
-        if (keys["ArrowRight"] || keys["d"]) this.x += this.speed * dt;
+        if (this.game.keys["ArrowUp"] || this.game.keys["w"]) this.y -= this.speed * dt;
+        if (this.game.keys["ArrowDown"] || this.game.keys["s"]) this.y += this.speed * dt;
+        if (this.game.keys["ArrowLeft"] || this.game.keys["a"]) this.x -= this.speed * dt;
+        if (this.game.keys["ArrowRight"] || this.game.keys["d"]) this.x += this.speed * dt;
+        
+        const radius = this.radius;
+        const canvas = this.game.canvas;
 
-        /* TODO: WEAPONS FIRE LOGIC HERE
+        if (this.x < radius) this.x = radius;
+        if (this.x > canvas.width - radius) this.x = canvas.width - radius;
+        if (this.y < radius) this.y = radius;
+        if (this.y > canvas.height - radius) this.y = canvas.height - radius;
+
+        this.fireCooldown -= dt;
+
         if (this.fireCooldown <= 0) {
-            this.fireCooldown = 0.5;
-            const dx = mouseX - this.x;
-            const dy = mouseY - this.y;
-            const len = Math.sqrt(dx * dx + dy * dy) || 1;
-            const speed = 200;
-            const vx = (dx / len) * speed;
-            const vy = (dy / len) * speed;
+            this.fireCooldown += 0.05;
             for (const weapon of this.weapons) {
-                
+                weapon.attack(this.x, this.y);
             }
-        } 
-        */
+        }
     }
 
     gainExp(amount: number) {
@@ -54,10 +81,5 @@ export class Player extends LivingEntity {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fill();
-
-        ctx.fillStyle = "red";
-        ctx.fillRect(this.x - 20, this.y - 40, 40 * (this.hp / 100), 5);
-        ctx.strokeStyle = "black";
-        ctx.strokeRect(this.x - 20, this.y - 40, 40, 5);
     }
 }

@@ -5,5 +5,5 @@ export abstract class Item {
     this.name = name;
   }
 
-  abstract use(): void;
+  abstract use?(): void;
 }
