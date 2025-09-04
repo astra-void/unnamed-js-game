@@ -1,7 +1,7 @@
 # Introduction
 > This project is builded with pnpm.
 
-# Install
+## Install
 ```
 npm install
 ```
@@ -10,7 +10,7 @@ or
 pnpm install
 ```
 
-# Run
+## Run
 ```
 npm run dev
 ```
