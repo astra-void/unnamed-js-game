@@ -57,11 +57,13 @@ export class Player extends LivingEntity {
         if (this.y < radius) this.y = radius;
         if (this.y > canvas.height - radius) this.y = canvas.height - radius;
 
-        this.fireCooldown -= dt;
 
-        if (this.fireCooldown <= 0) {
-            this.fireCooldown += 0.05;
-            for (const weapon of this.weapons) {
+        for (const weapon of this.weapons) {
+            weapon.currentCooldown -= dt;
+
+            if (weapon.currentCooldown <= 0) {
+                weapon.currentCooldown += weapon.cooldown;
+                
                 weapon.attack(this.x, this.y);
             }
         }

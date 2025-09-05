@@ -4,7 +4,7 @@ import { Weapon } from "./Weapon";
 
 export class Knife extends Weapon {
     constructor(game: Game) {
-        super("Knife", game, 0, 10, 50, 5);
+        super("Knife", game, 0.25, 10, 50, 5);
     }
 
     use?(): void {} /* empty */

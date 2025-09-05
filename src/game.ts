@@ -14,8 +14,8 @@ export class Game {
   keys: Record<string, boolean> = {};
   mouseX: number = 0;
   mouseY: number = 0;
-  ui: UIManager
-  
+  ui: UIManager;
+
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
@@ -29,12 +29,13 @@ export class Game {
     // UI Init
     this.ui = new UIManager();
     this.ui.addCanvasUI(new HealthBar(this.player));
-    
+
     canvas.addEventListener("mousemove", (e) => {
       const rect = canvas.getBoundingClientRect();
       this.mouseX = e.clientX - rect.left;
       this.mouseY = e.clientY - rect.top;
     });
+
     window.addEventListener("keydown", (e) => (this.keys[e.key] = true));
     window.addEventListener("keyup", (e) => (this.keys[e.key] = false));
 
