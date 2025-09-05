@@ -1,5 +1,6 @@
 import { Player, Projectile, Enemy, Knife } from "./entities";
 import { HealthBar, UIManager } from "./ui";
+import { Button } from "./ui/components/Button";
 import { checkCollision, distance } from "./utils";
 
 export class Game {
@@ -29,6 +30,11 @@ export class Game {
     // UI Init
     this.ui = new UIManager();
     this.ui.addCanvasUI(new HealthBar(this.player));
+    this.ui.addCanvasUI(new Button(
+      200, 150, 150, 50, "test",
+      () => alert("hey"),
+      this.canvas
+    ));
 
     canvas.addEventListener("mousemove", (e) => {
       const rect = canvas.getBoundingClientRect();

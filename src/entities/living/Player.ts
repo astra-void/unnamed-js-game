@@ -1,6 +1,7 @@
 import type { Game } from "../../Game";
-import type { Weapon } from "../item";
+import { Weapon } from "../item";
 import { LivingEntity } from "./LivingEntity";
+import * as Items from "../item";
 
 /**
  * Player 클래스
@@ -63,7 +64,7 @@ export class Player extends LivingEntity {
 
             if (weapon.currentCooldown <= 0) {
                 weapon.currentCooldown += weapon.cooldown;
-                
+
                 weapon.attack(this.x, this.y);
             }
         }
@@ -71,10 +72,25 @@ export class Player extends LivingEntity {
 
     gainExp(amount: number) {
         this.exp += amount;
-        if (this.exp >= this.level * 10) {
+
+        while (this.exp >= this.level * 10) {
             this.exp = 0;
             this.level++;
-            console.log(`level up current level: ${this.level}`); // PLACEHOLDER: TEMP
+            console.log(`Level Up! Current level: ${this.level}`); // PLACEHOLDER
+
+            const weaponClasses = Object.values(Items)
+                .filter(ItemClass => {
+                    const instance = new (ItemClass as any)(this.game);
+                    return instance instanceof Weapon;
+                }) as (new (...args: any) => Weapon)[];
+                
+            if (weaponClasses.length === 0) return;
+
+            const choices: (new (...args: any) => Weapon)[] = [];
+            while (choices.length < 3 && weaponClasses.length > 0) {
+                const index = Math.floor(Math.random() * weaponClasses.length);
+                choices.push(weaponClasses.splice(index, 1)[0]);
+            }
         }
     }
 

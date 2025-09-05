@@ -8,8 +8,18 @@ export class UIManager {
         this.canvasComponents.push(c);
     }
 
+    removeCanvasUI(c: UIComponent) {
+        const index = this.canvasComponents.indexOf(c);
+        if (index !== -1) this.canvasComponents.splice(index, 1);
+    }
+
     addDOMUI(c: DOMUIComponent) {
         this.domComponents.push(c);
+    }
+
+    removeDOMUI(c: DOMUIComponent) {
+        const index = this.domComponents.indexOf(c);
+        if (index !== -1) this.canvasComponents.splice(index, 1);
     }
 
     update(dt: number) {
