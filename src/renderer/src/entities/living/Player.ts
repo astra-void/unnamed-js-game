@@ -56,13 +56,13 @@ export class Player extends LivingEntity {
    * @param dt - 프레임 간 시간(초)
    */
   update(dt: number): void {
-    if (this.game.keys['ArrowUp'] || this.game.keys['w'])
+    if (this.game.keys['w'] || this.game.keys['ArrowUp'])
       this.y -= this.speed * dt;
-    if (this.game.keys['ArrowDown'] || this.game.keys['s'])
+    if (this.game.keys['s'] || this.game.keys['ArrowDown'])
       this.y += this.speed * dt;
-    if (this.game.keys['ArrowLeft'] || this.game.keys['a'])
+    if (this.game.keys['a'] || this.game.keys['ArrowLeft'])
       this.x -= this.speed * dt;
-    if (this.game.keys['ArrowRight'] || this.game.keys['d'])
+    if (this.game.keys['d'] || this.game.keys['ArrowRight'])
       this.x += this.speed * dt;
 
     const radius = this.radius;
@@ -95,7 +95,7 @@ export class Player extends LivingEntity {
       const weaponClasses = Object.values(Items).filter((ItemClass) => {
         try {
           const instance = new (ItemClass as any)(this.game);
-          return instance instanceof Weapon;
+          return instance.attack && instance instanceof Weapon;
         } catch {
           return false;
         }
@@ -114,6 +114,8 @@ export class Player extends LivingEntity {
         this.weapons.push(weapon);
         this.game.ui.removeCanvasUI(itemSelect);
       });
+
+      console.log(this.weapons);
 
       this.game.ui.addCanvasUI(itemSelect);
     }

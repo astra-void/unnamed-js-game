@@ -1,5 +1,5 @@
 {
-  "name": "unnamed-game",
+  "name": "unnamed-js-game",
   "private": true,
   "version": "0.0.0",
   "main": "./out/main/index.js",
@@ -42,7 +42,9 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
-    "electron-updater": "^6.6.2"
+    "@tailwindcss/vite": "^4.1.13",
+    "electron-updater": "^6.6.2",
+    "tailwindcss": "^4.1.13"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

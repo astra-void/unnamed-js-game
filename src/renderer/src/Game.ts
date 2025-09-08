@@ -1,7 +1,6 @@
 import { Player, Projectile, Enemy, Knife } from './entities';
-import { HealthBar, UIManager } from './ui';
-import { Button } from './ui/components/Button';
-import { GameOver } from './ui/components/GameOver';
+import { GameOver, HealthBar } from './ui';
+import { UIManager } from './ui/UIManager';
 import { checkCollision, distance } from './utils';
 
 export class Game {
@@ -38,32 +37,26 @@ export class Game {
     this.lastTime = 0;
     this.spawnTimer = 2;
 
-    // UI Init
-    this.ui = new UIManager();
-    this.ui.addCanvasUI(new HealthBar(this.player));
-    const testButton = new Button(
-      200,
-      150,
-      150,
-      50,
-      'test',
-      () => this.ui.removeCanvasUI(testButton),
-      this.canvas
-    );
-    this.ui.addCanvasUI(testButton);
-
     canvas.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
       this.mouseX = e.clientX - rect.left;
       this.mouseY = e.clientY - rect.top;
     });
 
+    // UI Init
+    this.ui = new UIManager();
+    this.ui.addCanvasUI(new HealthBar(this.player));
+
     window.addEventListener('keydown', (e) => (this.keys[e.key] = true));
     window.addEventListener('keyup', (e) => (this.keys[e.key] = false));
+  }
 
+  start() {
     this.loop = this.loop.bind(this);
     requestAnimationFrame(this.loop);
   }
+
+  stop() {}
 
   loop(timestamp: number) {
     const dt = (timestamp - this.lastTime) / 1000;

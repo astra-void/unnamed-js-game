@@ -76,7 +76,7 @@ export class ItemSelect extends UIComponent {
         this.onSelect(weapon);
 
         this.destroy();
-        this.game.ui.removeCanvasUI(this);
+        //this.game.ui.removeCanvasUI(this);
         break;
       }
     }
@@ -107,8 +107,6 @@ export class ItemSelect extends UIComponent {
       ctx.font = isHover ? 'bold 16px Arial' : '16px Arial';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-
-      console.log(choice);
 
       ctx.fillText(
         new choice.weaponClass(this.game).name,

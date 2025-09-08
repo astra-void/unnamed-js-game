@@ -1,20 +1,22 @@
-import { useEffect, useState } from 'react';
-import { Game } from './Game';
+import GameCanvas from './ui/components/GameCanvas';
+import { useUIManager } from './ui';
+import { useEffect } from 'react';
+import TestUI from './ui/components/testUI';
 
 const App = () => {
-  const [_game, setGame] = useState<Game | null>(null);
-  const [canvas, setCanvas] = useState<HTMLCanvasElement>();
+  const ui = useUIManager();
 
   useEffect(() => {
-    setCanvas(document.getElementById('game') as HTMLCanvasElement);
+    ui.addDOMUI(<TestUI />);
   }, []);
 
   return (
-    <>
-      <button onClick={() => setGame(new Game(canvas!))}>asdf</button>
-      <canvas id="game" width="1000" height="800"></canvas>
-      {/*<canvas id="game" width="1000" height="800"></canvas> */}
-    </>
+    <div className="relative w-[1000px] h-[800px]">
+      <GameCanvas onReady={(game) => {}} />
+      {ui.domComponents.map((Component, idx) => (
+        <div key={idx}>{Component}</div>
+      ))}
+    </div>
   );
 };
 
