@@ -3,11 +3,15 @@
 > This project is builded with pnpm.
 
 <<<<<<< Updated upstream
+
 ## Install
+
 =======
+
 # Install
 
->>>>>>> Stashed changes
+> > > > > > > Stashed changes
+
 ```
 npm install
 ```
@@ -19,11 +23,15 @@ pnpm install
 ```
 
 <<<<<<< Updated upstream
+
 ## Run
+
 =======
+
 # Run
 
->>>>>>> Stashed changes
+> > > > > > > Stashed changes
+
 ```
 npm run dev
 ```

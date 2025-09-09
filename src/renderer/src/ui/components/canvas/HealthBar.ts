@@ -1,5 +1,5 @@
-import { UIComponent } from '../../UIComponent';
 import type { Player } from '../../../entities';
+import { UIComponent } from '../../UIComponent';
 
 export class HealthBar extends UIComponent {
   player: Player;
