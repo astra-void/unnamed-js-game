@@ -47,8 +47,14 @@ export class Game {
     this.ui = new UIManager();
     this.ui.addCanvasUI(new HealthBar(this.player));
 
-    window.addEventListener('keydown', (e) => (this.keys[e.key] = true));
-    window.addEventListener('keyup', (e) => (this.keys[e.key] = false));
+    window.addEventListener('keydown', (e) => {
+      const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      this.keys[key] = true;
+    });
+    window.addEventListener('keyup', (e) => {
+      const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      this.keys[key] = false;
+    });
   }
 
   start() {
@@ -95,6 +101,11 @@ export class Game {
       const enemy = this.enemies[i];
       for (let j = this.projectiles.length - 1; j >= 0; j--) {
         const proj = this.projectiles[j];
+
+        if (proj.hp <= 0 || proj.lifetime <= 0) {
+          this.projectiles.splice(j, 1);
+        }
+
         if (distance(enemy, proj) < enemy.radius + proj.radius) {
           enemy.takeDamage(proj.damage);
           proj.takeDamage(enemy.damage);
@@ -102,10 +113,6 @@ export class Game {
           if (enemy.hp <= 0) {
             this.enemies.splice(i, 1);
             this.player.gainExp(5);
-          }
-
-          if (proj.hp <= 0) {
-            this.projectiles.splice(j, 1);
           }
         }
       }

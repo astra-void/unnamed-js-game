@@ -32,7 +32,7 @@ export class KnifeProjectile extends Projectile {
   draw(ctx: CanvasRenderingContext2D): void {
     ctx.fillStyle = 'rgba(128, 128, 128, 0.5)';
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI);
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
     ctx.fill();
   }
 }

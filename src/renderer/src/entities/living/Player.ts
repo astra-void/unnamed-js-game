@@ -2,7 +2,8 @@ import type { Game } from '../../Game';
 import { Weapon } from '../item';
 import { LivingEntity } from './LivingEntity';
 import * as Items from '../item';
-import { ItemSelect } from '../../ui/components/ItemSelect';
+import { ItemSelect } from '../../ui/components/';
+import { randomInt } from '../../utils/random';
 
 /**
  * Player 클래스
@@ -88,7 +89,7 @@ export class Player extends LivingEntity {
     this.exp += amount;
 
     while (this.exp >= this.level * 25) {
-      this.exp = 0;
+      this.exp -= this.level * 25;
       this.level++;
       console.log(`Level Up! Current level: ${this.level}`); // PLACEHOLDER
 
@@ -106,18 +107,20 @@ export class Player extends LivingEntity {
       const choices: (new (game: Game) => Weapon)[] = [];
       const pool = [...weaponClasses];
       while (choices.length < 3 && pool.length > 0) {
-        const index = Math.floor(Math.random() * pool.length);
+        const index = randomInt(pool.length);
         choices.push(pool.splice(index, 1)[0]);
       }
 
       const itemSelect = new ItemSelect(choices, this.game, (weapon) => {
-        this.weapons.push(weapon);
+        if (!this.weapons.some(w => w.constructor === weapon.constructor)) {
+          this.weapons.push(weapon);
+        }
         this.game.ui.removeCanvasUI(itemSelect);
       });
 
-      console.log(this.weapons);
-
       this.game.ui.addCanvasUI(itemSelect);
+
+      console.log(this.weapons); // FOR DEBUG
     }
   }
 

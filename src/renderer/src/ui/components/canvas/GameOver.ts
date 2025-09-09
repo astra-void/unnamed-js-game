@@ -1,4 +1,4 @@
-import { UIComponent } from '../UIComponent';
+import { UIComponent } from '../../UIComponent';
 
 export class GameOver extends UIComponent {
   canvas: HTMLCanvasElement;

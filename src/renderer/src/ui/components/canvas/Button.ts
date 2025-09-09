@@ -1,4 +1,4 @@
-import { UIComponent } from '../UIComponent';
+import { UIComponent } from '../../UIComponent';
 
 export class Button extends UIComponent {
   x: number;
@@ -56,9 +56,7 @@ export class Button extends UIComponent {
       mouseY <= this.y + this.height;
   }
 
-  update(_dt: number): void {
-    // 필요없음
-  }
+  update(_dt: number): void {} /* empty */
 
   draw(ctx: CanvasRenderingContext2D): void {
     ctx.fillStyle = this.hover ? '#555' : '#333';

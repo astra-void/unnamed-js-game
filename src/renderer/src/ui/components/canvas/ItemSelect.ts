@@ -1,9 +1,9 @@
-import { UIComponent } from '../UIComponent';
-import type { Weapon } from '../../entities';
-import type { Game } from '../../Game';
+import { UIComponent } from '../../UIComponent';
+import { Weapon } from '../../../entities';
+import { Game } from '../../../Game';
 
 interface Choice {
-  weaponClass: new (...args: any) => Weapon;
+  weaponClass: new (game: Game) => Weapon;
   x: number;
   y: number;
   width: number;
@@ -19,7 +19,7 @@ export class ItemSelect extends UIComponent {
   canvas: HTMLCanvasElement;
 
   constructor(
-    weaponClasses: (new (...args: any) => Weapon)[],
+    weaponClasses: (new (game: Game) => Weapon)[],
     game: Game,
     onSelect: (weapon: Weapon) => void
   ) {
@@ -76,7 +76,7 @@ export class ItemSelect extends UIComponent {
         this.onSelect(weapon);
 
         this.destroy();
-        //this.game.ui.removeCanvasUI(this);
+        this.game.ui.removeCanvasUI(this);
         break;
       }
     }
