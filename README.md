@@ -1,11 +1,14 @@
 # Introduction
+
 > This project is builded with pnpm.
 
 ## Install
 ```
 npm install
 ```
+
 or
+
 ```
 pnpm install
 ```
@@ -14,7 +17,9 @@ pnpm install
 ```
 npm run dev
 ```
+
 or
+
 ```
 pnpm dev
 ```
