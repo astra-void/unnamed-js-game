@@ -3,7 +3,6 @@
 > This project is builded with pnpm.
 
 # Install
-
 ```
 npm install
 ```
@@ -15,7 +14,6 @@ pnpm install
 ```
 
 # Run
-
 ```
 npm run dev
 ```
