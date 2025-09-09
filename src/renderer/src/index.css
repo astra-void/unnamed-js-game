@@ -1,0 +1,19 @@
+@import 'tailwindcss';
+
+* {
+  font-style: normal;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  margin: 0;
+  background-color: black;
+  color: white;
+}
+
+canvas {
+  display: block;
+  margin: 0 auto;
+  background-color: #111;
+  position: fixed;
+}

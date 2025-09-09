@@ -1,4 +1,5 @@
 # Introduction
+
 > This project is builded with pnpm.
 
 <<<<<<< Updated upstream
@@ -10,7 +11,9 @@
 ```
 npm install
 ```
+
 or
+
 ```
 pnpm install
 ```
@@ -24,7 +27,9 @@ pnpm install
 ```
 npm run dev
 ```
+
 or
+
 ```
 pnpm dev
 ```
