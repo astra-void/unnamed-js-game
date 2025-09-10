@@ -1,10 +1,10 @@
-import type { Game } from '../../Game';
-import { TestProjectile } from '../projectiles/TestProjectile';
-import { Weapon } from './Weapon';
+import type { Game } from '../../../Game';
+import { TestProjectile } from '../../projectiles/TestProjectile';
+import { Weapon } from '.././Weapon';
 
-export class Test2 extends Weapon {
+export class Test extends Weapon {
   constructor(game: Game) {
-    super('Test2', game, 1, 0, 20, 40, 5);
+    super('Test', game, 1, 0, 30, 50, 10);
   }
 
   use?(): void {} /* empty */

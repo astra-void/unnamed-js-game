@@ -1,10 +1,10 @@
-import type { Game } from '../../Game';
-import { KnifeProjectile } from '../projectiles';
-import { Weapon } from './Weapon';
+import type { Game } from '../../../Game';
+import { TestProjectile } from '../../projectiles/TestProjectile';
+import { Weapon } from '.././Weapon';
 
-export class Knife extends Weapon {
+export class Test2 extends Weapon {
   constructor(game: Game) {
-    super('Knife', game, 1, 0.25, 10, 50, 5);
+    super('Test2', game, 1, 0, 20, 40, 5);
   }
 
   use?(): void {} /* empty */
@@ -20,7 +20,7 @@ export class Knife extends Weapon {
     const vy = (dy / len) * speed;
 
     this.game.projectiles.push(
-      new KnifeProjectile(x, y, vx, vy, this.damage, this.speed, this.lifetime)
+      new TestProjectile(x, y, vx, vy, this.damage, this.speed, this.lifetime)
     );
   }
 }

@@ -1,7 +1,7 @@
 import type { Game } from '../../Game';
 import { Weapon } from '../item';
 import { LivingEntity } from './LivingEntity';
-import * as Items from '../item';
+import * as Weapons from '../item/weapons';
 import { ItemSelect } from '../../ui/components/';
 import { randomInt } from '../../utils/random';
 
@@ -93,16 +93,11 @@ export class Player extends LivingEntity {
       this.level++;
       console.log(`Level Up! Current level: ${this.level}`); // PLACEHOLDER
 
-      const weaponClasses = Object.values(Items).filter((ItemClass) => {
-        try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const instance = new (ItemClass as any)(this.game);
-          return instance.attack && instance instanceof Weapon;
-        } catch {
-          return false;
-        }
-      }) as (new (game: Game) => Weapon)[];
-
+      const weaponClasses = Object.values(Weapons).filter(
+        (ItemClass): ItemClass is new (game: Game) => Weapon =>
+          typeof ItemClass === 'function' &&
+          ItemClass.prototype instanceof Weapon
+      );
       if (weaponClasses.length === 0) return;
 
       const choices: (new (game: Game) => Weapon)[] = [];

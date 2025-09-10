@@ -10,8 +10,6 @@
 
 # Install
 
-> > > > > > > Stashed changes
-
 ```
 npm install
 ```
@@ -22,15 +20,11 @@ or
 pnpm install
 ```
 
-<<<<<<< Updated upstream
-
 ## Run
 
 =======
 
 # Run
-
-> > > > > > > Stashed changes
 
 ```
 npm run dev
