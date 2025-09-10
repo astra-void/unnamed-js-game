@@ -24,20 +24,19 @@ const App = () => {
     if (!canvasRef.current) return;
 
     setGame(new Game(canvasRef.current));
-    console.log(game);
 
     game?.start();
   };
 
   return (
-    <div className="relative w-[1000px] h-[800px]">
+    <div className="relative w-[1200px] h-[1000px]">
       <button className="w-full bg-indigo-500" onClick={handleClick}>
         start
       </button>
       <canvas
         ref={canvasRef}
-        width={1000}
-        height={800}
+        width={1200}
+        height={1000}
         className="border rounded-lg border-gray-600 bg-black"
       />
       {ui.domComponents.map((Component, idx) => (

@@ -4,6 +4,7 @@ import { Item } from './Item';
 export abstract class Weapon extends Item {
   game: Game;
   level: number;
+  maxLevel: number;
   currentCooldown: number;
   cooldown: number;
   damage: number;
@@ -14,6 +15,7 @@ export abstract class Weapon extends Item {
     name: string,
     game: Game,
     level = 1,
+    maxLevel = 5,
     cooldown: number,
     damage: number,
     speed?: number,
@@ -22,6 +24,7 @@ export abstract class Weapon extends Item {
     super(name);
     this.game = game;
     this.level = level;
+    this.maxLevel = maxLevel;
     this.currentCooldown = cooldown;
     this.cooldown = cooldown;
     this.damage = damage;
@@ -30,4 +33,5 @@ export abstract class Weapon extends Item {
   }
 
   abstract attack(x: number, y: number): void;
+  abstract levelUp(): boolean;
 }

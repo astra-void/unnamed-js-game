@@ -17,6 +17,7 @@ export class Game {
   mouseX: number = 0;
   mouseY: number = 0;
   ui: UIManager;
+  paused = false;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -65,7 +66,20 @@ export class Game {
 
   stop() {}
 
+  togglePause() {
+    this.paused = !this.paused;
+  }
+
   loop(timestamp: number) {
+    if (this.paused) {
+      requestAnimationFrame(this.loop);
+      return;
+    }
+
+    if (this.lastTime === 0) {
+      this.lastTime = timestamp;
+    }
+
     const dt = (timestamp - this.lastTime) / 1000;
     this.lastTime = timestamp;
 
@@ -80,10 +94,11 @@ export class Game {
   }
 
   update(dt: number) {
+    if (this.paused) return;
+
     this.player.update(dt);
     this.ui.update(dt);
 
-    // All projectiles update
     this.projectiles.forEach((p) => p.update(dt));
 
     // Enemy spawn

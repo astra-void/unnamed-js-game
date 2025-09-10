@@ -30,7 +30,7 @@ export class TestProjectile extends Projectile {
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.fillStyle = 'rgba(0, 255, 0, 0.3)';
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, 90);
     ctx.fill();

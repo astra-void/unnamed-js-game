@@ -94,9 +94,13 @@ export class Player extends LivingEntity {
       console.log(`Level Up! Current level: ${this.level}`); // PLACEHOLDER
 
       const weaponClasses = Object.values(Weapons).filter(
-        (ItemClass): ItemClass is new (game: Game) => Weapon =>
-          typeof ItemClass === 'function' &&
-          ItemClass.prototype instanceof Weapon
+        (item): item is new (game: Game) => Weapon => {
+          return (
+            typeof item === 'function' &&
+            item.prototype &&
+            item.prototype instanceof Weapon
+          );
+        }
       );
       if (weaponClasses.length === 0) return;
 
@@ -104,19 +108,29 @@ export class Player extends LivingEntity {
       const pool = [...weaponClasses];
       while (choices.length < 3 && pool.length > 0) {
         const index = randomInt(pool.length);
-        choices.push(pool.splice(index, 1)[0]);
+        const selected = pool.splice(index, 1);
+        if (selected.length > 0) {
+          choices.push(selected[0]);
+        }
       }
 
+      this.game.togglePause();
+
       const itemSelect = new ItemSelect(choices, this.game, (weapon) => {
-        if (!this.weapons.some((w) => w.constructor === weapon.constructor)) {
+        const existingWeapon = this.weapons.find(
+          (w) => w.constructor === weapon.constructor
+        );
+
+        if (existingWeapon) {
+          existingWeapon.levelUp();
+        } else {
           this.weapons.push(weapon);
         }
+
         this.game.ui.removeCanvasUI(itemSelect);
       });
 
       this.game.ui.addCanvasUI(itemSelect);
-
-      console.log(this.weapons); /* FOR DEBUG */
     }
   }
 

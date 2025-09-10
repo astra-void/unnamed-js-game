@@ -4,6 +4,7 @@ import { Game } from '../../../Game';
 
 interface Choice {
   weaponClass: new (game: Game) => Weapon;
+  name: string;
   x: number;
   y: number;
   width: number;
@@ -37,9 +38,12 @@ export class ItemSelect extends UIComponent {
       (this.canvas.width - total * buttonWidth - (total - 1) * spacing) / 2;
     const y = this.canvas.height / 2 - buttonHeight / 2;
 
-    weaponClasses.forEach((weaponClass, i) => {
+    weaponClasses.forEach((WeaponClass, i) => {
+      const tempWeapon = new WeaponClass(game);
+
       this.choices.push({
-        weaponClass,
+        weaponClass: WeaponClass,
+        name: tempWeapon.name,
         x: startX + i * (buttonWidth + spacing),
         y,
         width: buttonWidth,
@@ -109,7 +113,7 @@ export class ItemSelect extends UIComponent {
       ctx.textBaseline = 'middle';
 
       ctx.fillText(
-        new choice.weaponClass(this.game).name,
+        choice.name,
         choice.x + choice.width / 2,
         choice.y + choice.height / 2
       );

@@ -4,7 +4,7 @@ import { Weapon } from '.././Weapon';
 
 export class Knife extends Weapon {
   constructor(game: Game) {
-    super('Knife', game, 1, 0.25, 10, 50, 5);
+    super('Knife', game, 1, 5, 0.25, 10, 50, 5);
   }
 
   use?(): void {} /* empty */
@@ -22,5 +22,19 @@ export class Knife extends Weapon {
     this.game.projectiles.push(
       new KnifeProjectile(x, y, vx, vy, this.damage, this.speed, this.lifetime)
     );
+  }
+
+  levelUp(): boolean {
+    if (this.level < this.maxLevel) {
+      this.level++;
+
+      /**
+       * 대충 여기 안에다가 레벌입 로직 넣어라
+       */
+
+      return true;
+    } else {
+      return false;
+    }
   }
 }
