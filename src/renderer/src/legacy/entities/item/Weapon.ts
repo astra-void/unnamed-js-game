@@ -1,4 +1,4 @@
-import type { Game } from '../../Game';
+import type { Game } from '../../../legacy/Game';
 import { Item } from './Item';
 
 export abstract class Weapon extends Item {

@@ -1,4 +1,4 @@
-import type { Entity } from '../entities/Entity';
+import type { Entity } from '../../game/entities/Entity';
 
 /**
  * 대충 두 엔티티 사이 거리 구하는 함수

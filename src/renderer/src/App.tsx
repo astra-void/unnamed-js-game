@@ -1,49 +1,34 @@
-import { useUIManager } from './ui';
-import { useEffect, useRef, useState } from 'react';
-import TestUI from './ui/components/react/TestUI';
-import { Game } from './Game';
+import { useRef } from 'react';
+import { type IRefPhaserGame, PhaserGame } from './PhaserGame';
+import { MainMenu } from './game/scenes/MainMenu';
 
-const App = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [game, setGame] = useState<Game | null>(null);
-  const ui = useUIManager();
+function App() {
+  const phaserRef = useRef<IRefPhaserGame | null>(null);
 
-  useEffect(() => {
-    if (!canvasRef.current) return;
-    setGame(new Game(canvasRef.current));
+  const changeScene = () => {
+    if (phaserRef.current) {
+      const scene = phaserRef.current.scene as MainMenu;
 
-    game?.start();
-
-    ui.addDOMUI(<TestUI />);
-
-    return () => game?.stop();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleClick = () => {
-    if (!canvasRef.current) return;
-
-    setGame(new Game(canvasRef.current));
-
-    game?.start();
+      if (scene) {
+        scene.changeScene();
+      }
+    }
   };
 
+  const currentScene = (_scene: Phaser.Scene) => {};
+
   return (
-    <div className="relative w-[1200px] h-[1000px]">
-      <button className="w-full bg-indigo-500" onClick={handleClick}>
-        start
-      </button>
-      <canvas
-        ref={canvasRef}
-        width={1200}
-        height={1000}
-        className="border rounded-lg border-gray-600 bg-black"
-      />
-      {ui.domComponents.map((Component, idx) => (
-        <div key={idx}>{Component}</div>
-      ))}
+    <div id="app">
+      <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
+      <div>
+        <div>
+          <button className="button" onClick={changeScene}>
+            Change Scene
+          </button>
+        </div>
+      </div>
     </div>
   );
-};
+}
 
 export default App;

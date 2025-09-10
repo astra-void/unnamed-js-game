@@ -16,6 +16,25 @@ export default defineConfig({
         '@renderer': resolve('src/renderer/src')
       }
     },
-    plugins: [react(), tailwindcss()]
+    plugins: [react(), tailwindcss()],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            phaser: ['phaser']
+          }
+        }
+      },
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          passes: 2
+        },
+        mangle: true,
+        format: {
+          comments: false
+        }
+      }
+    }
   }
 });

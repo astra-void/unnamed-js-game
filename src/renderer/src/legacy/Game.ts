@@ -1,5 +1,5 @@
 import { Player, Projectile, Enemy } from './entities';
-import { Knife } from './entities/item/weapons';
+import { Knife } from '../game/entities/item/weapons';
 import { GameOver, HealthBar } from './ui';
 import { UIManager } from './ui/UIManager';
 import { checkCollision, distance } from './utils';

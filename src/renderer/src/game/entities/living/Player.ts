@@ -1,78 +1,61 @@
-import type { Game } from '../../Game';
-import { Weapon } from '../item';
+import { Weapon } from '../../../game/entities/item';
 import { LivingEntity } from './LivingEntity';
-import * as Weapons from '../item/weapons';
-import { ItemSelect } from '../../ui/components/';
-import { randomInt } from '../../utils/random';
 
 /**
  * Player 클래스
  * 플레이어 캐릭터 나타내는 클래스임
  */
 export class Player extends LivingEntity {
-  radius: number;
   speed: number;
   exp: number;
   level: number;
   weapons: Weapon[];
   fireCooldown: number;
-  game: Game;
+  cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+  keys: Record<string, Phaser.Input.Keyboard.Key>;
 
-  /**
-   *
-   * @param x
-   * @param y
-   * @param maxHp
-   * @param radius
-   * @param speed
-   * @param exp
-   * @param level
-   * @param weapons
-   * @param game
-   * @constructor
-   */
   constructor(
+    scene: Phaser.Scene,
     x: number,
     y: number,
     maxHp: number,
-    radius = 16,
     speed = 200,
     exp = 0,
     level = 1,
-    weapons: Weapon[],
-    game: Game
+    weapons: Weapon[]
   ) {
-    super(x, y, maxHp);
-    this.radius = radius;
+    super(scene, x, y, 'player', maxHp);
     this.speed = speed;
     this.exp = exp;
     this.level = level;
     this.weapons = weapons;
-    this.game = game;
     this.fireCooldown = 0;
+
+    scene.physics.add.existing(this.sprite);
+    (this.sprite.body as Phaser.Physics.Arcade.Body).setCollideWorldBounds(
+      true
+    );
+
+    this.cursors = scene.input.keyboard!.createCursorKeys();
+    this.keys = {
+      w: scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+      a: scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+      s: scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.S),
+      d: scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.D)
+    };
   }
 
-  /**
-   * 상태 업데이트
-   * @param dt - 프레임 간 시간(초)
-   */
-  update(dt: number): void {
-    if (this.game.keys['w'] || this.game.keys['ArrowUp'])
-      this.y -= this.speed * dt;
-    if (this.game.keys['s'] || this.game.keys['ArrowDown'])
-      this.y += this.speed * dt;
-    if (this.game.keys['a'] || this.game.keys['ArrowLeft'])
-      this.x -= this.speed * dt;
-    if (this.game.keys['d'] || this.game.keys['ArrowRight'])
-      this.x += this.speed * dt;
+  update(_time: number, delta: number): void {
+    const dt = delta / 1000;
+    let vx = 0;
+    let vy = 0;
 
-    const radius = this.radius;
-    const canvas = this.game.canvas;
+    if (this.keys.w.isDown || this.cursors.up.isDown) vy = -this.speed;
+    if (this.keys.s.isDown || this.cursors.down.isDown) vy = this.speed;
+    if (this.keys.a.isDown || this.cursors.left.isDown) vx = -this.speed;
+    if (this.keys.d.isDown || this.cursors.right.isDown) vx = this.speed;
 
-    if (this.x < radius) this.x = radius;
-    if (this.x > canvas.width - radius) this.x = canvas.width - radius;
-    if (this.y < radius) this.y = radius;
-    if (this.y > canvas.height - radius) this.y = canvas.height - radius;
+    (this.sprite.body as Phaser.Physics.Arcade.Body).setVelocity(vx, vy);
 
     for (const weapon of this.weapons) {
       weapon.currentCooldown -= dt;
@@ -80,7 +63,7 @@ export class Player extends LivingEntity {
       if (weapon.currentCooldown <= 0) {
         weapon.currentCooldown += weapon.cooldown;
 
-        weapon.attack(this.x, this.y);
+        weapon.attack();
       }
     }
   }
@@ -93,6 +76,7 @@ export class Player extends LivingEntity {
       this.level++;
       console.log(`Level Up! Current level: ${this.level}`); // PLACEHOLDER
 
+      /*
       const weaponClasses = Object.values(Weapons).filter(
         (item): item is new (game: Game) => Weapon => {
           return (
@@ -132,12 +116,7 @@ export class Player extends LivingEntity {
 
       this.game.ui.addCanvasUI(itemSelect);
     }
-  }
-
-  draw(ctx: CanvasRenderingContext2D): void {
-    ctx.fillStyle = 'rgb(255, 255, 255)';
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    ctx.fill();
+    */
+    }
   }
 }

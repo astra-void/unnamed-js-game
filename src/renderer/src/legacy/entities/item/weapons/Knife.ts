@@ -1,6 +1,6 @@
-import type { Game } from '../../../Game';
-import { KnifeProjectile } from '../../projectiles';
-import { Weapon } from '.././Weapon';
+import type { Game } from '../../../../legacy/Game';
+import { KnifeProjectile } from '../../../../game/entities/projectiles';
+import { Weapon } from '../Weapon';
 
 export class Knife extends Weapon {
   constructor(game: Game) {

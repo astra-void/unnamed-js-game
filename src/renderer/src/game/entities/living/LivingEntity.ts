@@ -1,4 +1,4 @@
-import { Entity } from '../Entity';
+import { Entity } from '../../../game/entities/Entity';
 
 /**
  * LivingEntity는 HP 가지는 엔티티의 추상 클래스임
@@ -15,8 +15,14 @@ export abstract class LivingEntity extends Entity {
    * @param maxHp - 최대 체력
    * @constructor
    */
-  constructor(x: number, y: number, maxHp: number) {
-    super(x, y);
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    texture: string,
+    maxHp: number
+  ) {
+    super(scene, x, y, texture);
     this.maxHp = maxHp;
     this.hp = maxHp;
   }
@@ -42,7 +48,8 @@ export abstract class LivingEntity extends Entity {
 
   /**
    * 죽음 처리 (오버라이드 가능)
-   * 엔티티 죽었을 때 호출됨
    */
-  protected onDeath() {}
+  protected onDeath() {
+    this.destroy();
+  }
 }

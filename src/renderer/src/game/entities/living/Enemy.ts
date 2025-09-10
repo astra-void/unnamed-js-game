@@ -1,3 +1,4 @@
+/*
 import { LivingEntity } from './LivingEntity';
 
 export class Enemy extends LivingEntity {
@@ -6,17 +7,6 @@ export class Enemy extends LivingEntity {
   damage: number;
   target: LivingEntity;
 
-  /**
-   *
-   * @param x
-   * @param y
-   * @param maxHp
-   * @param radius
-   * @param speed
-   * @param damage
-   * @param target
-   * @constructor
-   */
   constructor(
     x: number,
     y: number,
@@ -49,3 +39,4 @@ export class Enemy extends LivingEntity {
     ctx.fill();
   }
 }
+*/
