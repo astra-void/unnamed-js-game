@@ -2,12 +2,6 @@
 
 > This project is builded with pnpm.
 
-<<<<<<< Updated upstream
-
-## Install
-
-=======
-
 # Install
 
 ```
@@ -19,10 +13,6 @@ or
 ```
 pnpm install
 ```
-
-## Run
-
-=======
 
 # Run
 
