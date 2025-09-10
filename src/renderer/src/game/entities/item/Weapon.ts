@@ -23,7 +23,7 @@ export abstract class Weapon extends Item {
     level = 1,
     maxLevel = 5,
     speed?: number,
-    lifetime?: number,
+    lifetime?: number
   ) {
     super(name);
     this.scene = scene;
@@ -35,7 +35,7 @@ export abstract class Weapon extends Item {
     this.speed = speed;
     this.lifetime = lifetime;
 
-    this.sprite = scene.add.sprite(x, y, "1");
+    this.sprite = scene.add.sprite(x, y, '1');
     scene.physics.add.existing(this.sprite);
     this.body = this.sprite.body as Physics.Arcade.Body;
 

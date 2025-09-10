@@ -5,7 +5,7 @@ import { MainMenu } from './game/scenes/MainMenu';
 function App() {
   const phaserRef = useRef<IRefPhaserGame | null>(null);
 
-  const changeScene = () => {
+  const _changeScene = () => {
     if (phaserRef.current) {
       const scene = phaserRef.current.scene as MainMenu;
 
@@ -20,13 +20,6 @@ function App() {
   return (
     <div id="app">
       <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
-      <div>
-        <div>
-          <button className="button" onClick={changeScene}>
-            Change Scene
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

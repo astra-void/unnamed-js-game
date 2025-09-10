@@ -42,7 +42,7 @@ export class Game extends Scene {
 
     this.projectiles.getChildren().forEach((proj) => {
       if (proj.update) proj.update(time, delta);
-    })
+    });
   }
 
   changeScene() {

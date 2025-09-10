@@ -25,7 +25,16 @@ export class Test2 extends Weapon {
     const vx = (dx / len) * this.speed;
     const vy = (dy / len) * this.speed;
 
-    const proj = new TestProjectile(this.scene, this.player.x, this.player.y, vx, vy, this.damage, this.speed, this.lifetime);
+    const proj = new TestProjectile(
+      this.scene,
+      this.player.x,
+      this.player.y,
+      vx,
+      vy,
+      this.damage,
+      this.speed,
+      this.lifetime
+    );
     if (this.scene instanceof Game) this.scene.projectiles.add(proj.sprite);
   }
 
