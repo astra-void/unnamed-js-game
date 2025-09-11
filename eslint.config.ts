@@ -34,7 +34,7 @@ export default defineConfig([
           varsIgnorePattern: '^_'
         }
       ],
-      indent: ['error', 2]
+      indent: ['error', 2, { SwitchCase: 1 }]
     }
   }
 ]);
