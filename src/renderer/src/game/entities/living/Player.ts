@@ -1,5 +1,9 @@
 import { Weapon } from '../../../game/entities/item';
+import { randomInt } from '../../utils/random';
 import { LivingEntity } from './LivingEntity';
+import * as Weapons from "../item/weapons";
+import { ItemSelect, WeaponConstructor } from '../../ui/components/ItemSelect';
+import { Game } from '../../scenes/Game';
 
 /**
  * Player 클래스
@@ -55,7 +59,8 @@ export class Player extends LivingEntity {
     if (this.keys.a.isDown || this.cursors.left.isDown) vx = -this.speed;
     if (this.keys.d.isDown || this.cursors.right.isDown) vx = this.speed;
 
-    (this.sprite.body as Phaser.Physics.Arcade.Body).setVelocity(vx, vy);
+    if (this.sprite.body instanceof Phaser.Physics.Arcade.Body)
+      this.sprite.body.setVelocity(vx, vy);
 
     for (const weapon of this.weapons) {
       weapon.currentCooldown -= dt;
@@ -76,19 +81,18 @@ export class Player extends LivingEntity {
       this.level++;
       console.log(`Level Up! Current level: ${this.level}`); // PLACEHOLDER
 
-      /*
       const weaponClasses = Object.values(Weapons).filter(
-        (item): item is new (game: Game) => Weapon => {
+        (item) => {
           return (
             typeof item === 'function' &&
             item.prototype &&
             item.prototype instanceof Weapon
           );
         }
-      );
+      ) as WeaponConstructor[];
       if (weaponClasses.length === 0) return;
 
-      const choices: (new (game: Game) => Weapon)[] = [];
+      const choices: WeaponConstructor[] = [];
       const pool = [...weaponClasses];
       while (choices.length < 3 && pool.length > 0) {
         const index = randomInt(pool.length);
@@ -98,12 +102,10 @@ export class Player extends LivingEntity {
         }
       }
 
-      this.game.togglePause();
+      if (this.scene instanceof Game) this.scene.togglePuase();
 
-      const itemSelect = new ItemSelect(choices, this.game, (weapon) => {
-        const existingWeapon = this.weapons.find(
-          (w) => w.constructor === weapon.constructor
-        );
+      const itemSelect = new ItemSelect(this.scene, this, choices, (weapon) => {
+        const existingWeapon = this.weapons.find(w => w.constructor === weapon.constructor);
 
         if (existingWeapon) {
           existingWeapon.levelUp();
@@ -111,12 +113,16 @@ export class Player extends LivingEntity {
           this.weapons.push(weapon);
         }
 
-        this.game.ui.removeCanvasUI(itemSelect);
+        itemSelect.destroy();
       });
 
-      this.game.ui.addCanvasUI(itemSelect);
+      this.scene.add.existing(itemSelect as unknown as Phaser.GameObjects.GameObject);
     }
-    */
-    }
+  }
+
+  protected onDeath(): void {
+    this.destroy();
+
+    this.scene.scene.start('GameOver');
   }
 }

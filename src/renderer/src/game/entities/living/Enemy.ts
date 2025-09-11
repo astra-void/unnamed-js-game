@@ -1,42 +1,46 @@
-/*
 import { LivingEntity } from './LivingEntity';
+import { Player } from './Player';
 
 export class Enemy extends LivingEntity {
-  radius: number;
   speed: number;
   damage: number;
   target: LivingEntity;
 
   constructor(
+    scene: Phaser.Scene,
     x: number,
     y: number,
     maxHp: number,
-    radius = 12,
-    speed = 200,
     damage: number,
+    speed = 200,
     target: LivingEntity
   ) {
-    super(x, y, maxHp);
-    this.radius = radius;
-    this.speed = speed;
+    super(scene, x, y, 'enemy', maxHp);
+    this.hp = maxHp;
     this.damage = damage;
+    this.speed = speed;
     this.target = target;
+
+    scene.physics.add.existing(this.sprite);
+    (this.sprite.body as Phaser.Physics.Arcade.Body).setCollideWorldBounds(
+      true
+    );
   }
 
-  update(dt: number): void {
+  update(_time: number, _delta: number): void {
     const dx = this.target.x - this.x;
     const dy = this.target.y - this.y;
-    const dist = Math.hypot(dx, dy);
+    const dist = Math.hypot(dx, dy) || 1;
 
-    this.x += (dx / dist) * this.speed * dt;
-    this.y += (dy / dist) * this.speed * dt;
+    const vx = (dx / dist) * this.speed;
+    const vy = (dy / dist) * this.speed;
+
+    (this.sprite.body as Phaser.Physics.Arcade.Body).setVelocity(vx, vy);
   }
 
-  draw(ctx: CanvasRenderingContext2D): void {
-    ctx.fillStyle = 'rgb(255, 0, 0)';
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    ctx.fill();
+  protected onDeath(): void {
+    this.destroy();
+
+    if (this.target instanceof Player) this.target.gainExp(this.damage / 5);
   }
 }
-*/

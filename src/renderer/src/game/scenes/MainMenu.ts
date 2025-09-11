@@ -28,7 +28,7 @@ export class MainMenu extends Scene {
       this,
       512,
       560,
-      'Start Game',
+      'Start',
       {
         fontFamily: 'Arial',
         fontSize: '32px',

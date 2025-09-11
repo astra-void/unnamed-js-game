@@ -33,7 +33,7 @@ export abstract class LivingEntity extends Entity {
    */
   takeDamage(amount: number) {
     this.hp = Math.max(this.hp - amount, 0);
-    if (this.hp === 0) {
+    if (this.hp <= 0) {
       this.onDeath();
     }
   }

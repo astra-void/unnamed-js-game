@@ -21,7 +21,7 @@ export abstract class Entity {
     this.sprite.setPosition(x, y);
   }
 
-  abstract update(time: number, dt: number): void;
+  abstract update(time: number, delta: number): void;
 
   destroy() {
     this.sprite.destroy();

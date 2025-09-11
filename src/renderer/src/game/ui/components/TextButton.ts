@@ -27,7 +27,10 @@ export class TextButton extends Phaser.GameObjects.Text {
     this.setInteractive({ useHandCursor: true });
     scene.add.existing(this);
 
-    this.on('pointerdown', () => this.clickCallback?.());
+    this.on('pointerdown', () => {
+      this.clickCallback?.();
+      this.destroy();
+    });
     this.on('pointerover', () => this.setColor(this.hoverColor));
     this.on('pointerout', () => this.setColor(this.defaultColor));
   }

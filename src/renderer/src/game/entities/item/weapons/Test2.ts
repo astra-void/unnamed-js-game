@@ -8,7 +8,7 @@ export class Test2 extends Weapon {
   player: Player;
 
   constructor(scene: Scene, player: Player) {
-    super(scene, 'Test2', 1, 5, 0.25, 10, 50, 5);
+    super(scene, 'Test2', 0, 0, 0.1, 10, 1, 5, 300, 3);
     this.player = player;
   }
 
