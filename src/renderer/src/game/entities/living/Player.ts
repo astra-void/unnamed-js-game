@@ -1,9 +1,10 @@
-import { Weapon } from '../../../game/entities/item';
 import { randomInt } from '../../utils/random';
 import { LivingEntity } from './LivingEntity';
-import * as Weapons from "../item/weapons";
+import * as Weapons from '../../weapons';
 import { ItemSelect, WeaponConstructor } from '../../ui/components/ItemSelect';
 import { Game } from '../../scenes/Game';
+import { HealthBar } from '../../ui/components/HealthBar';
+import { Weapon } from '../../weapons';
 
 /**
  * Player 클래스
@@ -17,6 +18,7 @@ export class Player extends LivingEntity {
   fireCooldown: number;
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   keys: Record<string, Phaser.Input.Keyboard.Key>;
+  healthBar: HealthBar;
 
   constructor(
     scene: Phaser.Scene,
@@ -35,10 +37,17 @@ export class Player extends LivingEntity {
     this.weapons = weapons;
     this.fireCooldown = 0;
 
+    this.healthBar = new HealthBar(scene, x, y - 40, maxHp);
+
     scene.physics.add.existing(this.sprite);
     (this.sprite.body as Phaser.Physics.Arcade.Body).setCollideWorldBounds(
       true
     );
+
+    scene.events.on('postupdate', () => {
+      this.healthBar.setHealth(this.hp);
+      this.healthBar.setPosition(this.sprite.x, this.sprite.y - 40);
+    });
 
     this.cursors = scene.input.keyboard!.createCursorKeys();
     this.keys = {
@@ -81,15 +90,13 @@ export class Player extends LivingEntity {
       this.level++;
       console.log(`Level Up! Current level: ${this.level}`); // PLACEHOLDER
 
-      const weaponClasses = Object.values(Weapons).filter(
-        (item) => {
-          return (
-            typeof item === 'function' &&
-            item.prototype &&
-            item.prototype instanceof Weapon
-          );
-        }
-      ) as WeaponConstructor[];
+      const weaponClasses = Object.values(Weapons).filter((item) => {
+        return (
+          typeof item === 'function' &&
+          item.prototype &&
+          item.prototype instanceof Weapon
+        );
+      }) as WeaponConstructor[];
       if (weaponClasses.length === 0) return;
 
       const choices: WeaponConstructor[] = [];
@@ -105,7 +112,9 @@ export class Player extends LivingEntity {
       if (this.scene instanceof Game) this.scene.togglePuase();
 
       const itemSelect = new ItemSelect(this.scene, this, choices, (weapon) => {
-        const existingWeapon = this.weapons.find(w => w.constructor === weapon.constructor);
+        const existingWeapon = this.weapons.find(
+          (w) => w.constructor === weapon.constructor
+        );
 
         if (existingWeapon) {
           existingWeapon.levelUp();
@@ -113,16 +122,20 @@ export class Player extends LivingEntity {
           this.weapons.push(weapon);
         }
 
+        if (this.scene instanceof Game) this.scene.togglePuase();
         itemSelect.destroy();
       });
 
-      this.scene.add.existing(itemSelect as unknown as Phaser.GameObjects.GameObject);
+      this.scene.add.existing(
+        itemSelect as unknown as Phaser.GameObjects.GameObject
+      );
     }
   }
 
   protected onDeath(): void {
+    this.scene.events.off('postupdate');
+    this.healthBar.destroy();
     this.destroy();
-
     this.scene.scene.start('GameOver');
   }
 }

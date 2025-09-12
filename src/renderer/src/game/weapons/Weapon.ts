@@ -1,7 +1,7 @@
 import { GameObjects, Physics, Scene } from 'phaser';
-import { Item } from './Item';
 
-export abstract class Weapon extends Item {
+export abstract class Weapon {
+  name: string;
   scene: Scene;
   sprite: GameObjects.Sprite;
   body: Physics.Arcade.Body;
@@ -25,7 +25,7 @@ export abstract class Weapon extends Item {
     speed?: number,
     lifetime?: number
   ) {
-    super(name);
+    this.name = name;
     this.scene = scene;
     this.level = level;
     this.maxLevel = maxLevel;

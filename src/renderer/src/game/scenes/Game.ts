@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Knife } from '../entities/item/weapons';
+import { Knife } from '../weapons';
 import { Enemy } from '../entities/living/Enemy';
 import { Player } from '../entities/living/Player';
 import { Projectile } from '../entities/projectiles/Projectile';
@@ -76,15 +76,19 @@ export class Game extends Scene {
       this.projectiles,
       this.enemies,
       (projSprite, enemySprite) => {
-        const projectile = (projSprite as Phaser.GameObjects.Sprite & { entity: Projectile }).entity;
-        const enemy = (enemySprite as Phaser.GameObjects.Sprite & { entity: Enemy }).entity;
+        const projectile = (
+          projSprite as Phaser.GameObjects.Sprite & { entity: Projectile }
+        ).entity;
+        const enemy = (
+          enemySprite as Phaser.GameObjects.Sprite & { entity: Enemy }
+        ).entity;
 
         projectile.onHit(enemy);
         enemy.takeDamage(projectile.damage);
 
         projectile.destroy();
       }
-    )
+    );
 
     EventBus.emit('current-scene-ready', this);
   }

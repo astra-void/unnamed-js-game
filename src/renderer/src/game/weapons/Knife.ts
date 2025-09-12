@@ -1,8 +1,8 @@
 import { Scene } from 'phaser';
-import { Weapon } from '../Weapon';
-import { Player } from '../../living/Player';
-import { KnifeProjectile } from '../../projectiles/KnifeProjectile';
-import { Game } from '../../../scenes/Game';
+import { Player } from '../entities/living';
+import { Weapon } from './Weapon';
+import { KnifeProjectile } from '../entities/projectiles';
+import { Game } from '../scenes/Game';
 
 export class Knife extends Weapon {
   player: Player;

@@ -1,9 +1,12 @@
 import { Scene } from 'phaser';
 import { TextButton } from './TextButton';
-import { Weapon } from '../../entities/item';
+import { Weapon } from '../../weapons';
 import { Player } from '../../entities/living';
 
-export type WeaponConstructor = new (scene: Phaser.Scene, player: Player) => Weapon;
+export type WeaponConstructor = new (
+  scene: Phaser.Scene,
+  player: Player
+) => Weapon;
 
 interface Choice {
   weaponClass: WeaponConstructor;
@@ -45,7 +48,7 @@ export class ItemSelect {
         tempWeapon.name,
         {
           fontSize: '16px',
-          fontStyle: 'bold',
+          fontStyle: 'bold'
         },
         {
           textColor: 'white',
@@ -54,7 +57,7 @@ export class ItemSelect {
             const weapon = new WeaponClass(scene, player);
             this.onSelect(weapon);
             this.destroy();
-          },
+          }
         }
       );
 
@@ -63,7 +66,7 @@ export class ItemSelect {
       this.choices.push({
         weaponClass: WeaponClass,
         name: tempWeapon.name,
-        button: btn,
+        button: btn
       });
     });
   }

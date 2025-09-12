@@ -7,14 +7,14 @@ import { Preloader } from './scenes/Preloader';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: AUTO,
-  width: 1024,
-  height: 768,
+  width: import.meta.env.VITE_WIDTH,
+  height: import.meta.env.VITE_HEIGHT,
   physics: {
     default: 'arcade',
     arcade: {
       gravity: { x: 0, y: 0 },
-      debug: true,
-    },
+      debug: true
+    }
   },
   parent: 'game-container',
   backgroundColor: '#000000',

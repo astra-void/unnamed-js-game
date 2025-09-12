@@ -1,9 +1,18 @@
-export abstract class Item {
-  name: string;
+import Phaser from "phaser";
+import type { Player } from "../../entities/living";
 
-  constructor(name: string) {
-    this.name = name;
+export abstract class Item {
+  scene: Phaser.Scene;
+  player: Player;
+  level: number;
+
+  constructor(scene: Phaser.Scene, player: Player) {
+    this.scene = scene;
+    this.player = player;
+    this.level = 1;
   }
 
-  abstract use?(): void;
+  abstract applyEffect(): void;
+
+  abstract gainExp(amount: number): void;
 }

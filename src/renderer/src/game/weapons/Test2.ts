@@ -1,14 +1,14 @@
 import { Scene } from 'phaser';
-import { Weapon } from '../Weapon';
-import { Player } from '../../living/Player';
-import { TestProjectile } from '../../projectiles/TestProjectile';
-import { Game } from '../../../scenes/Game';
+import { Player } from '../entities/living';
+import { Weapon } from './Weapon';
+import { TestProjectile } from '../entities/projectiles';
+import { Game } from '../scenes/Game';
 
-export class Test extends Weapon {
+export class Test2 extends Weapon {
   player: Player;
 
   constructor(scene: Scene, player: Player) {
-    super(scene, 'Test', 0, 0, 0.1, 10, 1, 5, 300, 3);
+    super(scene, 'Test2', 0, 0, 0.1, 10, 1, 5, 300, 3);
     this.player = player;
   }
 
