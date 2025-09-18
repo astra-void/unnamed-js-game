@@ -1,10 +1,13 @@
-import { randomInt } from '../../utils/random';
 import { LivingEntity } from './LivingEntity';
 import * as Weapons from '../../weapons';
-import { ItemSelect, WeaponConstructor } from '../../ui/components/ItemSelect';
+import * as Items from '../../items';
 import { Game } from '../../scenes/Game';
 import { HealthBar } from '../../ui/components/HealthBar';
 import { Weapon } from '../../weapons';
+import { Item } from '../../items';
+import { GAME_CONFIG } from '../../constants';
+import { SelectionPanel } from '../../ui/components/SelectionPanel';
+import { WeaponConstructor, ItemConstructor } from '../../types/constructors';
 
 /**
  * Player 클래스
@@ -15,39 +18,49 @@ export class Player extends LivingEntity {
   exp: number;
   level: number;
   weapons: Weapon[];
-  fireCooldown: number;
+  items: Item[];
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   keys: Record<string, Phaser.Input.Keyboard.Key>;
-  healthBar: HealthBar;
 
   constructor(
     scene: Phaser.Scene,
     x: number,
     y: number,
     maxHp: number,
-    speed = 200,
     exp = 0,
     level = 1,
-    weapons: Weapon[]
+    weapons: Weapon[] = [],
+    items: Item[] = []
   ) {
     super(scene, x, y, 'player', maxHp);
-    this.speed = speed;
+    this.speed = GAME_CONFIG.PLAYER.DEFAULT_SPEED;
     this.exp = exp;
     this.level = level;
     this.weapons = weapons;
-    this.fireCooldown = 0;
+    this.items = items;
 
-    this.healthBar = new HealthBar(scene, x, y - 40, maxHp);
+    const healthBar = new HealthBar(
+      scene,
+      x,
+      y - GAME_CONFIG.PLAYER.HEALTH_BAR_OFFSET,
+      maxHp
+    );
+    this.scene.uiManager.addUI({
+      id: 'health-bar',
+      object: healthBar,
+      update: () => {
+        healthBar.setPosition(
+          this.x,
+          this.y - GAME_CONFIG.PLAYER.HEALTH_BAR_OFFSET
+        );
+        healthBar.setHealth(this.hp);
+      }
+    });
 
     scene.physics.add.existing(this.sprite);
     (this.sprite.body as Phaser.Physics.Arcade.Body).setCollideWorldBounds(
       true
     );
-
-    scene.events.on('postupdate', () => {
-      this.healthBar.setHealth(this.hp);
-      this.healthBar.setPosition(this.sprite.x, this.sprite.y - 40);
-    });
 
     this.cursors = scene.input.keyboard!.createCursorKeys();
     this.keys = {
@@ -58,7 +71,7 @@ export class Player extends LivingEntity {
     };
   }
 
-  update(_time: number, delta: number): void {
+  update(time: number, delta: number): void {
     const dt = delta / 1000;
     let vx = 0;
     let vy = 0;
@@ -70,6 +83,8 @@ export class Player extends LivingEntity {
 
     if (this.sprite.body instanceof Phaser.Physics.Arcade.Body)
       this.sprite.body.setVelocity(vx, vy);
+
+    this.items.forEach((item) => item.update(this, time, delta));
 
     for (const weapon of this.weapons) {
       weapon.currentCooldown -= dt;
@@ -83,58 +98,125 @@ export class Player extends LivingEntity {
   }
 
   gainExp(amount: number) {
+    if (amount <= 0) return;
+
     this.exp += amount;
 
-    while (this.exp >= this.level * 25) {
-      this.exp -= this.level * 25;
-      this.level++;
-      console.log(`Level Up! Current level: ${this.level}`); // PLACEHOLDER
+    const expNeeded = this.level * GAME_CONFIG.EXP_MULTIPLIER;
 
-      const weaponClasses = Object.values(Weapons).filter((item) => {
-        return (
-          typeof item === 'function' &&
-          item.prototype &&
-          item.prototype instanceof Weapon
-        );
-      }) as WeaponConstructor[];
-      if (weaponClasses.length === 0) return;
+    while (this.exp >= expNeeded) {
+      this.exp -= expNeeded;
+      this.levelUp();
+    }
+  }
 
-      const choices: WeaponConstructor[] = [];
-      const pool = [...weaponClasses];
-      while (choices.length < 3 && pool.length > 0) {
-        const index = randomInt(pool.length);
-        const selected = pool.splice(index, 1);
-        if (selected.length > 0) {
-          choices.push(selected[0]);
-        }
+  private levelUp(): void {
+    this.level++;
+
+    console.log(`Level Up! Current level: ${this.level}`); // DEBUG
+
+    const weaponClasses = Object.values(Weapons).filter((weapon) => {
+      if (
+        typeof weapon !== 'function' ||
+        !weapon.prototype ||
+        !(weapon.prototype instanceof Weapon)
+      )
+        return false;
+
+      const temp = new (weapon as WeaponConstructor)(this.scene, this);
+      const existing = this.weapons.find((w) => w.name === temp.name);
+      return !existing || !existing.isMaxLevel;
+    }) as WeaponConstructor[];
+
+    const itemClasses = Object.values(Items).filter((item) => {
+      if (
+        typeof item !== 'function' ||
+        !item.prototype ||
+        !(item.prototype instanceof Item)
+      )
+        return false;
+
+      const temp = new (item as ItemConstructor)(this);
+      const existing = this.items.find((i) => i.name === temp.name);
+      return !existing || !existing.isMaxLevel;
+    }) as ItemConstructor[];
+
+    if (weaponClasses.length === 0 && itemClasses.length === 0) return;
+
+    let pool = [
+      ...weaponClasses.map((ctor) => ({ kind: 'weapon', ctor })),
+      ...itemClasses.map((ctor) => ({ kind: 'item', ctor }))
+    ];
+    const originalPool = [...pool];
+
+    const selectedWeapons: WeaponConstructor[] = [];
+    const selectedItems: ItemConstructor[] = [];
+
+    while (selectedWeapons.length + selectedItems.length < 3) {
+      if (pool.length === 0) {
+        if (originalPool.length === 0) break;
+        pool = [...originalPool];
       }
 
-      if (this.scene instanceof Game) this.scene.togglePuase();
+      const index = Phaser.Math.Between(0, pool.length - 1);
+      const choice = pool.splice(index, 1)[0];
+      if (!choice) break;
 
-      const itemSelect = new ItemSelect(this.scene, this, choices, (weapon) => {
-        const existingWeapon = this.weapons.find(
-          (w) => w.constructor === weapon.constructor
-        );
+      const { kind, ctor } = choice;
+      if (kind === 'weapon') {
+        selectedWeapons.push(ctor as WeaponConstructor);
+      } else {
+        selectedItems.push(ctor as ItemConstructor);
+      }
+    }
 
-        if (existingWeapon) {
-          existingWeapon.levelUp();
+    if (selectedWeapons.length + selectedItems.length === 0) return;
+
+    if (this.scene instanceof Game) this.scene.togglePause();
+
+    const itemSelect = new SelectionPanel(
+      this.scene,
+      this,
+      selectedWeapons,
+      selectedItems,
+      (weapon) => {
+        const existing = this.weapons.find((w) => w.name === weapon.name);
+        if (existing) {
+          existing.levelUp();
+          weapon.destroy();
         } else {
           this.weapons.push(weapon);
         }
 
-        if (this.scene instanceof Game) this.scene.togglePuase();
+        if (this.scene instanceof Game) this.scene.togglePause();
         itemSelect.destroy();
-      });
+      },
+      (item) => {
+        const existing = this.items.find((i) => i.name === item.name);
+        if (existing) {
+          existing.levelUp(this);
+        } else {
+          this.items.push(item);
+          item.applyEffect(this);
+        }
 
-      this.scene.add.existing(
-        itemSelect as unknown as Phaser.GameObjects.GameObject
-      );
-    }
+        if (this.scene instanceof Game) this.scene.togglePause();
+        itemSelect.destroy();
+      }
+    );
+
+    this.scene.uiManager.addUI({
+      id: 'item-select',
+      object: itemSelect
+    });
   }
 
   protected onDeath(): void {
-    this.scene.events.off('postupdate');
-    this.healthBar.destroy();
+    this.weapons.forEach((weapon) => weapon.destroy());
+    this.weapons = [];
+    this.items = [];
+
+    this.scene.uiManager.clear();
     this.destroy();
     this.scene.scene.start('GameOver');
   }

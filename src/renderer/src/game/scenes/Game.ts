@@ -1,17 +1,19 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Knife } from '../weapons';
-import { Enemy } from '../entities/living/Enemy';
 import { Player } from '../entities/living/Player';
-import { Projectile } from '../entities/projectiles/Projectile';
 import { EventBus } from '../EventBus';
-import { Math, Scene } from 'phaser';
+import { Scene } from 'phaser';
+import { UIManager } from '../managers/UIManager';
+import { EnemyManager } from '../managers/EnemyManager';
+import { ProjectileManager } from '../managers/ProjectileManager';
 
 export class Game extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;
   gameText: Phaser.GameObjects.Text;
   player: Player;
-  enemies: Phaser.GameObjects.Group;
-  projectiles: Phaser.GameObjects.Group;
+  enemyManager: EnemyManager;
+  projectileManager: ProjectileManager;
+
+  declare uiManager: UIManager;
 
   spawnTimer: number = 0;
   spawnInterval: number = 2000;
@@ -54,41 +56,17 @@ export class Game extends Scene {
     this.camera = this.cameras.main;
     this.camera.setBackgroundColor(0x000000);
 
-    this.enemies = this.add.group();
-    this.projectiles = this.add.group();
+    this.uiManager = new UIManager(this);
 
-    this.player = new Player(this, 512, 384, 100, 200, 0, 1, []);
+    this.player = new Player(this, 512, 384, 100, 0, 1, [], []);
     this.player.weapons.push(new Knife(this, this.player));
+
+    this.enemyManager = new EnemyManager(this);
+    this.projectileManager = new ProjectileManager(this);
 
     this.physics.world.setBounds(0, 0, this.scale.width, this.scale.height);
 
-    this.physics.add.overlap(
-      this.player.sprite,
-      this.enemies,
-      (_playerSprite, enemySprite) => {
-        const enemy = (enemySprite as any).entity as Enemy;
-        this.player.takeDamage(enemy.damage);
-        enemy.takeDamage(enemy.maxHp);
-      }
-    );
-
-    this.physics.add.overlap(
-      this.projectiles,
-      this.enemies,
-      (projSprite, enemySprite) => {
-        const projectile = (
-          projSprite as Phaser.GameObjects.Sprite & { entity: Projectile }
-        ).entity;
-        const enemy = (
-          enemySprite as Phaser.GameObjects.Sprite & { entity: Enemy }
-        ).entity;
-
-        projectile.onHit(enemy);
-        enemy.takeDamage(projectile.damage);
-
-        projectile.destroy();
-      }
-    );
+    this.enemyManager.startSpawning();
 
     EventBus.emit('current-scene-ready', this);
   }
@@ -96,54 +74,14 @@ export class Game extends Scene {
   update(time: number, delta: number): void {
     if (this.paused) return;
 
+    this.uiManager.update(time, delta);
     this.player.update(time, delta);
 
-    this.spawnTimer += delta;
-    if (this.spawnTimer >= this.spawnInterval) {
-      this.spawnTimer = 0;
-      this.spawnEnemy();
-    }
-
-    this.enemies.getChildren().forEach((enemySprite) => {
-      const enemy = (enemySprite as any).entity as Enemy;
-      enemy.update(time, delta);
-    });
-
-    this.projectiles.getChildren().forEach((proj) => {
-      if (proj.update) proj.update(time, delta);
-    });
+    this.enemyManager.update(time, delta);
+    this.projectileManager.update(time, delta);
   }
 
-  spawnEnemy() {
-    const side = Math.Between(0, 3);
-    let x = 0;
-    let y = 0;
-
-    switch (side) {
-      case 0: // 위
-        x = Phaser.Math.Between(0, this.scale.width);
-        y = 0;
-        break;
-      case 1: // 아래
-        x = Phaser.Math.Between(0, this.scale.width);
-        y = this.scale.height;
-        break;
-      case 2: // 왼쪽
-        x = 0;
-        y = Phaser.Math.Between(0, this.scale.height);
-        break;
-      case 3: // 오른쪽
-        x = this.scale.width;
-        y = Phaser.Math.Between(0, this.scale.height);
-        break;
-    }
-
-    const enemy = new Enemy(this, x, y, 100, 10, 200, this.player);
-    (enemy.sprite as any).entity = enemy;
-    this.enemies.add(enemy.sprite);
-  }
-
-  togglePuase() {
+  togglePause() {
     this.paused = !this.paused;
 
     if (this.paused) {
@@ -151,5 +89,10 @@ export class Game extends Scene {
     } else {
       this.physics.world.resume();
     }
+  }
+
+  shutdown() {
+    if (this.enemyManager) this.enemyManager.destroy();
+    if (this.projectileManager) this.projectileManager.destroy();
   }
 }

@@ -1,3 +1,5 @@
+import { GAME_CONFIG } from '../../constants';
+
 export class HealthBar extends Phaser.GameObjects.Container {
   private bar: Phaser.GameObjects.Graphics;
   private background: Phaser.GameObjects.Graphics;
@@ -62,6 +64,7 @@ export class HealthBar extends Phaser.GameObjects.Container {
 
   setPositionTo(target: Phaser.GameObjects.Sprite) {
     this.x = target.x;
-    this.y = target.y - target.displayHeight / 2 - 10;
+    this.y =
+      target.y - target.displayHeight / 2 + GAME_CONFIG.OFFSETS.HEALTH_BAR_Y;
   }
 }

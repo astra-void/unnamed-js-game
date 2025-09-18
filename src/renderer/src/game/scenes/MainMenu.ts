@@ -15,7 +15,7 @@ export class MainMenu extends Scene {
 
   create() {
     this.title = this.add
-      .text(512, 460, 'Main Menu', {
+      .text(this.scale.width / 2, this.scale.height / 2, 'Main Menu', {
         fontFamily: 'Arial Black',
         fontSize: 38,
         color: '#ffffff',
@@ -26,8 +26,8 @@ export class MainMenu extends Scene {
 
     this.start = new TextButton(
       this,
-      512,
-      560,
+      this.scale.width / 2,
+      this.scale.height / 2 + 80,
       'Start',
       {
         fontFamily: 'Arial',
@@ -39,7 +39,7 @@ export class MainMenu extends Scene {
         hoverColor: '#e6e6e6',
         onClick: () => this.changeScene()
       }
-    ).setOrigin(0.5);
+    );
 
     EventBus.emit('current-scene-ready', this);
   }

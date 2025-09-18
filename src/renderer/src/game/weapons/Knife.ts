@@ -8,7 +8,7 @@ export class Knife extends Weapon {
   player: Player;
 
   constructor(scene: Scene, player: Player) {
-    super(scene, 'Knife', 0, 0, 0.25, 10, 1, 5, 200, 5);
+    super(scene, 'Knife', 'its knife', player, 0, 0, 0.25, 10, 1, 200, 5);
     this.player = player;
   }
 
@@ -35,11 +35,11 @@ export class Knife extends Weapon {
       this.speed,
       this.lifetime
     );
-    if (this.scene instanceof Game) this.scene.projectiles.add(proj.sprite);
+    if (this.scene instanceof Game) this.scene.projectileManager.add(proj.sprite);
   }
 
   levelUp(): boolean {
-    if (this.level < this.maxLevel) {
+    if (!this.isMaxLevel) {
       this.level++;
 
       /**

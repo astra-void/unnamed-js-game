@@ -1,12 +1,16 @@
+import { toHex } from '../../utils/color';
+
 type TextButtonOptions = {
   textColor?: string;
   hoverColor?: string;
+  backgroundColor?: number;
+  hoverBackgroundColor?: number;
   onClick?: () => void;
 };
 
-export class TextButton extends Phaser.GameObjects.Text {
-  private defaultColor: string;
-  private hoverColor: string;
+export class TextButton extends Phaser.GameObjects.Container {
+  private label: Phaser.GameObjects.Text;
+  private bg: Phaser.GameObjects.Rectangle;
   private clickCallback?: () => void;
 
   constructor(
@@ -17,25 +21,59 @@ export class TextButton extends Phaser.GameObjects.Text {
     style: Phaser.Types.GameObjects.Text.TextStyle = {},
     options: TextButtonOptions = {}
   ) {
-    super(scene, x, y, text, style);
+    super(scene, x, y);
 
-    this.defaultColor = options.textColor ?? 'rgb(255, 255, 255)';
-    this.hoverColor = options.hoverColor ?? 'rgb(230, 230, 230)';
+    const defaultTextColor = options.textColor ?? toHex('rgb(255, 255, 255)');
+    const hoverTextColor = options.hoverColor ?? toHex('rgb(200, 200, 200)');
+    const defaultBg = options.backgroundColor ?? 0x333333;
+    const hoverBg = options.hoverBackgroundColor ?? 0x555555;
     this.clickCallback = options.onClick;
 
-    this.setColor(this.defaultColor);
+    this.label = scene.add.text(0, 0, text, {
+      fontSize: '20px',
+      fontStyle: 'bold',
+      fontFamily: 'sans-serif',
+      color: defaultTextColor,
+      ...style
+    });
+    this.label.setOrigin(0.5);
+
+    this.bg = scene.add.rectangle(
+      0,
+      0,
+      this.label.width + 40,
+      this.label.height + 20,
+      defaultBg,
+      0.8
+    );
+    this.bg.setOrigin(0.5);
+    this.bg.setStrokeStyle(2, 0xffffff, 0.5);
+
+    this.add([this.bg, this.label]);
+
+    this.setSize(this.bg.width, this.bg.height);
     this.setInteractive({ useHandCursor: true });
-    scene.add.existing(this);
 
     this.on('pointerdown', () => {
       this.clickCallback?.();
-      this.destroy();
     });
-    this.on('pointerover', () => this.setColor(this.hoverColor));
-    this.on('pointerout', () => this.setColor(this.defaultColor));
+    this.on('pointerover', () => {
+      this.bg.setFillStyle(hoverBg, 0.9);
+      this.label.setColor(hoverTextColor);
+      this.setScale(1.05);
+    });
+    this.on('pointerout', () => {
+      this.bg.setFillStyle(defaultBg, 0.8);
+      this.label.setColor(defaultTextColor);
+      this.setScale(1);
+    });
+
+    scene.add.existing(this);
   }
 
   updateTextContent(text: string) {
-    this.setText(text);
+    this.label.setText(text);
+    this.bg.width = this.label.width + 40;
+    this.bg.height = this.label.height + 20;
   }
 }

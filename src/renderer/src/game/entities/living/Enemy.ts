@@ -40,7 +40,7 @@ export class Enemy extends LivingEntity {
 
   protected onDeath(): void {
     this.destroy();
-
     if (this.target instanceof Player) this.target.gainExp(this.damage / 5);
+    super.destroy();
   }
 }

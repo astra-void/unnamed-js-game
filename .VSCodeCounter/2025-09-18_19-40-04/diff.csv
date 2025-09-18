@@ -1,0 +1,15 @@
+"filename", "language", "TypeScript", "JSON", "YAML", "JSON with Comments", "Properties", "Markdown", "XML", "Ignore", "comment", "blank", "total"
+"/Users/returnf4lse/Desktop/Workspace/html/unnamed-js-game/.env", "Properties", 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, -2
+"/Users/returnf4lse/Desktop/Workspace/html/unnamed-js-game/.prettierignore", "Ignore", 0, 0, 0, 0, 0, 0, 0, -12, 0, -1, -13
+"/Users/returnf4lse/Desktop/Workspace/html/unnamed-js-game/.prettierrc.yaml", "YAML", 0, 0, -4, 0, 0, 0, 0, 0, 0, -1, -5
+"/Users/returnf4lse/Desktop/Workspace/html/unnamed-js-game/README.md", "Markdown", 0, 0, 0, 0, 0, -18, 0, 0, 0, -10, -28
+"/Users/returnf4lse/Desktop/Workspace/html/unnamed-js-game/electron.vite.config.ts", "TypeScript", -39, 0, 0, 0, 0, 0, 0, 0, 0, -2, -41
+"/Users/returnf4lse/Desktop/Workspace/html/unnamed-js-game/eslint.config.ts", "TypeScript", -39, 0, 0, 0, 0, 0, 0, 0, 0, -2, -41
+"/Users/returnf4lse/Desktop/Workspace/html/unnamed-js-game/package.json", "JSON", 0, -59, 0, 0, 0, 0, 0, 0, 0, -1, -60
+"/Users/returnf4lse/Desktop/Workspace/html/unnamed-js-game/pnpm-lock.yaml", "YAML", 0, 0, -3946, 0, 0, 0, 0, 0, 0, -1160, -5106
+"/Users/returnf4lse/Desktop/Workspace/html/unnamed-js-game/public/vite.svg", "XML", 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, -1
+"/Users/returnf4lse/Desktop/Workspace/html/unnamed-js-game/src/renderer/src/game/managers/ProjectileManager.ts", "TypeScript", 3, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4
+"/Users/returnf4lse/Desktop/Workspace/html/unnamed-js-game/tsconfig.json", "JSON with Comments", 0, 0, 0, -24, 0, 0, 0, 0, -2, -4, -30
+"/Users/returnf4lse/Desktop/Workspace/html/unnamed-js-game/tsconfig.node.json", "JSON", 0, -11, 0, 0, 0, 0, 0, 0, 0, -1, -12
+"/Users/returnf4lse/Desktop/Workspace/html/unnamed-js-game/tsconfig.tsbuildinfo", "JSON", 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, -1
+"Total", "-", -75, -71, -3950, -24, -2, -18, -1, -12, -2, -1181, -5336

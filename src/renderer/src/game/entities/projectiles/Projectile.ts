@@ -27,8 +27,8 @@ export abstract class Projectile extends LivingEntity {
     this.damage = damage;
     this.speed = speed;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (this.sprite as any).entity = this;
+    (this.sprite as Phaser.GameObjects.Sprite & { entity: Projectile }).entity =
+      this;
 
     scene.physics.add.existing(this.sprite);
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;

@@ -8,7 +8,19 @@ export class Test2 extends Weapon {
   player: Player;
 
   constructor(scene: Scene, player: Player) {
-    super(scene, 'Test2', 0, 0, 0.1, 10, 1, 5, 300, 3);
+    super(
+      scene,
+      'Test2',
+      'second test weapon',
+      player,
+      0,
+      0,
+      0.1,
+      10,
+      1,
+      300,
+      3
+    );
     this.player = player;
   }
 
@@ -35,11 +47,11 @@ export class Test2 extends Weapon {
       this.speed,
       this.lifetime
     );
-    if (this.scene instanceof Game) this.scene.projectiles.add(proj.sprite);
+    if (this.scene instanceof Game) this.scene.projectileManager.add(proj.sprite);
   }
 
   levelUp(): boolean {
-    if (this.level < this.maxLevel) {
+    if (!this.isMaxLevel) {
       this.level++;
 
       /**
