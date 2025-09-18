@@ -35,7 +35,8 @@ export class Test extends Weapon {
       this.speed,
       this.lifetime
     );
-    if (this.scene instanceof Game) this.scene.projectileManager.add(proj.sprite);
+    if (this.scene instanceof Game)
+      this.scene.projectileManager.add(proj.sprite);
   }
 
   levelUp(): boolean {

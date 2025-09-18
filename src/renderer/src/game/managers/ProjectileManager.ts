@@ -45,7 +45,7 @@ export class ProjectileManager {
   update(time: number, delta: number) {
     this.projectiles.getChildren().forEach((proj: unknown) => {
       if (proj instanceof Projectile) proj.update(time, delta);
-    })
+    });
   }
 
   clear() {
