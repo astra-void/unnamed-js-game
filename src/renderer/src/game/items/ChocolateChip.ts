@@ -12,6 +12,7 @@ export class ChocolateChip extends Item {
   applyEffect(_player: Player): void {
     this.timer = 0;
   }
+  removeEffect(_player: Player): void {}
 
   update(_player: Player, _time: number, delta: number): void {
     this.timer += delta / 1000;

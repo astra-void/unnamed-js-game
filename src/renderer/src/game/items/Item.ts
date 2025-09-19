@@ -19,6 +19,7 @@ export abstract class Item {
   }
 
   abstract applyEffect(player: Player): void;
+  abstract removeEffect(player: Player): void;
 
   levelUp(player: Player) {
     if (!this.isMaxLevel) {

@@ -8,11 +8,8 @@ import { Item } from '../../items';
 import { GAME_CONFIG } from '../../constants';
 import { SelectionPanel } from '../../ui/components/SelectionPanel';
 import { WeaponConstructor, ItemConstructor } from '../../types/constructors';
+import { FusionRecipe } from '../../fusion';
 
-/**
- * Player 클래스
- * 플레이어 캐릭터 나타내는 클래스임
- */
 export class Player extends LivingEntity {
   speed: number;
   exp: number;
@@ -110,10 +107,24 @@ export class Player extends LivingEntity {
     }
   }
 
+  attemptFusion(recipe: FusionRecipe): boolean {
+    if (!(this.scene instanceof Game)) return false;
+    const result = this.scene.fusionManager.fuse(recipe);
+    if (result) {
+      console.log(`Fusion Success: ${result.name} created!`);
+      return true;
+    } else {
+      console.log('Fusion failed: Required ingredients not available');
+      return false;
+    }
+  }
+
   private levelUp(): void {
     this.level++;
 
     console.log(`Level Up! Current level: ${this.level}`); // DEBUG
+
+    if (!(this.scene instanceof Game)) return;
 
     const weaponClasses = Object.values(Weapons).filter((weapon) => {
       if (
@@ -141,18 +152,28 @@ export class Player extends LivingEntity {
       return !existing || !existing.isMaxLevel;
     }) as ItemConstructor[];
 
-    if (weaponClasses.length === 0 && itemClasses.length === 0) return;
+    const availableFusions =
+      this.scene.fusionManager.getAvailableFusionsForMaxLevel();
+
+    const totalOptions =
+      weaponClasses.length + itemClasses.length + availableFusions.length;
+    if (totalOptions === 0) return;
 
     let pool = [
-      ...weaponClasses.map((ctor) => ({ kind: 'weapon', ctor })),
-      ...itemClasses.map((ctor) => ({ kind: 'item', ctor }))
+      ...weaponClasses.map((ctor) => ({ kind: 'weapon' as const, ctor })),
+      ...itemClasses.map((ctor) => ({ kind: 'item' as const, ctor })),
+      ...availableFusions.map((recipe) => ({ kind: 'fusion' as const, recipe }))
     ];
     const originalPool = [...pool];
 
     const selectedWeapons: WeaponConstructor[] = [];
     const selectedItems: ItemConstructor[] = [];
+    const selectedFusions: FusionRecipe[] = [];
 
-    while (selectedWeapons.length + selectedItems.length < 3) {
+    while (
+      selectedWeapons.length + selectedItems.length + selectedFusions.length <
+      3
+    ) {
       if (pool.length === 0) {
         if (originalPool.length === 0) break;
         pool = [...originalPool];
@@ -162,19 +183,25 @@ export class Player extends LivingEntity {
       const choice = pool.splice(index, 1)[0];
       if (!choice) break;
 
-      const { kind, ctor } = choice;
-      if (kind === 'weapon') {
-        selectedWeapons.push(ctor as WeaponConstructor);
-      } else {
-        selectedItems.push(ctor as ItemConstructor);
+      if (choice.kind === 'weapon') {
+        selectedWeapons.push(choice.ctor as WeaponConstructor);
+      } else if (choice.kind === 'item') {
+        selectedItems.push(choice.ctor as ItemConstructor);
+      } else if (choice.kind === 'fusion') {
+        selectedFusions.push(choice.recipe);
       }
     }
 
-    if (selectedWeapons.length + selectedItems.length === 0) return;
+    if (
+      selectedWeapons.length + selectedItems.length + selectedFusions.length ===
+      0
+    )
+      return;
 
-    if (this.scene instanceof Game) this.scene.togglePause();
+    this.scene.togglePause();
+    this.scene.enemyManager.waveUp();
 
-    const itemSelect = new SelectionPanel(
+    const selectionPanel = new SelectionPanel(
       this.scene,
       this,
       selectedWeapons,
@@ -189,7 +216,7 @@ export class Player extends LivingEntity {
         }
 
         if (this.scene instanceof Game) this.scene.togglePause();
-        itemSelect.destroy();
+        selectionPanel.destroy();
       },
       (item) => {
         const existing = this.items.find((i) => i.name === item.name);
@@ -201,13 +228,13 @@ export class Player extends LivingEntity {
         }
 
         if (this.scene instanceof Game) this.scene.togglePause();
-        itemSelect.destroy();
+        selectionPanel.destroy();
       }
     );
 
     this.scene.uiManager.addUI({
-      id: 'item-select',
-      object: itemSelect
+      id: 'selection-panel',
+      object: selectionPanel
     });
   }
 

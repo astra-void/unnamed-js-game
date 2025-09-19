@@ -11,6 +11,7 @@ export class JellyCrown extends Item {
   applyEffect(player: Player): void {
     this.recalc(player);
   }
+  removeEffect(_player: Player): void {}
 
   protected onLevelUp(player: Player): void {
     this.recalc(player);

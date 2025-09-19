@@ -6,10 +6,12 @@ import { TextButton } from './TextButton';
 import { toNumber } from '../../utils/color';
 import { GAME_CONFIG } from '../../constants';
 import { WeaponConstructor, ItemConstructor } from '../../types/constructors';
+import { FusionRecipe } from '../../fusion';
 
 interface Choice {
-  kind: 'weapon' | 'item' | 'bonus';
+  kind: 'weapon' | 'item' | 'fusion';
   ctor: WeaponConstructor | ItemConstructor | null;
+  recipe?: FusionRecipe;
   name: string;
   button: TextButton;
 }
@@ -18,6 +20,7 @@ export class SelectionPanel extends GameObjects.Container {
   player: Player;
   onSelectWeapon: (weapon: Weapon) => void;
   onSelectItem: (item: Item) => void;
+  onSelectFusion: (recipe: FusionRecipe) => void;
   choices: Choice[] = [];
   bg: GameObjects.Rectangle;
 
@@ -26,13 +29,16 @@ export class SelectionPanel extends GameObjects.Container {
     player: Player,
     weaponClasses: WeaponConstructor[],
     itemClasses: ItemConstructor[],
+    fusionRecipes: FusionRecipe[],
     onSelectWeapon: (weapon: Weapon) => void,
-    onSelectItem: (item: Item) => void
+    onSelectItem: (item: Item) => void,
+    onSelectFusion: (recipe: FusionRecipe) => void
   ) {
     super(scene);
     this.player = player;
     this.onSelectWeapon = onSelectWeapon;
     this.onSelectItem = onSelectItem;
+    this.onSelectFusion = onSelectFusion;
 
     const { PANEL_WIDTH, PANEL_HEIGHT, CARD_WIDTH, CARD_HEIGHT, CARD_SPACING } =
       GAME_CONFIG.SELECTION_PANEL;
@@ -66,7 +72,8 @@ export class SelectionPanel extends GameObjects.Container {
       .setDepth(10000);
     this.add(panel);
 
-    const total = weaponClasses.length + itemClasses.length;
+    const total =
+      weaponClasses.length + itemClasses.length + fusionRecipes.length;
     const cols = Math.min(3, total);
     const rows = Math.ceil(total / cols);
 
@@ -86,9 +93,10 @@ export class SelectionPanel extends GameObjects.Container {
     let index = 0;
 
     const makeChoice = (
-      ctor: WeaponConstructor | ItemConstructor,
-      kind: 'weapon' | 'item',
-      instance: Weapon | Item,
+      ctor: WeaponConstructor | ItemConstructor | null,
+      kind: 'weapon' | 'item' | 'fusion',
+      instance: Weapon | Item | null,
+      recipe: FusionRecipe | null,
       onSelect: () => void
     ) => {
       const col = index % cols;
@@ -96,11 +104,24 @@ export class SelectionPanel extends GameObjects.Container {
       const x = startX + col * (cardWidth + spacing);
       const y = startY + row * (cardHeight + spacing);
 
-      const card = this.createCard(scene, x, y, instance, onSelect);
+      let card: TextButton;
+      let name: string;
+
+      if (kind === 'fusion' && recipe) {
+        card = this.createFusionCard(scene, x, y, recipe, onSelect);
+        name = recipe.name;
+      } else if (instance) {
+        card = this.createCard(scene, x, y, instance, onSelect);
+        name = instance.name;
+      } else {
+        return;
+      }
+
       this.choices.push({
         kind,
         ctor,
-        name: instance.name,
+        recipe: recipe || undefined,
+        name,
         button: card
       });
       index++;
@@ -110,7 +131,7 @@ export class SelectionPanel extends GameObjects.Container {
       let instance = this.player.weapons.find((w) => w.name === W.name);
       if (!instance) instance = new W(this.scene, this.player);
 
-      makeChoice(W, 'weapon', instance, () => {
+      makeChoice(W, 'weapon', instance, null, () => {
         this.onSelectWeapon(instance);
         this.destroy();
         super.destroy();
@@ -121,7 +142,7 @@ export class SelectionPanel extends GameObjects.Container {
       let instance = this.player.items.find((i) => i.name === I.name);
       if (!instance) instance = new I(this.player);
 
-      makeChoice(I, 'item', instance, () => {
+      makeChoice(I, 'item', instance, null, () => {
         this.onSelectItem(instance);
         this.destroy();
         super.destroy();
@@ -185,24 +206,23 @@ export class SelectionPanel extends GameObjects.Container {
       })
       .setOrigin(0, 0);
 
-    const container = scene.add
-      .container(0, 0, [cardBg, icon, nameText, levelText])
-      .setSize(cardWidth, cardHeight);
+    const descText = scene.add
+      .text(x - cardWidth / 2 + 50, y + 15, item.description, {
+        fontSize: '12px',
+        color: '#cccccc',
+        wordWrap: { width: cardWidth - 60 }
+      })
+      .setOrigin(0, 0);
 
-    if ('description' in item && item.description) {
-      const descText = scene.add
-        .text(x - cardWidth / 2 + 50, y + 15, item.description, {
-          fontSize: '12px',
-          color: '#cccccc',
-          wordWrap: { width: cardWidth - 60 }
-        })
-        .setOrigin(0, 0);
-      container.add(descText);
-    }
+    const container = scene.add
+      .container(0, 0, [cardBg, icon, nameText, levelText, descText])
+      .setSize(cardWidth, cardHeight);
 
     this.add(container);
     return container as unknown as TextButton;
   }
+
+  
 
   destroy(fromScene?: boolean) {
     this.bg?.destroy();

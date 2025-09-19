@@ -1,6 +1,7 @@
 import { Game } from '../scenes/Game';
 import { Enemy } from '../entities/living/Enemy';
 import Phaser from 'phaser';
+import { GAME_CONFIG } from '../constants';
 
 type EnemySprite = Phaser.GameObjects.Sprite & { entity: Enemy };
 
@@ -9,12 +10,15 @@ export class EnemyManager {
   private spawnTimer: Phaser.Time.TimerEvent | null = null;
   private spawnInterval: number = 2000;
   private enemies: Phaser.GameObjects.Group;
+  wave: number = 1;
 
   constructor(scene: Game) {
     this.scene = scene;
     this.enemies = scene.add.group({
       runChildUpdate: false
     });
+
+    this.spawnInterval = GAME_CONFIG.ENEMY.SPAWN_INTERVAL;
 
     scene.physics.add.overlap(
       scene.player.sprite,
@@ -35,7 +39,39 @@ export class EnemyManager {
     return this.enemies.children.size;
   }
 
+  waveUp() {
+    this.wave++;
+    this.updateSpawnInterval();
+    this.updateSpawnTimer();
+  }
+
+  waveDown() {
+    this.wave--;
+    this.updateSpawnInterval();
+    this.updateSpawnTimer();
+  }
+
+  private updateSpawnInterval() {
+    if (this.wave % 5 === 0) {
+      this.spawnInterval = GAME_CONFIG.ENEMY.SPAWN_INTERVAL;
+    } else {
+      this.spawnInterval = Math.max(
+        GAME_CONFIG.ENEMY.SPAWN_INTERVAL / this.wave,
+        500
+      );
+    }
+  }
+
+  private updateSpawnTimer() {
+    if (this.spawnTimer) {
+      this.stopSpawning();
+      this.startSpawning();
+    }
+  }
+
   startSpawning() {
+    if (this.spawnTimer) return;
+
     this.spawnTimer = this.scene.time.addEvent({
       delay: this.spawnInterval,
       callback: this.spawnEnemy,
@@ -45,7 +81,10 @@ export class EnemyManager {
   }
 
   stopSpawning() {
-    if (this.spawnTimer) this.spawnTimer.remove();
+    if (this.spawnTimer) {
+      this.spawnTimer.remove();
+      this.spawnTimer = null;
+    }
   }
 
   update(time: number, delta: number) {
@@ -57,6 +96,8 @@ export class EnemyManager {
   }
 
   spawnEnemy() {
+    if (this.scene.paused) return;
+
     const side = Phaser.Math.Between(0, 3);
     let x = 0;
     let y = 0;

@@ -11,12 +11,13 @@ export class CreamCloak extends Item {
   }
 
   applyEffect(_player: Player): void {}
+  removeEffect(_player: Player): void {}
 
   update(player: Player, _time: number, _delta: number): void {
     if (!(player.scene instanceof Game)) return;
     const slow = this.slowRates[this.level - 1];
     const enemies =
-      player.scene.enemies.getChildren() as Phaser.GameObjects.Sprite[];
+      player.scene.enemyManager.enemiesGroup.getChildren() as Phaser.GameObjects.Sprite[];
     for (const enemy of enemies) {
       const dx = enemy.x - player.x;
       const dy = enemy.y - player.y;

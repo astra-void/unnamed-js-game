@@ -5,6 +5,8 @@ import { Scene } from 'phaser';
 import { UIManager } from '../managers/UIManager';
 import { EnemyManager } from '../managers/EnemyManager';
 import { ProjectileManager } from '../managers/ProjectileManager';
+import { FusionManager } from '../fusion';
+import { FUSION_RECIPES } from '../constants/FusionRecipes';
 
 export class Game extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;
@@ -12,6 +14,7 @@ export class Game extends Scene {
   player: Player;
   enemyManager: EnemyManager;
   projectileManager: ProjectileManager;
+  fusionManager: FusionManager;
 
   declare uiManager: UIManager;
 
@@ -63,6 +66,7 @@ export class Game extends Scene {
 
     this.enemyManager = new EnemyManager(this);
     this.projectileManager = new ProjectileManager(this);
+    this.fusionManager = new FusionManager(this.player, FUSION_RECIPES);
 
     this.physics.world.setBounds(0, 0, this.scale.width, this.scale.height);
 

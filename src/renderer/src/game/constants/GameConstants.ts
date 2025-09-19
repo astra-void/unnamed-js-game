@@ -1,5 +1,5 @@
 export const GAME_CONFIG = {
-  EXP_MULTIPLIER: 2, // 다음 레벨까지 필요한 경험치 배수
+  EXP_MULTIPLIER: 2, // 다음 레벨까지 필요한 경험치 배수 (level * EXP_MULTIPLIER)
   MAX_ITEM_LEVEL: 5, // 아이템 최대 레벨
   MAX_WEAPON_LEVEL: 5, // 무기 최대 레벨
 
@@ -37,5 +37,9 @@ export const GAME_CONFIG = {
   PLAYER: {
     DEFAULT_SPEED: 200, // 기본 이동속도
     HEALTH_BAR_OFFSET: 40 // 체력바 오프셋
+  },
+
+  ENEMY: {
+    SPAWN_INTERVAL: 2000 // (ms)
   }
 } as const;

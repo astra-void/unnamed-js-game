@@ -1,2 +1,2 @@
 export * from './CraftingRecipe';
-export * from './Fusion';
+export * from '../managers/FusionManager';
