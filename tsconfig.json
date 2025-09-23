@@ -19,9 +19,11 @@
     "strictPropertyInitialization": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    
+    "types": ["phaser"]
   },
-  "include": ["src"],
+  "include": ["src", "src/types"],
   "exclude": ["dist", "out"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

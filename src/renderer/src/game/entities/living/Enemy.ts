@@ -1,3 +1,5 @@
+import { EventBus } from '../../EventBus';
+import { HealthManager } from '../../managers';
 import { LivingEntity } from './LivingEntity';
 import { Player } from './Player';
 
@@ -15,16 +17,24 @@ export class Enemy extends LivingEntity {
     speed = 200,
     target: LivingEntity
   ) {
-    super(scene, x, y, 'enemy', maxHp);
-    this.hp = maxHp;
+    super(scene, x, y, 'enemy', 'enemy');
     this.damage = damage;
     this.speed = speed;
     this.target = target;
+
+    this.healthManager = new HealthManager(this, maxHp);
 
     scene.physics.add.existing(this.sprite);
     (this.sprite.body as Phaser.Physics.Arcade.Body).setCollideWorldBounds(
       true
     );
+
+    EventBus.on('enemy:dead', () => {
+      this.destroy();
+      if (this.target instanceof Player)
+        this.target.levelManager.gainExp(this.damage / 5);
+      super.destroy();
+    });
   }
 
   update(_time: number, _delta: number): void {
@@ -36,11 +46,5 @@ export class Enemy extends LivingEntity {
     const vy = (dy / dist) * this.speed;
 
     (this.sprite.body as Phaser.Physics.Arcade.Body).setVelocity(vx, vy);
-  }
-
-  protected onDeath(): void {
-    this.destroy();
-
-    if (this.target instanceof Player) this.target.gainExp(this.damage / 5);
   }
 }

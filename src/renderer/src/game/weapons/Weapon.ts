@@ -1,12 +1,15 @@
 import { GameObjects, Physics, Scene } from 'phaser';
+import { Player } from '../entities/living';
+import { GAME_CONFIG } from '../constants';
 
 export abstract class Weapon {
   name: string;
+  description: string;
   scene: Scene;
+  player: Player;
   sprite: GameObjects.Sprite;
   body: Physics.Arcade.Body;
-  level: number;
-  maxLevel: number;
+  level: number = 0;
   currentCooldown: number;
   cooldown: number;
   damage: number;
@@ -16,19 +19,19 @@ export abstract class Weapon {
   constructor(
     scene: Scene,
     name: string,
+    description: string,
+    player: Player,
     x: number,
     y: number,
     cooldown: number,
     damage: number,
-    level = 1,
-    maxLevel = 5,
     speed?: number,
     lifetime?: number
   ) {
     this.name = name;
+    this.description = description;
     this.scene = scene;
-    this.level = level;
-    this.maxLevel = maxLevel;
+    this.player = player;
     this.currentCooldown = cooldown;
     this.cooldown = cooldown;
     this.damage = damage;
@@ -43,8 +46,20 @@ export abstract class Weapon {
     this.sprite.setVisible(false);
   }
 
+  get isMaxLevel() {
+    return this.level >= GAME_CONFIG.MAX_WEAPON_LEVEL;
+  }
+
   abstract attack(): void;
-  abstract levelUp(): boolean;
+
+  levelUp(player: Player) {
+    if (!this.isMaxLevel) {
+      this.level++;
+      this.onLevelUp(player);
+    }
+  }
+
+  protected onLevelUp(_player: Player): void {}
 
   destroy() {
     this.sprite.destroy();

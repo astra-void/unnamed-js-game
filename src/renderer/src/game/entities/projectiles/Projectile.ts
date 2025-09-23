@@ -1,5 +1,6 @@
 import { Scene } from 'phaser';
 import { LivingEntity } from '../living/LivingEntity';
+import { HealthManager } from '../../managers';
 
 export abstract class Projectile extends LivingEntity {
   vx: number;
@@ -20,15 +21,17 @@ export abstract class Projectile extends LivingEntity {
     speed = 200,
     texture: string = 'projectile'
   ) {
-    super(scene, x, y, texture, maxHp);
+    super(scene, x, y, 'projectile', texture);
     this.vx = vx;
     this.vy = vy;
     this.lifetime = lifetime;
     this.damage = damage;
     this.speed = speed;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (this.sprite as any).entity = this;
+    this.healthManager = new HealthManager(this, maxHp);
+
+    (this.sprite as Phaser.GameObjects.Sprite & { entity: Projectile }).entity =
+      this;
 
     scene.physics.add.existing(this.sprite);
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;

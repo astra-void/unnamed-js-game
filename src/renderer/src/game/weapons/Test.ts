@@ -8,11 +8,11 @@ export class Test extends Weapon {
   player: Player;
 
   constructor(scene: Scene, player: Player) {
-    super(scene, 'Test', 0, 0, 0.1, 10, 1, 5, 300, 3);
+    super(scene, 'Test', 'test weapon', player, 0, 0, 0.1, 10, 300, 3);
     this.player = player;
   }
 
-  use?(): void {} /* empty */
+  use?(): void {}
 
   attack(): void {
     if (!this.speed || !this.lifetime) return;
@@ -35,20 +35,7 @@ export class Test extends Weapon {
       this.speed,
       this.lifetime
     );
-    if (this.scene instanceof Game) this.scene.projectiles.add(proj.sprite);
-  }
-
-  levelUp(): boolean {
-    if (this.level < this.maxLevel) {
-      this.level++;
-
-      /**
-       * 대충 여기 안에다가 레벌입 로직 넣어라
-       */
-
-      return true;
-    } else {
-      return false;
-    }
+    if (this.scene instanceof Game)
+      this.scene.projectileManager.add(proj.sprite);
   }
 }

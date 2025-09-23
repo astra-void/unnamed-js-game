@@ -17,7 +17,7 @@ export class KnifeProjectile extends Projectile {
   }
 
   onHit(target: LivingEntity): void {
-    target.takeDamage(this.damage);
-    this.takeDamage(this.damage);
+    target.healthManager.takeDamage(this.damage);
+    this.healthManager.takeDamage(this.damage);
   }
 }
