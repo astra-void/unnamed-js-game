@@ -2,13 +2,13 @@ import { Game } from '../scenes/Game';
 import { Enemy } from '../entities/living/Enemy';
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../constants';
-
-type EnemySprite = Phaser.GameObjects.Sprite & { entity: Enemy };
+import { EnemySprite, isEnemySprite } from '../types/typeGuards';
+import { EventBus } from '../EventBus';
 
 export class EnemyManager {
   private scene: Game;
   private spawnTimer: Phaser.Time.TimerEvent | null = null;
-  private spawnInterval: number = 2000;
+  private spawnInterval: number;
   private enemies: Phaser.GameObjects.Group;
   wave: number = 1;
 
@@ -24,11 +24,20 @@ export class EnemyManager {
       scene.player.sprite,
       this.enemies,
       (_playerSprite: unknown, enemySprite: unknown) => {
-        const enemy = (enemySprite as EnemySprite).entity;
+        if (!isEnemySprite(enemySprite)) return;
+        const enemy = enemySprite.entity;
         scene.player.healthManager.takeDamage(enemy.damage);
         enemy.healthManager.takeDamage(enemy.healthManager.maxHp);
       }
     );
+
+    EventBus.on('enemyManager:waveUp', () => {
+      this.waveUp();
+    });
+
+    EventBus.on('enemyManager:waveDown', () => {
+      this.waveDown();
+    });
   }
 
   get enemiesGroup() {
@@ -43,9 +52,6 @@ export class EnemyManager {
     this.wave++;
     this.updateSpawnInterval();
     this.updateSpawnTimer();
-
-    console.log('wave up');
-    console.log(this.wave);
   }
 
   waveDown() {
@@ -60,7 +66,7 @@ export class EnemyManager {
     } else {
       this.spawnInterval = Math.max(
         GAME_CONFIG.ENEMY.SPAWN_INTERVAL / this.wave,
-        500
+        GAME_CONFIG.ENEMY.MIN_SPAWN_INTERVAL
       );
     }
   }
@@ -92,7 +98,8 @@ export class EnemyManager {
 
   update(time: number, delta: number) {
     this.enemies.children.each((enemySprite: unknown) => {
-      const enemy = (enemySprite as EnemySprite).entity;
+      if (!isEnemySprite(enemySprite)) return false;
+      const enemy = enemySprite.entity;
       if (enemy) enemy.update(time, delta);
       return true;
     }, this);

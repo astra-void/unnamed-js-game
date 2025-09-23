@@ -35,24 +35,28 @@ export class Player extends LivingEntity {
   levelManager: LevelManager;
   uiManager: UIManager;
 
-  constructor(scene: Game, x: number, y: number, maxHp: number) {
+  constructor(scene: Game, x: number, y: number) {
     super(scene, x, y, 'player', 'player');
     this.speed = GAME_CONFIG.PLAYER.DEFAULT_SPEED;
 
-    this.initializeManagers(maxHp);
+    this.initializeManagers();
     this.setupPhysics();
     this.setupControls();
     this.setupEventListeners();
   }
 
-  private initializeManagers(maxHp: number) {
+  private initializeManagers() {
     this.weaponManager = new WeaponManager(this, this.scene);
     this.itemManager = new ItemManager(this, this.scene);
     this.levelManager = new LevelManager(this, this.scene as Game);
-    this.healthManager = new HealthManager(this, maxHp);
+    this.healthManager = new HealthManager(this);
     this.uiManager = this.scene.uiManager;
 
-    const hpBar = new HealthBar(this.scene, this, this.healthManager.maxHp);
+    const hpBar = new HealthBar(
+      this.scene,
+      this,
+      GAME_CONFIG.PLAYER.DEFAULT_MAX_HP
+    );
     this.uiManager.add(hpBar);
   }
 
@@ -88,9 +92,7 @@ export class Player extends LivingEntity {
   }
 
   private handleLevelUp() {
-    if (!(this.scene instanceof Game)) return;
-
-    this.scene.pauseGame();
+    (this.scene as Game).pauseGame();
 
     const candidates = this.getCandidates();
 
@@ -101,11 +103,11 @@ export class Player extends LivingEntity {
   }
 
   private getCandidates() {
-    if (!(this.scene instanceof Game)) return;
-
     const weapons = this.getAvailableWeapons();
     const items = this.getAvailableItems();
-    const fusions = this.scene.fusionManager.getAvailableFusionsForMaxLevel();
+    const fusions = (
+      this.scene as Game
+    ).fusionManager.getAvailableFusionsForMaxLevel();
 
     return [
       ...weapons.map((w) => ({ kind: 'weapon' as const, value: w })),
@@ -114,32 +116,38 @@ export class Player extends LivingEntity {
     ] as Candidate[];
   }
 
-  private getAvailableWeapons(): WeaponConstructor[] {
-    return Object.values(Weapons).filter((w) => {
+  private getAvailable<C extends WeaponConstructor | ItemConstructor>(
+    type: 'weapon' | 'item'
+  ): C[] {
+    const isWeapon = type === 'weapon';
+    const items = isWeapon ? Weapons : Items;
+    const baseClass = isWeapon ? Weapon : Item;
+    const findMethod = isWeapon
+      ? (name: string) => this.weaponManager.findWeapon(name)
+      : (name: string) => this.itemManager.findItem(name);
+
+    return Object.values(items).filter((item) => {
       if (
-        typeof w !== 'function' ||
-        !w.prototype ||
-        !(w.prototype instanceof Weapon)
+        typeof item !== 'function' ||
+        !item.prototype ||
+        !(item.prototype instanceof baseClass)
       )
         return false;
-      const temp = new (w as WeaponConstructor)(this.scene, this);
-      const existing = this.weaponManager.findWeapon(temp.name);
+
+      const temp = isWeapon
+        ? new (item as WeaponConstructor)(this.scene, this)
+        : new (item as ItemConstructor)();
+      const existing = findMethod(temp.name);
       return !existing || !existing.isMaxLevel;
-    }) as WeaponConstructor[];
+    }) as C[];
+  }
+
+  private getAvailableWeapons(): WeaponConstructor[] {
+    return this.getAvailable<WeaponConstructor>('weapon');
   }
 
   private getAvailableItems(): ItemConstructor[] {
-    return Object.values(Items).filter((i) => {
-      if (
-        typeof i !== 'function' ||
-        !i.prototype ||
-        !(i.prototype instanceof Item)
-      )
-        return false;
-      const temp = new (i as ItemConstructor)(this);
-      const existing = this.itemManager.findItem(temp.name);
-      return !existing || !existing.isMaxLevel;
-    }) as ItemConstructor[];
+    return this.getAvailable<ItemConstructor>('item');
   }
 
   private selectRandomCandidates<T>(arr: T[], max: number): T[] {
@@ -181,13 +189,11 @@ export class Player extends LivingEntity {
 
   private setupSelectionHandlers(selectionPanel: SelectionPanel) {
     const handleSelection = () => {
-      if (!(this.scene instanceof Game)) return;
       selectionPanel.destroy();
-      this.scene.resumeGame();
+      (this.scene as Game).resumeGame();
     };
 
     EventBus.once('selection:weapon', (weapon: Weapon) => {
-      if (!(this.scene instanceof Game)) return;
       const existing = this.weaponManager.findWeapon(weapon.name);
       if (existing) {
         existing.levelUp(this);
@@ -199,7 +205,6 @@ export class Player extends LivingEntity {
     });
 
     EventBus.once('selection:item', (item: Item) => {
-      if (!(this.scene instanceof Game)) return;
       const existing = this.itemManager.findItem(item.name);
       if (existing) {
         existing.levelUp(this);
@@ -212,8 +217,7 @@ export class Player extends LivingEntity {
     });
 
     EventBus.once('selection:fusion', (recipe: FusionRecipe) => {
-      if (!(this.scene instanceof Game)) return;
-      const result = this.scene.fusionManager.fuse(recipe);
+      const result = (this.scene as Game).fusionManager.fuse(recipe);
       console.log(result ? `Fusion Success: ${result.name}` : 'Fusion failed');
       handleSelection();
     });
@@ -241,8 +245,7 @@ export class Player extends LivingEntity {
   }
 
   attemptFusion(recipe: FusionRecipe): boolean {
-    if (!(this.scene instanceof Game)) return false;
-    const result = this.scene.fusionManager.fuse(recipe);
+    const result = (this.scene as Game).fusionManager.fuse(recipe);
     if (result) {
       console.log(`Fusion Success: ${result.name} created!`);
       return true;

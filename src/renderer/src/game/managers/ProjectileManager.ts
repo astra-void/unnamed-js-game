@@ -1,9 +1,5 @@
-import { Enemy } from '../entities/living';
-import { Projectile } from '../entities/projectiles';
 import { Game } from '../scenes/Game';
-
-type ProjectileSprite = Phaser.GameObjects.Sprite & { entity: Projectile };
-type EnemySprite = Phaser.GameObjects.Sprite & { entity: Enemy };
+import { isEnemySprite, isProjectileSprite } from '../types/typeGuards';
 
 export class ProjectileManager {
   private scene: Game;
@@ -19,8 +15,11 @@ export class ProjectileManager {
       this.projectiles,
       scene.enemyManager.enemiesGroup,
       (projSprite, enemySprite) => {
-        const projectile = (projSprite as ProjectileSprite).entity;
-        const enemy = (enemySprite as EnemySprite).entity;
+        if (!isProjectileSprite(projSprite) || !isEnemySprite(enemySprite))
+          return;
+
+        const projectile = projSprite.entity;
+        const enemy = enemySprite.entity;
 
         projectile.onHit(enemy);
         enemy.healthManager.takeDamage(projectile.damage);
@@ -40,13 +39,17 @@ export class ProjectileManager {
 
   update(time: number, delta: number) {
     this.projectiles.getChildren().forEach((proj: unknown) => {
-      if (proj instanceof Projectile) proj.update(time, delta);
+      if (isProjectileSprite(proj)) {
+        proj.entity.update(time, delta);
+      }
     });
   }
 
   clear() {
     this.projectiles.children.each((sprite: unknown) => {
-      const projectile = (sprite as ProjectileSprite).entity;
+      if (!isProjectileSprite(sprite)) return false;
+
+      const projectile = sprite.entity;
       projectile.destroy();
       return true;
     });

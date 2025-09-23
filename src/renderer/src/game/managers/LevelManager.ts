@@ -15,15 +15,13 @@ export class LevelManager {
   }
 
   gainExp(amount: number) {
-    if (amount <= 0) return;
-
     this.exp += amount;
 
     const expNeeded = this.level * GAME_CONFIG.EXP_MULTIPLIER;
     while (this.exp >= expNeeded) {
       this.exp -= expNeeded;
       this.level++;
-      this.game.enemyManager.waveUp();
+      EventBus.emit('enemyManager:waveUp');
       EventBus.emit('player:levelUp', this.level);
     }
   }

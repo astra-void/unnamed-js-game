@@ -17,16 +17,24 @@ export class FusionManager {
     return this.recipes.filter((recipe) => {
       return recipe.ingredients.every((ingredientCtor) => {
         if (this.isItemConstructor(ingredientCtor)) {
-          const item = this.player.itemManager.items.find(
-            (i) => i.constructor === ingredientCtor && i.isMaxLevel
-          );
-          return item !== undefined;
+          let found = false;
+          for (const item of this.player.itemManager.items.values()) {
+            if (item.constructor === ingredientCtor && item.isMaxLevel) {
+              found = true;
+              break;
+            }
+          }
+          return found;
         }
         if (this.isWeaponConstructor(ingredientCtor)) {
-          const weapon = this.player.weaponManager.weapons.find(
-            (w) => w.constructor === ingredientCtor && w.isMaxLevel
-          );
-          return weapon !== undefined;
+          let found = false;
+          for (const weapon of this.player.weaponManager.weapons.values()) {
+            if (weapon.constructor === ingredientCtor && weapon.isMaxLevel) {
+              found = true;
+              break;
+            }
+          }
+          return found;
         }
         return false;
       });
@@ -38,22 +46,32 @@ export class FusionManager {
 
     return this.recipes.filter((recipe) => {
       const hasThisIngredient = recipe.ingredients.some(
-        (ing) => ing === instanceConstructor
+        (ing) => ing.ctor === instanceConstructor
       );
       if (!hasThisIngredient) return false;
 
       return recipe.ingredients.every((ingredientCtor) => {
-        if (ingredientCtor === instanceConstructor) return true;
+        if (ingredientCtor.ctor === instanceConstructor) return true;
 
         if (this.isItemConstructor(ingredientCtor)) {
-          return this.player.itemManager.items.some(
-            (i) => i.constructor === ingredientCtor && i.isMaxLevel
-          );
+          let found = false;
+          for (const item of this.player.itemManager.items.values()) {
+            if (item.constructor === ingredientCtor && item.isMaxLevel) {
+              found = true;
+              break;
+            }
+          }
+          return found;
         }
         if (this.isWeaponConstructor(ingredientCtor)) {
-          return this.player.weaponManager.weapons.some(
-            (w) => w.constructor === ingredientCtor && w.isMaxLevel
-          );
+          let found = false;
+          for (const weapon of this.player.weaponManager.weapons.values()) {
+            if (weapon.constructor === ingredientCtor && weapon.isMaxLevel) {
+              found = true;
+              break;
+            }
+          }
+          return found;
         }
         return false;
       });
@@ -63,14 +81,24 @@ export class FusionManager {
   canFuse(recipe: FusionRecipe): boolean {
     return recipe.ingredients.every((ingredientCtor) => {
       if (this.isItemConstructor(ingredientCtor)) {
-        return this.player.itemManager.items.some(
-          (i) => i.constructor === ingredientCtor && i.isMaxLevel
-        );
+        let found = false;
+        for (const item of this.player.itemManager.items.values()) {
+          if (item.constructor === ingredientCtor && item.isMaxLevel) {
+            found = true;
+            break;
+          }
+        }
+        return found;
       }
       if (this.isWeaponConstructor(ingredientCtor)) {
-        return this.player.weaponManager.weapons.some(
-          (w) => w.constructor === ingredientCtor && w.isMaxLevel
-        );
+        let found = false;
+        for (const weapon of this.player.weaponManager.weapons.values()) {
+          if (weapon.constructor === ingredientCtor && weapon.isMaxLevel) {
+            found = true;
+            break;
+          }
+        }
+        return found;
       }
       return false;
     });
@@ -83,21 +111,23 @@ export class FusionManager {
 
     recipe.ingredients.forEach((ingredientCtor) => {
       if (this.isItemConstructor(ingredientCtor)) {
-        const idx = this.player.itemManager.items.findIndex(
-          (i) => i.constructor === ingredientCtor && i.isMaxLevel
-        );
-        if (idx !== -1) {
-          const item = this.player.itemManager.items.splice(idx, 1)[0];
-          item.removeEffect?.(this.player);
-        }
+        let itemToRemove: Item | undefined;
+        this.player.itemManager.items.forEach((item, key) => {
+          if (item.constructor === ingredientCtor && item.isMaxLevel) {
+            itemToRemove = item;
+            this.player.itemManager.items.delete(key);
+            itemToRemove.removeEffect?.(this.player);
+          }
+        });
       } else if (this.isWeaponConstructor(ingredientCtor)) {
-        const idx = this.player.weaponManager.weapons.findIndex(
-          (w) => w.constructor === ingredientCtor && w.isMaxLevel
-        );
-        if (idx !== -1) {
-          const weapon = this.player.weaponManager.weapons.splice(idx, 1)[0];
-          weapon.destroy();
-        }
+        let weaponToRemove: Weapon | undefined;
+        this.player.weaponManager.weapons.forEach((weapon, key) => {
+          if (weapon.constructor === ingredientCtor && weapon.isMaxLevel) {
+            weaponToRemove = weapon;
+            this.player.weaponManager.weapons.delete(key);
+            weaponToRemove.destroy();
+          }
+        });
       }
     });
 
@@ -105,7 +135,7 @@ export class FusionManager {
 
     if (this.isItemConstructor(recipe.result)) {
       const NewItem = recipe.result as ItemConstructor;
-      result = new NewItem(this.player);
+      result = new NewItem();
       this.player.itemManager.addItem(result);
       result.applyEffect?.(this.player);
     } else {

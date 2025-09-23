@@ -1,32 +1,35 @@
+import { GAME_CONFIG } from '../constants';
 import { LivingEntity } from '../entities/living';
 import { EventBus } from '../EventBus';
 
 export class HealthManager {
-  entitiy: LivingEntity;
-  hp: number;
+  entity: LivingEntity;
   maxHp: number;
+  hp: number;
 
-  constructor(entity: LivingEntity, maxHp = 100) {
-    this.entitiy = entity;
-    this.maxHp = maxHp;
-    this.hp = maxHp;
+  constructor(entity: LivingEntity, maxHp?: number) {
+    this.entity = entity;
+    this.maxHp = maxHp ?? GAME_CONFIG.PLAYER.DEFAULT_MAX_HP;
+    this.hp = this.maxHp;
   }
 
   takeDamage(amount: number) {
     this.hp = Math.max(0, this.hp - amount);
-    EventBus.emit(`${this.entitiy.name}:healthChanged`, {
+
+    EventBus.emit(`${this.entity.name}:healthChanged`, {
       hp: this.hp,
       maxHp: this.maxHp
     });
+
     if (this.hp <= 0) {
-      EventBus.emit(`${this.entitiy.name}:dead`, this.entitiy);
+      EventBus.emit(`${this.entity.name}:dead`, this.entity);
     }
   }
 
   heal(amount: number) {
     this.hp = Math.min(this.maxHp, this.hp + amount);
 
-    EventBus.emit(`${this.entitiy.name}:healthChanged`, {
+    EventBus.emit(`${this.entity.name}:healthChanged`, {
       hp: this.hp,
       maxHp: this.maxHp
     });

@@ -5,8 +5,11 @@ import { Knife } from '../weapons';
 export const FUSION_RECIPES: FusionRecipe[] = [
   {
     id: 'test',
-    ingredients: [Knife, ChocolateChip],
-    name: 'test',
+    name: 'Jelly Crown Fusion',
+    ingredients: [
+      { ctor: Knife, count: 1 },
+      { ctor: ChocolateChip, count: 1 }
+    ],
     result: JellyCrown
   }
 ] as const;

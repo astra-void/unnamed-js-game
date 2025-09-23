@@ -9,6 +9,6 @@ export interface WeaponConstructor {
 }
 
 export interface ItemConstructor {
-  new (player: Player): Item;
+  new (): Item;
   prototype: Item;
 }

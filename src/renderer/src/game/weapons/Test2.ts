@@ -12,7 +12,7 @@ export class Test2 extends Weapon {
     this.player = player;
   }
 
-  use?(): void {} /* empty */
+  use?(): void {}
 
   attack(): void {
     if (!this.speed || !this.lifetime) return;

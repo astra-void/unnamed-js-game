@@ -12,7 +12,7 @@ export class Knife extends Weapon {
     this.player = player;
   }
 
-  use?(): void {} /* empty */
+  use?(): void {}
 
   attack(): void {
     if (!this.speed || !this.lifetime) return;

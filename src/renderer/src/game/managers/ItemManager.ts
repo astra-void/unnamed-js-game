@@ -4,23 +4,23 @@ import { Item } from '../items';
 export class ItemManager {
   player: Player;
   scene: Phaser.Scene;
-  items: Item[] = [];
+  items = new Map<string, Item>();
 
   constructor(player: Player, scene: Phaser.Scene) {
     this.player = player;
     this.scene = scene;
   }
 
-  addItem(item: Item) {
-    this.items.push(item);
+  addItem(item: Item): void {
+    this.items.set(item.name, item);
   }
 
-  removeItem(item: Item) {
-    this.items = this.items.filter((i) => i !== item);
+  removeItem(item: Item): void {
+    this.items.delete(item.name);
   }
 
-  findItem(name: string) {
-    return this.items.find((i) => i.name === name);
+  findItem(name: string): Item | undefined {
+    return this.items.get(name);
   }
 
   update(time: number, delta: number) {
@@ -28,6 +28,6 @@ export class ItemManager {
   }
 
   clear() {
-    this.items = [];
+    this.items.clear();
   }
 }

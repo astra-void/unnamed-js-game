@@ -16,7 +16,7 @@ export class Game extends Scene {
   enemyManager: EnemyManager;
   projectileManager: ProjectileManager;
   fusionManager: FusionManager;
-  declare uiManager: UIManager;
+  uiManager: UIManager;
 
   spawnTimer: number = 0;
   spawnInterval: number = 2000;
@@ -61,7 +61,11 @@ export class Game extends Scene {
 
     this.uiManager = new UIManager(this);
 
-    this.player = new Player(this, 512, 384, 100);
+    this.player = new Player(
+      this,
+      import.meta.env.VITE_WIDTH / 2,
+      import.meta.env.VITE_HEIGHT / 2
+    );
     this.player.weaponManager.addWeapon(new Knife(this, this.player)); // PLACEHOLDER
     this.player.weaponManager.weapons.forEach((w) => w.levelUp(this.player)); // PLACEHOLDER
 

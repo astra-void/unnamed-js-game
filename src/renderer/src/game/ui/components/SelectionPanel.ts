@@ -156,7 +156,7 @@ export class SelectionPanel
 
     itemClasses.forEach((I) => {
       let instance = this.player.itemManager.findItem(I.name);
-      if (!instance) instance = new I(this.player);
+      if (!instance) instance = new I();
       makeChoice(I, 'item', instance, null);
     });
 
@@ -301,7 +301,7 @@ export class SelectionPanel
       .setDepth(10002);
 
     const ingredients = recipe.ingredients
-      .map((ing) => ing.name || 'Unknown')
+      .map((ing) => ing.ctor.prototype.name || 'Unknown')
       .join(' + ');
 
     const ingredientsText = scene.add
