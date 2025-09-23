@@ -1,70 +1,62 @@
+import { GameObjects } from 'phaser';
+import { UIComponent } from '../../types/ui';
+import { LivingEntity } from '../../entities/living';
 import { GAME_CONFIG } from '../../constants';
+import { EventBus } from '../../EventBus';
 
-export class HealthBar extends Phaser.GameObjects.Container {
+export class HealthBar implements UIComponent {
+  id = 'healthBar';
+  object: GameObjects.GameObject;
+  private container: Phaser.GameObjects.Container;
   private bar: Phaser.GameObjects.Graphics;
-  private background: Phaser.GameObjects.Graphics;
+  private bg: Phaser.GameObjects.Graphics;
   private maxHp: number;
-  private value: number;
-  width: number;
-  height: number;
+  private currentHp: number;
+  private entity: LivingEntity;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, maxHp: number) {
-    super(scene, x, y);
-
+  constructor(scene: Phaser.Scene, entity: LivingEntity, maxHp: number) {
+    this.entity = entity;
     this.maxHp = maxHp;
-    this.value = maxHp;
-    this.width = 50;
-    this.height = 6;
+    this.currentHp = maxHp;
 
-    this.background = scene.add.graphics();
+    this.bg = scene.add.graphics();
     this.bar = scene.add.graphics();
-
-    this.add(this.background);
-    this.add(this.bar);
+    this.container = scene.add.container(entity.sprite.x, entity.sprite.y, [
+      this.bg,
+      this.bar
+    ]);
+    this.object = this.container;
 
     this.draw();
 
-    scene.add.existing(this);
+    EventBus.on('player:healthChanged', ({ hp }: { hp: number }) =>
+      this.setHp(hp)
+    );
+  }
+
+  setHp(value: number) {
+    this.currentHp = Phaser.Math.Clamp(value, 0, this.maxHp);
+    this.draw();
   }
 
   private draw() {
-    this.background.clear();
-    this.bar.clear();
+    this.bg.clear().fillStyle(0x555555).fillRect(-25, -3, 50, 6);
 
-    this.background.fillStyle(0x555555, 0.6);
-    this.background.fillRect(
-      -this.width / 2,
-      -this.height / 2,
-      this.width,
-      this.height
-    );
+    const ratio = this.currentHp / this.maxHp;
+    this.bar
+      .clear()
+      .fillStyle(0xff0000)
+      .fillRect(-25, -3, 50 * ratio, 6);
+  }
 
-    const hpPercent = Phaser.Math.Clamp(this.value / this.maxHp, 0, 1);
-    const color = Phaser.Display.Color.Interpolate.ColorWithColor(
-      new Phaser.Display.Color(255, 0, 0),
-      new Phaser.Display.Color(0, 255, 0),
-      100,
-      hpPercent * 100
-    );
-    const tint = Phaser.Display.Color.GetColor(color.r, color.g, color.b);
-
-    this.bar.fillStyle(tint, 1);
-    this.bar.fillRect(
-      -this.width / 2,
-      -this.height / 2,
-      this.width * hpPercent,
-      this.height
+  update(_time: number, _delta: number) {
+    this.container.setPosition(
+      this.entity.sprite.x,
+      this.entity.sprite.y - GAME_CONFIG.PLAYER.HEALTH_BAR_OFFSET
     );
   }
 
-  setHealth(value: number) {
-    this.value = value;
-    this.draw();
-  }
-
-  setPositionTo(target: Phaser.GameObjects.Sprite) {
-    this.x = target.x;
-    this.y =
-      target.y - target.displayHeight / 2 + GAME_CONFIG.OFFSETS.HEALTH_BAR_Y;
+  destroy() {
+    this.container.destroy(true);
   }
 }

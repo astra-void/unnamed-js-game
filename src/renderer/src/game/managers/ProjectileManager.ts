@@ -23,15 +23,11 @@ export class ProjectileManager {
         const enemy = (enemySprite as EnemySprite).entity;
 
         projectile.onHit(enemy);
-        enemy.takeDamage(projectile.damage);
+        enemy.healthManager.takeDamage(projectile.damage);
 
         projectile.destroy();
       }
     );
-  }
-
-  get projectilesGroup() {
-    return this.projectiles;
   }
 
   get projectileCount() {

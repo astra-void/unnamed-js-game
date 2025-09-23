@@ -7,6 +7,8 @@ import { toNumber } from '../../utils/color';
 import { GAME_CONFIG } from '../../constants';
 import { WeaponConstructor, ItemConstructor } from '../../types/constructors';
 import { FusionRecipe } from '../../fusion';
+import { UIComponent } from '../../types/ui';
+import { EventBus } from '../../EventBus';
 
 interface Choice {
   kind: 'weapon' | 'item' | 'fusion';
@@ -16,29 +18,29 @@ interface Choice {
   button: TextButton;
 }
 
-export class SelectionPanel extends GameObjects.Container {
+export class SelectionPanel
+  extends GameObjects.Container
+  implements UIComponent
+{
+  id = 'selectionPanel';
+  object: GameObjects.Container;
   player: Player;
-  onSelectWeapon: (weapon: Weapon) => void;
-  onSelectItem: (item: Item) => void;
-  onSelectFusion: (recipe: FusionRecipe) => void;
   choices: Choice[] = [];
   bg: GameObjects.Rectangle;
+
+  selectedCount = 0;
+  maxSelect = 3;
 
   constructor(
     scene: Scene,
     player: Player,
     weaponClasses: WeaponConstructor[],
     itemClasses: ItemConstructor[],
-    fusionRecipes: FusionRecipe[],
-    onSelectWeapon: (weapon: Weapon) => void,
-    onSelectItem: (item: Item) => void,
-    onSelectFusion: (recipe: FusionRecipe) => void
+    fusionRecipes: FusionRecipe[]
   ) {
     super(scene);
     this.player = player;
-    this.onSelectWeapon = onSelectWeapon;
-    this.onSelectItem = onSelectItem;
-    this.onSelectFusion = onSelectFusion;
+    this.object = this;
 
     const { PANEL_WIDTH, PANEL_HEIGHT, CARD_WIDTH, CARD_HEIGHT, CARD_SPACING } =
       GAME_CONFIG.SELECTION_PANEL;
@@ -92,12 +94,24 @@ export class SelectionPanel extends GameObjects.Container {
 
     let index = 0;
 
+    const handleSelection = (
+      kind: 'weapon' | 'item' | 'fusion',
+      payload: Weapon | Item | FusionRecipe
+    ) => {
+      if (this.selectedCount >= this.maxSelect) return;
+      this.selectedCount++;
+      EventBus.emit(`selection:${kind}`, payload);
+
+      if (this.selectedCount >= this.maxSelect) {
+        this.destroy();
+      }
+    };
+
     const makeChoice = (
       ctor: WeaponConstructor | ItemConstructor | null,
       kind: 'weapon' | 'item' | 'fusion',
       instance: Weapon | Item | null,
-      recipe: FusionRecipe | null,
-      onSelect: () => void
+      recipe: FusionRecipe | null
     ) => {
       const col = index % cols;
       const row = Math.floor(index / cols);
@@ -108,10 +122,17 @@ export class SelectionPanel extends GameObjects.Container {
       let name: string;
 
       if (kind === 'fusion' && recipe) {
-        card = this.createFusionCard(scene, x, y, recipe, onSelect);
+        card = this.createFusionCard(scene, x, y, recipe, handleSelection);
         name = recipe.name;
       } else if (instance) {
-        card = this.createCard(scene, x, y, instance, onSelect);
+        card = this.createCard(
+          scene,
+          x,
+          y,
+          instance,
+          kind as 'weapon' | 'item',
+          handleSelection
+        );
         name = instance.name;
       } else {
         return;
@@ -128,26 +149,18 @@ export class SelectionPanel extends GameObjects.Container {
     };
 
     weaponClasses.forEach((W) => {
-      let instance = this.player.weapons.find((w) => w.name === W.name);
+      let instance = this.player.weaponManager.findWeapon(W.name);
       if (!instance) instance = new W(this.scene, this.player);
-
-      makeChoice(W, 'weapon', instance, null, () => {
-        this.onSelectWeapon(instance);
-        this.destroy();
-        super.destroy();
-      });
+      makeChoice(W, 'weapon', instance, null);
     });
 
     itemClasses.forEach((I) => {
-      let instance = this.player.items.find((i) => i.name === I.name);
+      let instance = this.player.itemManager.findItem(I.name);
       if (!instance) instance = new I(this.player);
-
-      makeChoice(I, 'item', instance, null, () => {
-        this.onSelectItem(instance);
-        this.destroy();
-        super.destroy();
-      });
+      makeChoice(I, 'item', instance, null);
     });
+
+    fusionRecipes.forEach((recipe) => makeChoice(null, 'fusion', null, recipe));
 
     scene.add.existing(this);
 
@@ -166,8 +179,12 @@ export class SelectionPanel extends GameObjects.Container {
     scene: Scene,
     x: number,
     y: number,
-    item: Weapon | Item,
-    onClick: () => void
+    instance: Weapon | Item,
+    kind: 'weapon' | 'item',
+    onSelect: (
+      kind: 'weapon' | 'item' | 'fusion',
+      payload: Weapon | Item | FusionRecipe
+    ) => void
   ) {
     const cardWidth = GAME_CONFIG.SELECTION_PANEL.CARD_WIDTH;
     const cardHeight = GAME_CONFIG.SELECTION_PANEL.CARD_HEIGHT;
@@ -178,7 +195,9 @@ export class SelectionPanel extends GameObjects.Container {
       .setDepth(10001)
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true })
-      .on('pointerdown', onClick);
+      .on('pointerdown', () => {
+        onSelect(kind, instance);
+      });
 
     cardBg.on('pointerover', () => {
       scene.tweens.add({ targets: cardBg, scale: 1.05, duration: 100 });
@@ -192,7 +211,7 @@ export class SelectionPanel extends GameObjects.Container {
       .setDepth(10002);
 
     const nameText = scene.add
-      .text(x - cardWidth / 2 + 50, y - 15, item.name, {
+      .text(x - cardWidth / 2 + 50, y - 15, instance.name, {
         fontSize: '14px',
         fontStyle: 'bold',
         color: '#ffffff'
@@ -200,14 +219,19 @@ export class SelectionPanel extends GameObjects.Container {
       .setOrigin(0, 0);
 
     const levelText = scene.add
-      .text(x - cardWidth / 2 + 50, y, `Lv. ${item.level}`, {
-        fontSize: '12px',
-        color: '#aaaaaa'
-      })
+      .text(
+        x - cardWidth / 2 + 50,
+        y,
+        instance.level === 0 ? 'New Item' : `Lv. ${instance.level}`,
+        {
+          fontSize: '12px',
+          color: '#aaaaaa'
+        }
+      )
       .setOrigin(0, 0);
 
     const descText = scene.add
-      .text(x - cardWidth / 2 + 50, y + 15, item.description, {
+      .text(x - cardWidth / 2 + 50, y + 15, instance.description, {
         fontSize: '12px',
         color: '#cccccc',
         wordWrap: { width: cardWidth - 60 }
@@ -222,7 +246,94 @@ export class SelectionPanel extends GameObjects.Container {
     return container as unknown as TextButton;
   }
 
-  
+  private createFusionCard(
+    scene: Scene,
+    x: number,
+    y: number,
+    recipe: FusionRecipe,
+    onSelect: (
+      kind: 'weapon' | 'item' | 'fusion',
+      payload: Weapon | Item | FusionRecipe
+    ) => void
+  ) {
+    const cardWidth = GAME_CONFIG.SELECTION_PANEL.CARD_WIDTH;
+    const cardHeight = GAME_CONFIG.SELECTION_PANEL.CARD_HEIGHT;
+
+    const cardBg = scene.add
+      .rectangle(x, y, cardWidth, cardHeight, 0x6a1b9a, 1)
+      .setStrokeStyle(3, 0xffd700)
+      .setDepth(10001)
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true })
+      .on('pointerdown', () => {
+        onSelect('fusion', recipe);
+      });
+
+    cardBg.on('pointerover', () => {
+      scene.tweens.add({
+        targets: cardBg,
+        scale: 1.05,
+        tint: 0xffff99,
+        duration: 100
+      });
+    });
+    cardBg.on('pointerout', () => {
+      scene.tweens.add({
+        targets: cardBg,
+        scale: 1,
+        tint: 0xffffff,
+        duration: 100
+      });
+    });
+
+    const icon = scene.add
+      .text(x - cardWidth / 2 + 20, y - 20, '🔧', { fontSize: '24px' })
+      .setOrigin(0.5)
+      .setDepth(10002);
+
+    const nameText = scene.add
+      .text(x - cardWidth / 2 + 50, y - 25, `⚡ ${recipe.name}`, {
+        fontSize: '14px',
+        fontStyle: 'bold',
+        color: '#ffd700'
+      })
+      .setOrigin(0, 0.5)
+      .setDepth(10002);
+
+    const ingredients = recipe.ingredients
+      .map((ing) => ing.name || 'Unknown')
+      .join(' + ');
+
+    const ingredientsText = scene.add
+      .text(x - cardWidth / 2 + 50, y - 5, `Materials: ${ingredients}`, {
+        fontSize: '10px',
+        color: '#e1bee7',
+        wordWrap: { width: cardWidth - 60 }
+      })
+      .setOrigin(0, 0.5)
+      .setDepth(10002);
+
+    const resultText = scene.add
+      .text(
+        x - cardWidth / 2 + 50,
+        y + 15,
+        `→ ${recipe.result.name || 'Legendary Item'}`,
+        {
+          fontSize: '12px',
+          color: '#ffffff',
+          fontStyle: 'bold'
+        }
+      )
+      .setOrigin(0, 0.5)
+      .setDepth(10002);
+
+    const container = scene.add
+      .container(0, 0, [cardBg, icon, nameText, ingredientsText, resultText])
+      .setSize(cardWidth, cardHeight);
+
+    this.add(container);
+    return container as unknown as TextButton;
+  }
 
   destroy(fromScene?: boolean) {
     this.bg?.destroy();

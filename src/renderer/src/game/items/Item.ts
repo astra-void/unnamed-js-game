@@ -11,7 +11,7 @@ export abstract class Item {
     this.name = name;
     this.description = description;
     this.texture = texture;
-    this.level = 1;
+    this.level = 0;
   }
 
   get isMaxLevel() {
@@ -19,7 +19,7 @@ export abstract class Item {
   }
 
   abstract applyEffect(player: Player): void;
-  abstract removeEffect(player: Player): void;
+  abstract removeEffect?(player: Player): void;
 
   levelUp(player: Player) {
     if (!this.isMaxLevel) {

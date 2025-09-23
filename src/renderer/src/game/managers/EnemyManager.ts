@@ -25,8 +25,8 @@ export class EnemyManager {
       this.enemies,
       (_playerSprite: unknown, enemySprite: unknown) => {
         const enemy = (enemySprite as EnemySprite).entity;
-        scene.player.takeDamage(enemy.damage);
-        enemy.takeDamage(enemy.maxHp);
+        scene.player.healthManager.takeDamage(enemy.damage);
+        enemy.healthManager.takeDamage(enemy.healthManager.maxHp);
       }
     );
   }
@@ -43,6 +43,9 @@ export class EnemyManager {
     this.wave++;
     this.updateSpawnInterval();
     this.updateSpawnTimer();
+
+    console.log('wave up');
+    console.log(this.wave);
   }
 
   waveDown() {

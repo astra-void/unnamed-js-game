@@ -9,7 +9,7 @@ export abstract class Weapon {
   player: Player;
   sprite: GameObjects.Sprite;
   body: Physics.Arcade.Body;
-  level: number;
+  level: number = 0;
   currentCooldown: number;
   cooldown: number;
   damage: number;
@@ -25,7 +25,6 @@ export abstract class Weapon {
     y: number,
     cooldown: number,
     damage: number,
-    level = 1,
     speed?: number,
     lifetime?: number
   ) {
@@ -33,7 +32,6 @@ export abstract class Weapon {
     this.description = description;
     this.scene = scene;
     this.player = player;
-    this.level = level;
     this.currentCooldown = cooldown;
     this.cooldown = cooldown;
     this.damage = damage;
@@ -53,7 +51,15 @@ export abstract class Weapon {
   }
 
   abstract attack(): void;
-  abstract levelUp(): boolean;
+
+  levelUp(player: Player) {
+    if (!this.isMaxLevel) {
+      this.level++;
+      this.onLevelUp(player);
+    }
+  }
+
+  protected onLevelUp(_player: Player): void {}
 
   destroy() {
     this.sprite.destroy();

@@ -8,7 +8,7 @@ export class Knife extends Weapon {
   player: Player;
 
   constructor(scene: Scene, player: Player) {
-    super(scene, 'Knife', 'its knife', player, 0, 0, 0.25, 10, 1, 200, 5);
+    super(scene, 'Knife', 'its knife', player, 0, 0, 0.25, 10, 200, 5);
     this.player = player;
   }
 
@@ -37,19 +37,5 @@ export class Knife extends Weapon {
     );
     if (this.scene instanceof Game)
       this.scene.projectileManager.add(proj.sprite);
-  }
-
-  levelUp(): boolean {
-    if (!this.isMaxLevel) {
-      this.level++;
-
-      /**
-       * 대충 여기 안에다가 레벌입 로직 넣어라
-       */
-
-      return true;
-    } else {
-      return false;
-    }
   }
 }

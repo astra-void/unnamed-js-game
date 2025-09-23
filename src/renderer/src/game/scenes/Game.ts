@@ -12,10 +12,10 @@ export class Game extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;
   gameText: Phaser.GameObjects.Text;
   player: Player;
+
   enemyManager: EnemyManager;
   projectileManager: ProjectileManager;
   fusionManager: FusionManager;
-
   declare uiManager: UIManager;
 
   spawnTimer: number = 0;
@@ -61,8 +61,9 @@ export class Game extends Scene {
 
     this.uiManager = new UIManager(this);
 
-    this.player = new Player(this, 512, 384, 100, 0, 1, [], []);
-    this.player.weapons.push(new Knife(this, this.player));
+    this.player = new Player(this, 512, 384, 100);
+    this.player.weaponManager.addWeapon(new Knife(this, this.player)); // PLACEHOLDER
+    this.player.weaponManager.weapons.forEach((w) => w.levelUp(this.player)); // PLACEHOLDER
 
     this.enemyManager = new EnemyManager(this);
     this.projectileManager = new ProjectileManager(this);
@@ -85,18 +86,21 @@ export class Game extends Scene {
     this.projectileManager.update(time, delta);
   }
 
-  togglePause() {
-    this.paused = !this.paused;
+  pauseGame() {
+    if (this.paused) return;
+    this.paused = true;
+    this.physics.world.pause();
+  }
 
-    if (this.paused) {
-      this.physics.world.pause();
-    } else {
-      this.physics.world.resume();
-    }
+  resumeGame() {
+    if (!this.paused) return;
+    this.paused = false;
+    this.physics.world.resume();
   }
 
   shutdown() {
     if (this.enemyManager) this.enemyManager.destroy();
     if (this.projectileManager) this.projectileManager.destroy();
+    this.game.events.shutdown();
   }
 }

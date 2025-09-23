@@ -1,5 +1,3 @@
-// utils/color.ts
-
 export interface RGB {
   r: number;
   g: number;

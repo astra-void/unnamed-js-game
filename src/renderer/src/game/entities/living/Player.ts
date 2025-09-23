@@ -2,108 +2,241 @@ import { LivingEntity } from './LivingEntity';
 import * as Weapons from '../../weapons';
 import * as Items from '../../items';
 import { Game } from '../../scenes/Game';
-import { HealthBar } from '../../ui/components/HealthBar';
 import { Weapon } from '../../weapons';
 import { Item } from '../../items';
 import { GAME_CONFIG } from '../../constants';
-import { SelectionPanel } from '../../ui/components/SelectionPanel';
 import { WeaponConstructor, ItemConstructor } from '../../types/constructors';
 import { FusionRecipe } from '../../fusion';
+import { EventBus } from '../../EventBus';
+import {
+  WeaponManager,
+  ItemManager,
+  LevelManager,
+  HealthManager,
+  UIManager
+} from '../../managers';
+import { HealthBar } from '../../ui/components/HealthBar';
+import { SelectionPanel } from '../../ui/components/SelectionPanel';
+
+type Candidate = {
+  kind: 'weapon' | 'item' | 'fusion';
+  value: WeaponConstructor | ItemConstructor | FusionRecipe;
+};
 
 export class Player extends LivingEntity {
   speed: number;
   exp: number;
   level: number;
-  weapons: Weapon[];
-  items: Item[];
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   keys: Record<string, Phaser.Input.Keyboard.Key>;
 
-  constructor(
-    scene: Phaser.Scene,
-    x: number,
-    y: number,
-    maxHp: number,
-    exp = 0,
-    level = 1,
-    weapons: Weapon[] = [],
-    items: Item[] = []
-  ) {
-    super(scene, x, y, 'player', maxHp);
+  weaponManager: WeaponManager;
+  itemManager: ItemManager;
+  levelManager: LevelManager;
+  uiManager: UIManager;
+
+  constructor(scene: Game, x: number, y: number, maxHp: number) {
+    super(scene, x, y, 'player', 'player');
     this.speed = GAME_CONFIG.PLAYER.DEFAULT_SPEED;
-    this.exp = exp;
-    this.level = level;
-    this.weapons = weapons;
-    this.items = items;
 
-    const healthBar = new HealthBar(
-      scene,
-      x,
-      y - GAME_CONFIG.PLAYER.HEALTH_BAR_OFFSET,
-      maxHp
-    );
-    this.scene.uiManager.addUI({
-      id: 'health-bar',
-      object: healthBar,
-      update: () => {
-        healthBar.setPosition(
-          this.x,
-          this.y - GAME_CONFIG.PLAYER.HEALTH_BAR_OFFSET
-        );
-        healthBar.setHealth(this.hp);
-      }
-    });
+    this.initializeManagers(maxHp);
+    this.setupPhysics();
+    this.setupControls();
+    this.setupEventListeners();
+  }
 
-    scene.physics.add.existing(this.sprite);
+  private initializeManagers(maxHp: number) {
+    this.weaponManager = new WeaponManager(this, this.scene);
+    this.itemManager = new ItemManager(this, this.scene);
+    this.levelManager = new LevelManager(this, this.scene as Game);
+    this.healthManager = new HealthManager(this, maxHp);
+    this.uiManager = this.scene.uiManager;
+
+    const hpBar = new HealthBar(this.scene, this, this.healthManager.maxHp);
+    this.uiManager.add(hpBar);
+  }
+
+  private setupPhysics() {
+    this.scene.physics.add.existing(this.sprite);
     (this.sprite.body as Phaser.Physics.Arcade.Body).setCollideWorldBounds(
       true
     );
+  }
 
-    this.cursors = scene.input.keyboard!.createCursorKeys();
+  private setupControls() {
+    const keyboard = this.scene.input.keyboard!;
+    this.cursors = keyboard.createCursorKeys();
     this.keys = {
-      w: scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.W),
-      a: scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.A),
-      s: scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.S),
-      d: scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.D)
+      w: keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+      a: keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+      s: keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
+      d: keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D)
     };
   }
 
+  private setupEventListeners() {
+    EventBus.on('player:levelUp', this.handleLevelUp.bind(this));
+    EventBus.on('player:dead', () => this.handleDeath.bind(this));
+  }
+
+  private handleDeath() {
+    this.weaponManager.clear();
+    this.itemManager.clear();
+    this.scene.uiManager.clear();
+    this.destroy();
+    this.scene.scene.start('GameOver');
+  }
+
+  private handleLevelUp() {
+    if (!(this.scene instanceof Game)) return;
+
+    this.scene.pauseGame();
+
+    const candidates = this.getCandidates();
+
+    if (!candidates || candidates.length === 0) return;
+
+    const selected = this.selectRandomCandidates(candidates, 3);
+    this.showSelectionPanel(selected);
+  }
+
+  private getCandidates() {
+    if (!(this.scene instanceof Game)) return;
+
+    const weapons = this.getAvailableWeapons();
+    const items = this.getAvailableItems();
+    const fusions = this.scene.fusionManager.getAvailableFusionsForMaxLevel();
+
+    return [
+      ...weapons.map((w) => ({ kind: 'weapon' as const, value: w })),
+      ...items.map((i) => ({ kind: 'item' as const, value: i })),
+      ...fusions.map((f) => ({ kind: 'fusion' as const, value: f }))
+    ] as Candidate[];
+  }
+
+  private getAvailableWeapons(): WeaponConstructor[] {
+    return Object.values(Weapons).filter((w) => {
+      if (
+        typeof w !== 'function' ||
+        !w.prototype ||
+        !(w.prototype instanceof Weapon)
+      )
+        return false;
+      const temp = new (w as WeaponConstructor)(this.scene, this);
+      const existing = this.weaponManager.findWeapon(temp.name);
+      return !existing || !existing.isMaxLevel;
+    }) as WeaponConstructor[];
+  }
+
+  private getAvailableItems(): ItemConstructor[] {
+    return Object.values(Items).filter((i) => {
+      if (
+        typeof i !== 'function' ||
+        !i.prototype ||
+        !(i.prototype instanceof Item)
+      )
+        return false;
+      const temp = new (i as ItemConstructor)(this);
+      const existing = this.itemManager.findItem(temp.name);
+      return !existing || !existing.isMaxLevel;
+    }) as ItemConstructor[];
+  }
+
+  private selectRandomCandidates<T>(arr: T[], max: number): T[] {
+    const copy = [...arr];
+    const selected: T[] = [];
+    while (selected.length < max && copy.length > 0) {
+      const index = Phaser.Math.Between(0, copy.length - 1);
+      selected.push(copy.splice(index, 1)[0]);
+    }
+    return selected;
+  }
+
+  private showSelectionPanel(candidates: Candidate[]) {
+    const weapons = candidates
+      .filter((c) => c.kind === 'weapon')
+      .map((c) => c.value) as WeaponConstructor[];
+    const items = candidates
+      .filter((c) => c.kind === 'item')
+      .map((c) => c.value) as ItemConstructor[];
+    const fusions = candidates
+      .filter((c) => c.kind === 'fusion')
+      .map((c) => c.value) as FusionRecipe[];
+
+    const selectionPanel = new SelectionPanel(
+      this.scene,
+      this,
+      weapons,
+      items,
+      fusions
+    );
+    this.uiManager.add({
+      id: 'selection-panel',
+      object: selectionPanel,
+      destroy: () => selectionPanel.destroy()
+    });
+
+    this.setupSelectionHandlers(selectionPanel);
+  }
+
+  private setupSelectionHandlers(selectionPanel: SelectionPanel) {
+    const handleSelection = () => {
+      if (!(this.scene instanceof Game)) return;
+      selectionPanel.destroy();
+      this.scene.resumeGame();
+    };
+
+    EventBus.once('selection:weapon', (weapon: Weapon) => {
+      if (!(this.scene instanceof Game)) return;
+      const existing = this.weaponManager.findWeapon(weapon.name);
+      if (existing) {
+        existing.levelUp(this);
+      } else {
+        weapon.levelUp(this);
+        this.weaponManager.addWeapon(weapon);
+      }
+      handleSelection();
+    });
+
+    EventBus.once('selection:item', (item: Item) => {
+      if (!(this.scene instanceof Game)) return;
+      const existing = this.itemManager.findItem(item.name);
+      if (existing) {
+        existing.levelUp(this);
+      } else {
+        item.levelUp(this);
+        this.itemManager.addItem(item);
+        item.applyEffect(this);
+      }
+      handleSelection();
+    });
+
+    EventBus.once('selection:fusion', (recipe: FusionRecipe) => {
+      if (!(this.scene instanceof Game)) return;
+      const result = this.scene.fusionManager.fuse(recipe);
+      console.log(result ? `Fusion Success: ${result.name}` : 'Fusion failed');
+      handleSelection();
+    });
+  }
+
   update(time: number, delta: number): void {
-    const dt = delta / 1000;
-    let vx = 0;
-    let vy = 0;
+    this.handleMovement();
+
+    this.itemManager.update(time, delta);
+    this.weaponManager.attack(delta / 1000);
+  }
+
+  private handleMovement() {
+    let vx = 0,
+      vy = 0;
 
     if (this.keys.w.isDown || this.cursors.up.isDown) vy = -this.speed;
     if (this.keys.s.isDown || this.cursors.down.isDown) vy = this.speed;
     if (this.keys.a.isDown || this.cursors.left.isDown) vx = -this.speed;
     if (this.keys.d.isDown || this.cursors.right.isDown) vx = this.speed;
 
-    if (this.sprite.body instanceof Phaser.Physics.Arcade.Body)
+    if (this.sprite.body instanceof Phaser.Physics.Arcade.Body) {
       this.sprite.body.setVelocity(vx, vy);
-
-    this.items.forEach((item) => item.update(this, time, delta));
-
-    for (const weapon of this.weapons) {
-      weapon.currentCooldown -= dt;
-
-      if (weapon.currentCooldown <= 0) {
-        weapon.currentCooldown += weapon.cooldown;
-
-        weapon.attack();
-      }
-    }
-  }
-
-  gainExp(amount: number) {
-    if (amount <= 0) return;
-
-    this.exp += amount;
-
-    const expNeeded = this.level * GAME_CONFIG.EXP_MULTIPLIER;
-
-    while (this.exp >= expNeeded) {
-      this.exp -= expNeeded;
-      this.levelUp();
     }
   }
 
@@ -117,134 +250,5 @@ export class Player extends LivingEntity {
       console.log('Fusion failed: Required ingredients not available');
       return false;
     }
-  }
-
-  private levelUp(): void {
-    this.level++;
-
-    console.log(`Level Up! Current level: ${this.level}`); // DEBUG
-
-    if (!(this.scene instanceof Game)) return;
-
-    const weaponClasses = Object.values(Weapons).filter((weapon) => {
-      if (
-        typeof weapon !== 'function' ||
-        !weapon.prototype ||
-        !(weapon.prototype instanceof Weapon)
-      )
-        return false;
-
-      const temp = new (weapon as WeaponConstructor)(this.scene, this);
-      const existing = this.weapons.find((w) => w.name === temp.name);
-      return !existing || !existing.isMaxLevel;
-    }) as WeaponConstructor[];
-
-    const itemClasses = Object.values(Items).filter((item) => {
-      if (
-        typeof item !== 'function' ||
-        !item.prototype ||
-        !(item.prototype instanceof Item)
-      )
-        return false;
-
-      const temp = new (item as ItemConstructor)(this);
-      const existing = this.items.find((i) => i.name === temp.name);
-      return !existing || !existing.isMaxLevel;
-    }) as ItemConstructor[];
-
-    const availableFusions =
-      this.scene.fusionManager.getAvailableFusionsForMaxLevel();
-
-    const totalOptions =
-      weaponClasses.length + itemClasses.length + availableFusions.length;
-    if (totalOptions === 0) return;
-
-    let pool = [
-      ...weaponClasses.map((ctor) => ({ kind: 'weapon' as const, ctor })),
-      ...itemClasses.map((ctor) => ({ kind: 'item' as const, ctor })),
-      ...availableFusions.map((recipe) => ({ kind: 'fusion' as const, recipe }))
-    ];
-    const originalPool = [...pool];
-
-    const selectedWeapons: WeaponConstructor[] = [];
-    const selectedItems: ItemConstructor[] = [];
-    const selectedFusions: FusionRecipe[] = [];
-
-    while (
-      selectedWeapons.length + selectedItems.length + selectedFusions.length <
-      3
-    ) {
-      if (pool.length === 0) {
-        if (originalPool.length === 0) break;
-        pool = [...originalPool];
-      }
-
-      const index = Phaser.Math.Between(0, pool.length - 1);
-      const choice = pool.splice(index, 1)[0];
-      if (!choice) break;
-
-      if (choice.kind === 'weapon') {
-        selectedWeapons.push(choice.ctor as WeaponConstructor);
-      } else if (choice.kind === 'item') {
-        selectedItems.push(choice.ctor as ItemConstructor);
-      } else if (choice.kind === 'fusion') {
-        selectedFusions.push(choice.recipe);
-      }
-    }
-
-    if (
-      selectedWeapons.length + selectedItems.length + selectedFusions.length ===
-      0
-    )
-      return;
-
-    this.scene.togglePause();
-    this.scene.enemyManager.waveUp();
-
-    const selectionPanel = new SelectionPanel(
-      this.scene,
-      this,
-      selectedWeapons,
-      selectedItems,
-      (weapon) => {
-        const existing = this.weapons.find((w) => w.name === weapon.name);
-        if (existing) {
-          existing.levelUp();
-          weapon.destroy();
-        } else {
-          this.weapons.push(weapon);
-        }
-
-        if (this.scene instanceof Game) this.scene.togglePause();
-        selectionPanel.destroy();
-      },
-      (item) => {
-        const existing = this.items.find((i) => i.name === item.name);
-        if (existing) {
-          existing.levelUp(this);
-        } else {
-          this.items.push(item);
-          item.applyEffect(this);
-        }
-
-        if (this.scene instanceof Game) this.scene.togglePause();
-        selectionPanel.destroy();
-      }
-    );
-
-    this.scene.uiManager.addUI({
-      id: 'selection-panel',
-      object: selectionPanel
-    });
-  }
-
-  protected onDeath(): void {
-    this.weapons.forEach((weapon) => weapon.destroy());
-    this.weapons = [];
-    this.items = [];
-
-    this.scene.uiManager.clear();
-    this.destroy();
-    this.scene.scene.start('GameOver');
   }
 }
