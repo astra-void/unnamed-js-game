@@ -1,6 +1,6 @@
 import { GAME_CONFIG } from '../constants';
-import { LivingEntity } from '../entities/living';
 import { EventBus } from '../EventBus';
+import { LivingEntity } from '../entities/living';
 
 export class HealthManager {
   entity: LivingEntity;

@@ -1,9 +1,9 @@
-import { Game } from '../scenes/Game';
-import { Enemy } from '../entities/living/Enemy';
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../constants';
-import { EnemySprite, isEnemySprite } from '../types/typeGuards';
 import { EventBus } from '../EventBus';
+import { Enemy } from '../entities/living/Enemy';
+import { Game } from '../scenes/Game';
+import { EnemySprite, isEnemySprite } from '../types/typeGuards';
 
 export class EnemyManager {
   private scene: Game;

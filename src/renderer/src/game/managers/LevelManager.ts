@@ -1,6 +1,6 @@
 import { GAME_CONFIG } from '../constants';
-import { Player } from '../entities/living';
 import { EventBus } from '../EventBus';
+import { Player } from '../entities/living';
 import { Game } from '../scenes/Game';
 
 export class LevelManager {

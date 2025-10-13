@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
-import { LivingEntity } from '../living/LivingEntity';
 import { HealthManager } from '../../managers';
+import { LivingEntity } from '../living/LivingEntity';
 
 export abstract class Projectile extends LivingEntity {
   vx: number;

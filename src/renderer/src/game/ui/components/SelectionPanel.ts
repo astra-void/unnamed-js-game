@@ -1,14 +1,14 @@
 import { GameObjects, Scene } from 'phaser';
-import { Weapon } from '../../weapons';
-import { Item } from '../../items';
-import { Player } from '../../entities/living';
-import { TextButton } from './TextButton';
-import { toNumber } from '../../utils/color';
 import { GAME_CONFIG } from '../../constants';
-import { WeaponConstructor, ItemConstructor } from '../../types/constructors';
-import { FusionRecipe } from '../../fusion';
-import { UIComponent } from '../../types/ui';
 import { EventBus } from '../../EventBus';
+import { Player } from '../../entities/living';
+import { FusionRecipe } from '../../fusion';
+import { Item } from '../../items';
+import { ItemConstructor, WeaponConstructor } from '../../types/constructors';
+import { UIComponent } from '../../types/ui';
+import { toNumber } from '../../utils/color';
+import { Weapon } from '../../weapons';
+import { TextButton } from './TextButton';
 
 interface Choice {
   kind: 'weapon' | 'item' | 'fusion';
@@ -149,13 +149,13 @@ export class SelectionPanel
     };
 
     weaponClasses.forEach((W) => {
-      let instance = this.player.weaponManager.findWeapon(W.name);
+      let instance = this.player.weaponManager.find(W.name);
       if (!instance) instance = new W(this.scene, this.player);
       makeChoice(W, 'weapon', instance, null);
     });
 
     itemClasses.forEach((I) => {
-      let instance = this.player.itemManager.findItem(I.name);
+      let instance = this.player.itemManager.find(I.name);
       if (!instance) instance = new I();
       makeChoice(I, 'item', instance, null);
     });
@@ -170,7 +170,7 @@ export class SelectionPanel
       targets: this,
       scale: 1,
       alpha: 1,
-      duration: 200,
+      duration: GAME_CONFIG.SELECTION_PANEL.ANIMATION_DURATION,
       ease: 'Back'
     });
   }
@@ -256,11 +256,10 @@ export class SelectionPanel
       payload: Weapon | Item | FusionRecipe
     ) => void
   ) {
-    const cardWidth = GAME_CONFIG.SELECTION_PANEL.CARD_WIDTH;
-    const cardHeight = GAME_CONFIG.SELECTION_PANEL.CARD_HEIGHT;
+    const { CARD_WIDTH, CARD_HEIGHT } = GAME_CONFIG.SELECTION_PANEL;
 
     const cardBg = scene.add
-      .rectangle(x, y, cardWidth, cardHeight, 0x6a1b9a, 1)
+      .rectangle(x, y, CARD_WIDTH, CARD_HEIGHT, 0x6a1b9a, 1)
       .setStrokeStyle(3, 0xffd700)
       .setDepth(10001)
       .setOrigin(0.5)
@@ -286,50 +285,78 @@ export class SelectionPanel
       });
     });
 
-    const icon = scene.add
-      .text(x - cardWidth / 2 + 20, y - 20, '🔧', { fontSize: '24px' })
-      .setOrigin(0.5)
-      .setDepth(10002);
-
     const nameText = scene.add
-      .text(x - cardWidth / 2 + 50, y - 25, `⚡ ${recipe.name}`, {
+      .text(x - CARD_WIDTH / 2, y - 25, `${recipe.name}`, {
         fontSize: '14px',
         fontStyle: 'bold',
-        color: '#ffd700'
+        color: '#ffd700',
+        wordWrap: { width: CARD_WIDTH - 60 }
       })
       .setOrigin(0, 0.5)
       .setDepth(10002);
 
     const ingredients = recipe.ingredients
-      .map((ing) => ing.ctor.prototype.name || 'Unknown')
+      .map((ing) => {
+        try {
+          if (ing.ctor.prototype instanceof Item) {
+            const tempItem = new (ing.ctor as ItemConstructor)();
+            const name = tempItem.name;
+            return name;
+          } else if (ing.ctor.prototype instanceof Weapon) {
+            const tempWeapon = new (ing.ctor as WeaponConstructor)(
+              scene,
+              this.player
+            );
+            const name = tempWeapon.name;
+            tempWeapon.destroy();
+            return name;
+          }
+          return ing.ctor.name || 'Unknown';
+        } catch {
+          return ing.ctor.name || 'Unknown';
+        }
+      })
       .join(' + ');
 
     const ingredientsText = scene.add
-      .text(x - cardWidth / 2 + 50, y - 5, `Materials: ${ingredients}`, {
+      .text(x - CARD_WIDTH / 2 + 50, y - 5, `Materials: ${ingredients}`, {
         fontSize: '10px',
         color: '#e1bee7',
-        wordWrap: { width: cardWidth - 60 }
+        wordWrap: { width: CARD_WIDTH - 60 }
       })
       .setOrigin(0, 0.5)
       .setDepth(10002);
 
+    const resultName = () => {
+      if (recipe.result.prototype instanceof Item) {
+        const tempItem = new (recipe.result as ItemConstructor)();
+        const name = tempItem.name;
+        return name;
+      } else if (recipe.result.prototype instanceof Weapon) {
+        const tempWeapon = new (recipe.result as WeaponConstructor)(
+          scene,
+          this.player
+        );
+        const name = tempWeapon.name;
+        tempWeapon.destroy();
+        return name;
+      }
+      return 'nothing';
+    };
+
     const resultText = scene.add
-      .text(
-        x - cardWidth / 2 + 50,
-        y + 15,
-        `→ ${recipe.result.name || 'Legendary Item'}`,
-        {
-          fontSize: '12px',
-          color: '#ffffff',
-          fontStyle: 'bold'
-        }
-      )
+      .text(x - CARD_WIDTH / 2 + 50, y + 15, resultName(), {
+        fontSize: '12px',
+        color: '#ffffff',
+        fontStyle: 'bold',
+        wordWrap: { width: CARD_WIDTH - 60 }
+      })
       .setOrigin(0, 0.5)
       .setDepth(10002);
 
     const container = scene.add
-      .container(0, 0, [cardBg, icon, nameText, ingredientsText, resultText])
-      .setSize(cardWidth, cardHeight);
+      .container(0, 0, [cardBg, nameText, ingredientsText, resultText])
+      .setSize(CARD_WIDTH, CARD_HEIGHT);
 
     this.add(container);
     return container as unknown as TextButton;

@@ -11,15 +11,15 @@ export class ItemManager {
     this.scene = scene;
   }
 
-  addItem(item: Item): void {
+  add(item: Item): void {
     this.items.set(item.name, item);
   }
 
-  removeItem(item: Item): void {
+  remove(item: Item): void {
     this.items.delete(item.name);
   }
 
-  findItem(name: string): Item | undefined {
+  find(name: string): Item | undefined {
     return this.items.get(name);
   }
 

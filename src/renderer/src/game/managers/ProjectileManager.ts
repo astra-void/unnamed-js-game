@@ -2,7 +2,7 @@ import { Game } from '../scenes/Game';
 import { isEnemySprite, isProjectileSprite } from '../types/typeGuards';
 
 export class ProjectileManager {
-  private scene: Game;
+  scene: Game;
   private projectiles: Phaser.GameObjects.Group;
 
   constructor(scene: Game) {

@@ -1,8 +1,8 @@
 import { GameObjects } from 'phaser';
-import { UIComponent } from '../../types/ui';
-import { LivingEntity } from '../../entities/living';
 import { GAME_CONFIG } from '../../constants';
 import { EventBus } from '../../EventBus';
+import { LivingEntity } from '../../entities/living';
+import { UIComponent } from '../../types/ui';
 
 export class HealthBar implements UIComponent {
   id = 'healthBar';

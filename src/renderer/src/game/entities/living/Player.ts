@@ -1,22 +1,22 @@
-import { LivingEntity } from './LivingEntity';
-import * as Weapons from '../../weapons';
-import * as Items from '../../items';
-import { Game } from '../../scenes/Game';
-import { Weapon } from '../../weapons';
-import { Item } from '../../items';
 import { GAME_CONFIG } from '../../constants';
-import { WeaponConstructor, ItemConstructor } from '../../types/constructors';
-import { FusionRecipe } from '../../fusion';
 import { EventBus } from '../../EventBus';
+import { FusionRecipe } from '../../fusion';
+import * as Items from '../../items';
+import { Item } from '../../items';
 import {
-  WeaponManager,
+  HealthManager,
   ItemManager,
   LevelManager,
-  HealthManager,
-  UIManager
+  UIManager,
+  WeaponManager
 } from '../../managers';
+import { Game } from '../../scenes/Game';
+import { ItemConstructor, WeaponConstructor } from '../../types/constructors';
 import { HealthBar } from '../../ui/components/HealthBar';
 import { SelectionPanel } from '../../ui/components/SelectionPanel';
+import * as Weapons from '../../weapons';
+import { Weapon } from '../../weapons';
+import { LivingEntity } from './LivingEntity';
 
 type Candidate = {
   kind: 'weapon' | 'item' | 'fusion';
@@ -123,8 +123,8 @@ export class Player extends LivingEntity {
     const items = isWeapon ? Weapons : Items;
     const baseClass = isWeapon ? Weapon : Item;
     const findMethod = isWeapon
-      ? (name: string) => this.weaponManager.findWeapon(name)
-      : (name: string) => this.itemManager.findItem(name);
+      ? (name: string) => this.weaponManager.find(name)
+      : (name: string) => this.itemManager.find(name);
 
     return Object.values(items).filter((item) => {
       if (
@@ -138,6 +138,7 @@ export class Player extends LivingEntity {
         ? new (item as WeaponConstructor)(this.scene, this)
         : new (item as ItemConstructor)();
       const existing = findMethod(temp.name);
+      if (isWeapon && 'destory' in temp) (temp as Weapon).destroy();
       return !existing || !existing.isMaxLevel;
     }) as C[];
   }
@@ -194,23 +195,23 @@ export class Player extends LivingEntity {
     };
 
     EventBus.once('selection:weapon', (weapon: Weapon) => {
-      const existing = this.weaponManager.findWeapon(weapon.name);
+      const existing = this.weaponManager.find(weapon.name);
       if (existing) {
         existing.levelUp(this);
       } else {
         weapon.levelUp(this);
-        this.weaponManager.addWeapon(weapon);
+        this.weaponManager.add(weapon);
       }
       handleSelection();
     });
 
     EventBus.once('selection:item', (item: Item) => {
-      const existing = this.itemManager.findItem(item.name);
+      const existing = this.itemManager.find(item.name);
       if (existing) {
         existing.levelUp(this);
       } else {
         item.levelUp(this);
-        this.itemManager.addItem(item);
+        this.itemManager.add(item);
         item.applyEffect(this);
       }
       handleSelection();
@@ -241,17 +242,6 @@ export class Player extends LivingEntity {
 
     if (this.sprite.body instanceof Phaser.Physics.Arcade.Body) {
       this.sprite.body.setVelocity(vx, vy);
-    }
-  }
-
-  attemptFusion(recipe: FusionRecipe): boolean {
-    const result = (this.scene as Game).fusionManager.fuse(recipe);
-    if (result) {
-      console.log(`Fusion Success: ${result.name} created!`);
-      return true;
-    } else {
-      console.log('Fusion failed: Required ingredients not available');
-      return false;
     }
   }
 }

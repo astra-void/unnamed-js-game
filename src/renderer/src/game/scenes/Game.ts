@@ -1,12 +1,13 @@
-import { Knife } from '../weapons';
-import { Player } from '../entities/living/Player';
-import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
-import { UIManager } from '../managers/UIManager';
-import { EnemyManager } from '../managers/EnemyManager';
-import { ProjectileManager } from '../managers/ProjectileManager';
-import { FusionManager } from '../fusion';
 import { FUSION_RECIPES } from '../constants/FusionRecipes';
+import { EventBus } from '../EventBus';
+import { Player } from '../entities/living/Player';
+import { FusionManager } from '../fusion';
+import { EnemyManager } from '../managers/EnemyManager';
+import { InstanceManager } from '../managers/InstanceManager';
+import { ProjectileManager } from '../managers/ProjectileManager';
+import { UIManager } from '../managers/UIManager';
+import { Knife } from '../weapons';
 
 export class Game extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;
@@ -17,6 +18,7 @@ export class Game extends Scene {
   projectileManager: ProjectileManager;
   fusionManager: FusionManager;
   uiManager: UIManager;
+  instanceManager: InstanceManager;
 
   spawnTimer: number = 0;
   spawnInterval: number = 2000;
@@ -53,6 +55,12 @@ export class Game extends Scene {
       .fillCircle(6, 6, 6)
       .generateTexture('projectile', 12, 12)
       .destroy();
+    this.add
+      .graphics()
+      .fillStyle(0x00ff00, 0.5)
+      .fillRect(6, 6, 6, 6)
+      .generateTexture('test_object', 12, 12)
+      .destroy();
   }
 
   create() {
@@ -66,12 +74,22 @@ export class Game extends Scene {
       import.meta.env.VITE_WIDTH / 2,
       import.meta.env.VITE_HEIGHT / 2
     );
-    this.player.weaponManager.addWeapon(new Knife(this, this.player)); // PLACEHOLDER
+    this.player.weaponManager.add(new Knife(this, this.player)); // PLACEHOLDER
     this.player.weaponManager.weapons.forEach((w) => w.levelUp(this.player)); // PLACEHOLDER
 
     this.enemyManager = new EnemyManager(this);
     this.projectileManager = new ProjectileManager(this);
     this.fusionManager = new FusionManager(this.player, FUSION_RECIPES);
+    this.instanceManager = new InstanceManager(this);
+
+    this.instanceManager.add(
+      'test',
+      this.make.sprite({
+        x: 100,
+        y: 100,
+        scale: 10
+      })
+    ); // PLACEHOLDER
 
     this.physics.world.setBounds(0, 0, this.scale.width, this.scale.height);
 
@@ -88,6 +106,7 @@ export class Game extends Scene {
 
     this.enemyManager.update(time, delta);
     this.projectileManager.update(time, delta);
+    this.instanceManager.update(time, delta);
   }
 
   pauseGame() {

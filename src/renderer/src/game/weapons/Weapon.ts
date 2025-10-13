@@ -1,6 +1,6 @@
 import { GameObjects, Physics, Scene } from 'phaser';
-import { Player } from '../entities/living';
 import { GAME_CONFIG } from '../constants';
+import { Player } from '../entities/living';
 
 export abstract class Weapon {
   name: string;

@@ -1,7 +1,7 @@
 import { Scene } from 'phaser';
 import { Player } from '../entities/living';
-import { Weapon } from '../weapons';
 import { Item } from '../items';
+import { Weapon } from '../weapons';
 
 export interface WeaponConstructor {
   new (scene: Scene, player: Player): Weapon;
