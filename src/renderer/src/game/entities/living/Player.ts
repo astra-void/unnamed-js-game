@@ -80,7 +80,7 @@ export class Player extends LivingEntity {
 
   private setupEventListeners() {
     EventBus.on('player:levelUp', this.handleLevelUp.bind(this));
-    EventBus.on('player:dead', () => this.handleDeath.bind(this));
+    EventBus.once('player:dead', () => this.handleDeath.bind(this));
   }
 
   private handleDeath() {

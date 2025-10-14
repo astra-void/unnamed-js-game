@@ -4,6 +4,7 @@ import { LivingEntity } from './LivingEntity';
 import { Player } from './Player';
 
 export class Enemy extends LivingEntity {
+  id: string;
   speed: number;
   damage: number;
   target: LivingEntity;
@@ -29,7 +30,7 @@ export class Enemy extends LivingEntity {
       true
     );
 
-    EventBus.on('enemy:dead', () => {
+    EventBus.once('enemy:dead', () => {
       this.destroy();
       if (this.target instanceof Player)
         this.target.levelManager.gainExp(this.damage / 5);

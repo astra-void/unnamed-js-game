@@ -83,12 +83,12 @@ export class Game extends Scene {
     this.instanceManager = new InstanceManager(this);
 
     this.instanceManager.add(
-      'test',
       this.make.sprite({
         x: 100,
         y: 100,
         scale: 10
-      })
+      }),
+      'test'
     ); // PLACEHOLDER
 
     this.physics.world.setBounds(0, 0, this.scale.width, this.scale.height);

@@ -98,7 +98,7 @@
         "useNamespaceKeyword": "error"
       }
     },
-    "includes": ["*/src"]
+    "includes": ["**/*.{ts,tsx,cts,mts}"]
   },
   "javascript": {
     "formatter": {
