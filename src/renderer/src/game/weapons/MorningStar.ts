@@ -4,11 +4,22 @@ import { TestProjectile } from '../entities/projectiles';
 import { Game } from '../scenes/Game';
 import { Weapon } from './Weapon';
 
-export class Test extends Weapon {
+export class MorningStar extends Weapon {
   player: Player;
 
   constructor(scene: Scene, player: Player) {
-    super(scene, 'Tesat', 'test weapon', player, 0, 0, 0.1, 10, 300, 3);
+    super(
+      scene,
+      '모닝스타',
+      '눈 앞의 적을 내리찍으며 공격',
+      player,
+      0,
+      0,
+      0.1,
+      10,
+      300,
+      3
+    );
     this.player = player;
   }
 

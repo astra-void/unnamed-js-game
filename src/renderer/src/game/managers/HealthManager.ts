@@ -16,20 +16,20 @@ export class HealthManager {
   takeDamage(amount: number) {
     this.hp = Math.max(0, this.hp - amount);
 
-    EventBus.emit(`${this.entity.name}:healthChanged`, {
+    EventBus.emit(`${this.entity.name}:${this.entity.id}:healthChanged`, {
       hp: this.hp,
       maxHp: this.maxHp
     });
 
     if (this.hp <= 0) {
-      EventBus.emit(`${this.entity.name}:dead`, this.entity);
+      EventBus.emit(`${this.entity.name}:${this.entity.id}:dead`, this.entity);
     }
   }
 
   heal(amount: number) {
     this.hp = Math.min(this.maxHp, this.hp + amount);
 
-    EventBus.emit(`${this.entity.name}:healthChanged`, {
+    EventBus.emit(`${this.entity.name}:${this.entity.id}:healthChanged`, {
       hp: this.hp,
       maxHp: this.maxHp
     });

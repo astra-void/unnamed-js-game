@@ -4,17 +4,29 @@ import { TestProjectile } from '../entities/projectiles';
 import { Game } from '../scenes/Game';
 import { Weapon } from './Weapon';
 
-export class Test extends Weapon {
+export class JellyBombard extends Weapon {
   player: Player;
 
   constructor(scene: Scene, player: Player) {
-    super(scene, 'Tesat', 'test weapon', player, 0, 0, 0.1, 10, 300, 3);
+    super(
+      scene,
+      '젤리 폭격',
+      '20초마다, 적이 있는 지점에 미사일 3회 포격',
+      player,
+      0,
+      0,
+      0.1,
+      10,
+      300,
+      3
+    );
     this.player = player;
   }
 
   use?(): void {}
 
   attack(): void {
+    /*
     if (!this.speed || !this.lifetime) return;
 
     const pointer = this.scene.input.activePointer;
@@ -37,5 +49,6 @@ export class Test extends Weapon {
     );
     if (this.scene instanceof Game)
       this.scene.projectileManager.add(proj.sprite);
+    */
   }
 }

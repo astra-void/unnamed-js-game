@@ -4,11 +4,22 @@ import { TestProjectile } from '../entities/projectiles';
 import { Game } from '../scenes/Game';
 import { Weapon } from './Weapon';
 
-export class Test extends Weapon {
+export class MilkSprayer extends Weapon {
   player: Player;
 
   constructor(scene: Scene, player: Player) {
-    super(scene, 'Tesat', 'test weapon', player, 0, 0, 0.1, 10, 300, 3);
+    super(
+      scene,
+      '우유 분무기',
+      '일정시간마다 전방 부채꼴 범위에 우유를 흩뿌려 데미지를 주고 맞은 적의 방어력 감소',
+      player,
+      0,
+      0,
+      0.1,
+      10,
+      300,
+      3
+    );
     this.player = player;
   }
 

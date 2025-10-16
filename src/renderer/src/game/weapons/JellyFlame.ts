@@ -8,7 +8,18 @@ export class Test extends Weapon {
   player: Player;
 
   constructor(scene: Scene, player: Player) {
-    super(scene, 'Tesat', 'test weapon', player, 0, 0, 0.1, 10, 300, 3);
+    super(
+      scene,
+      '젤리의 성화',
+      '자신을 중심으로하여 원형태의 도트딜지대 형성',
+      player,
+      0,
+      0,
+      0.1,
+      10,
+      300,
+      3
+    );
     this.player = player;
   }
 

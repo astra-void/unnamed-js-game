@@ -4,11 +4,22 @@ import { TestProjectile } from '../entities/projectiles';
 import { Game } from '../scenes/Game';
 import { Weapon } from './Weapon';
 
-export class Test extends Weapon {
+export class GummyStaff extends Weapon {
   player: Player;
 
   constructor(scene: Scene, player: Player) {
-    super(scene, 'Tesat', 'test weapon', player, 0, 0, 0.1, 10, 300, 3);
+    super(
+      scene,
+      '곰젤리의 지팡이',
+      '주변에 곰젤리 머리를 소환하여 주변을 돔',
+      player,
+      0,
+      0,
+      0.1,
+      10,
+      300,
+      3
+    );
     this.player = player;
   }
 

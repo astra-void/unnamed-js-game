@@ -21,7 +21,7 @@ export abstract class Projectile extends LivingEntity {
     speed = 200,
     texture: string = 'projectile'
   ) {
-    super(scene, x, y, 'projectile', texture);
+    super(scene, x, y, 'projectile', 'projectile', texture);
     this.vx = vx;
     this.vy = vy;
     this.lifetime = lifetime;

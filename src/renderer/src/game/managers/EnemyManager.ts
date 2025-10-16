@@ -10,6 +10,7 @@ export class EnemyManager {
   private spawnTimer: Phaser.Time.TimerEvent | null = null;
   private spawnInterval: number;
   private enemies: Phaser.GameObjects.Group;
+  private nextEnemyId: number = 0;
   wave: number = 1;
 
   constructor(scene: Game) {
@@ -131,7 +132,17 @@ export class EnemyManager {
         break;
     }
 
-    const enemy = new Enemy(this.scene, x, y, 100, 10, 200, this.scene.player);
+    const enemy = new Enemy(
+      this.scene,
+      this.nextEnemyId.toString(),
+      x,
+      y,
+      100,
+      10,
+      200,
+      this.scene.player
+    );
+    this.nextEnemyId++;
     (enemy.sprite as EnemySprite).entity = enemy;
     this.enemies.add(enemy.sprite);
   }

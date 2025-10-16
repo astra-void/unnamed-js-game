@@ -4,13 +4,13 @@ import { LivingEntity } from './LivingEntity';
 import { Player } from './Player';
 
 export class Enemy extends LivingEntity {
-  id: string;
   speed: number;
   damage: number;
   target: LivingEntity;
 
   constructor(
     scene: Phaser.Scene,
+    id: string,
     x: number,
     y: number,
     maxHp: number,
@@ -18,7 +18,7 @@ export class Enemy extends LivingEntity {
     speed = 200,
     target: LivingEntity
   ) {
-    super(scene, x, y, 'enemy', 'enemy');
+    super(scene, x, y, 'enemy', id, 'enemy');
     this.damage = damage;
     this.speed = speed;
     this.target = target;
@@ -30,7 +30,7 @@ export class Enemy extends LivingEntity {
       true
     );
 
-    EventBus.once('enemy:dead', () => {
+    EventBus.once(`enemy:${this.id}:dead`, () => {
       this.destroy();
       if (this.target instanceof Player)
         this.target.levelManager.gainExp(this.damage / 5);

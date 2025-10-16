@@ -12,7 +12,8 @@ import {
 } from '../../managers';
 import { Game } from '../../scenes/Game';
 import { ItemConstructor, WeaponConstructor } from '../../types/constructors';
-import { HealthBar } from '../../ui/components/HealthBar';
+import { HUDPanel } from '../../ui/components/HUDPanel';
+import { CardContent } from '../../ui/components/InfoCard';
 import { SelectionPanel } from '../../ui/components/SelectionPanel';
 import * as Weapons from '../../weapons';
 import { Weapon } from '../../weapons';
@@ -36,13 +37,14 @@ export class Player extends LivingEntity {
   uiManager: UIManager;
 
   constructor(scene: Game, x: number, y: number) {
-    super(scene, x, y, 'player', 'player');
+    super(scene, x, y, 'player', 'player', 'player');
     this.speed = GAME_CONFIG.PLAYER.DEFAULT_SPEED;
 
     this.initializeManagers();
     this.setupPhysics();
     this.setupControls();
     this.setupEventListeners();
+    this.setupUI();
   }
 
   private initializeManagers() {
@@ -51,13 +53,6 @@ export class Player extends LivingEntity {
     this.levelManager = new LevelManager(this, this.scene as Game);
     this.healthManager = new HealthManager(this);
     this.uiManager = this.scene.uiManager;
-
-    const hpBar = new HealthBar(
-      this.scene,
-      this,
-      GAME_CONFIG.PLAYER.DEFAULT_MAX_HP
-    );
-    this.uiManager.add(hpBar);
   }
 
   private setupPhysics() {
@@ -80,7 +75,20 @@ export class Player extends LivingEntity {
 
   private setupEventListeners() {
     EventBus.on('player:levelUp', this.handleLevelUp.bind(this));
-    EventBus.once('player:dead', () => this.handleDeath.bind(this));
+    EventBus.once(`player:${this.id}:dead`, () => this.handleDeath.bind(this));
+  }
+
+  private setupUI() {
+    const hud = new HUDPanel(this.scene, 20, 40);
+    hud.updateData({
+      health: this.healthManager.hp,
+      maxHealth: this.healthManager.maxHp,
+      level: this.levelManager.level,
+      experience: this.levelManager.exp,
+      maxExperience: this.levelManager.nextLevelExp
+    });
+
+    this.uiManager.add(hud);
   }
 
   private handleDeath() {
@@ -162,65 +170,96 @@ export class Player extends LivingEntity {
   }
 
   private showSelectionPanel(candidates: Candidate[]) {
-    const weapons = candidates
-      .filter((c) => c.kind === 'weapon')
-      .map((c) => c.value) as WeaponConstructor[];
-    const items = candidates
-      .filter((c) => c.kind === 'item')
-      .map((c) => c.value) as ItemConstructor[];
-    const fusions = candidates
-      .filter((c) => c.kind === 'fusion')
-      .map((c) => c.value) as FusionRecipe[];
+    const choices: CardContent[] = candidates.map((candidate) => {
+      if (candidate.kind === 'weapon') {
+        const WpnCtor = candidate.value as WeaponConstructor;
+        const tempWeapon = new WpnCtor(this.scene, this);
+        const existing = this.weaponManager.find(tempWeapon.name);
+        const card: CardContent = {
+          title: tempWeapon.name,
+          description: existing
+            ? `레벨업! (Lv.${existing.level} -> Lv.${existing.level + 1})`
+            : '새로운 무기'
+        };
+        tempWeapon.destroy();
+        return card;
+      }
 
-    const selectionPanel = new SelectionPanel(
-      this.scene,
-      this,
-      weapons,
-      items,
-      fusions
-    );
+      if (candidate.kind === 'item') {
+        const ItmCtor = candidate.value as ItemConstructor;
+        const tempItem = new ItmCtor();
+        const existing = this.itemManager.find(tempItem.name);
+        return {
+          title: tempItem.name,
+          description: existing
+            ? `레벨업! (Lv.${existing.level} -> Lv.${existing.level + 1})`
+            : '새로운 아이템'
+        };
+      }
+
+      const recipe = candidate.value as FusionRecipe;
+      const ingredients = recipe.ingredients
+        .map((ing) => ing.ctor.prototype.name || 'Unknown')
+        .join(' + ');
+      return {
+        title: `합성: ${recipe.result.name}`,
+        description: `${ingredients}`
+      };
+    });
+
+    const selectionPanel = new SelectionPanel(this.scene, choices, {
+      onSelect: (index: number) => {
+        const selected = candidates[index];
+        if (!selected) {
+          return;
+        }
+
+        switch (selected.kind) {
+          case 'weapon': {
+            const WpnCtor = selected.value as WeaponConstructor;
+            const weapon = new WpnCtor(this.scene, this);
+            const existing = this.weaponManager.find(weapon.name);
+            if (existing) {
+              existing.levelUp(this);
+              weapon.destroy();
+            } else {
+              weapon.levelUp(this);
+              this.weaponManager.add(weapon);
+            }
+            break;
+          }
+          case 'item': {
+            const ItmCtor = selected.value as ItemConstructor;
+            const item = new ItmCtor();
+            const existing = this.itemManager.find(item.name);
+            if (existing) {
+              existing.levelUp(this);
+            } else {
+              item.levelUp(this);
+              this.itemManager.add(item);
+              item.applyEffect(this);
+            }
+            break;
+          }
+          case 'fusion': {
+            const recipe = selected.value as FusionRecipe;
+            const result = (this.scene as Game).fusionManager.fuse(recipe);
+            console.log(
+              result ? `Fusion Success: ${result.name}` : 'Fusion failed'
+            );
+            break;
+          }
+        }
+      },
+      onClose: () => {
+        (this.scene as Game).resumeGame();
+      }
+    });
+
     this.uiManager.add({
       id: 'selection-panel',
       object: selectionPanel,
       destroy: () => selectionPanel.destroy()
-    });
-
-    this.setupSelectionHandlers(selectionPanel);
-  }
-
-  private setupSelectionHandlers(selectionPanel: SelectionPanel) {
-    const handleSelection = () => {
-      selectionPanel.destroy();
-      (this.scene as Game).resumeGame();
-    };
-
-    EventBus.once('selection:weapon', (weapon: Weapon) => {
-      const existing = this.weaponManager.find(weapon.name);
-      if (existing) {
-        existing.levelUp(this);
-      } else {
-        weapon.levelUp(this);
-        this.weaponManager.add(weapon);
-      }
-      handleSelection();
-    });
-
-    EventBus.once('selection:item', (item: Item) => {
-      const existing = this.itemManager.find(item.name);
-      if (existing) {
-        existing.levelUp(this);
-      } else {
-        item.levelUp(this);
-        this.itemManager.add(item);
-        item.applyEffect(this);
-      }
-      handleSelection();
-    });
-
-    EventBus.once('selection:fusion', (recipe: FusionRecipe) => {
-      const result = (this.scene as Game).fusionManager.fuse(recipe);
-      console.log(result ? `Fusion Success: ${result.name}` : 'Fusion failed');
-      handleSelection();
     });
   }
 

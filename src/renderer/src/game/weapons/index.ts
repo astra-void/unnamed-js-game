@@ -1,6 +1,10 @@
+export * from './GummySoul';
+export * from './GummyStaff';
+export * from './JellyBombard';
+export * from './JellyCrossbow';
+export * from './JellyFlame';
 export * from './Knife';
+export * from './MilkSprayer';
+export * from './MorningStar';
+export * from './Scythe';
 export * from './Weapon';
-/*
-export * from './Test';
-export * from './Test2';
-*/

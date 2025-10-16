@@ -1,13 +1,13 @@
 export const GAME_CONFIG = {
-  EXP_MULTIPLIER: 2, // 다음 레벨까지 필요한 경험치 배수 (level * EXP_MULTIPLIER)
+  EXP_MULTIPLIER: 5, // 다음 레벨까지 필요한 경험치 배수 (level * EXP_MULTIPLIER)
   MAX_ITEM_LEVEL: 5, // 아이템 최대 레벨
   MAX_WEAPON_LEVEL: 5, // 무기 최대 레벨
 
   SELECTION_PANEL: {
     PANEL_WIDTH: 650, // 아이템 선택 패널 폭
     PANEL_HEIGHT: 350, // 아이템 선택 패널 높이
-    CARD_WIDTH: 180, // 카드 폭
-    CARD_HEIGHT: 80, // 카드 높이
+    CARD_WIDTH: 200, // 카드 폭
+    CARD_HEIGHT: 120, // 카드 높이
     CARD_SPACING: 20, // 카드 간격
     MAX_CHOICES: 3, // 최대 선택 가능 개수
     ANIMATION_DURATION: 200 // 애니메이션 시간 (ms)

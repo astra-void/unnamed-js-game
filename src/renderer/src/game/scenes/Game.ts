@@ -57,9 +57,9 @@ export class Game extends Scene {
       .destroy();
     this.add
       .graphics()
-      .fillStyle(0x00ff00, 0.5)
-      .fillRect(6, 6, 6, 6)
-      .generateTexture('test_object', 12, 12)
+      .fillStyle(0xffffff, 1)
+      .fillRect(6, 6, 64, 64)
+      .generateTexture('test_object', 128, 128)
       .destroy();
   }
 
@@ -82,14 +82,7 @@ export class Game extends Scene {
     this.fusionManager = new FusionManager(this.player, FUSION_RECIPES);
     this.instanceManager = new InstanceManager(this);
 
-    this.instanceManager.add(
-      this.make.sprite({
-        x: 100,
-        y: 100,
-        scale: 10
-      }),
-      'test'
-    ); // PLACEHOLDER
+    this.instanceManager.add(this.add.sprite(100, 100, 'test_object'), 'test'); // PLACEHOLDER
 
     this.physics.world.setBounds(0, 0, this.scale.width, this.scale.height);
 

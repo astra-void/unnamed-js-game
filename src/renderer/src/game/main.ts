@@ -1,9 +1,10 @@
-import { AUTO, Game } from 'phaser';
+import { AUTO } from 'phaser';
 import { Boot } from './scenes/Boot';
-import { Game as MainGame } from './scenes/Game';
+import { Game } from './scenes/Game';
 import { GameOver } from './scenes/GameOver';
 import { MainMenu } from './scenes/MainMenu';
 import { Preloader } from './scenes/Preloader';
+import { Settings } from './scenes/Settings';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: AUTO,
@@ -18,11 +19,11 @@ const config: Phaser.Types.Core.GameConfig = {
   },
   parent: 'game-container',
   backgroundColor: '#000000',
-  scene: [Boot, Preloader, MainMenu, MainGame, GameOver]
+  scene: [Boot, Preloader, MainMenu, Game, GameOver, Settings]
 };
 
 const StartGame = (parent: string) => {
-  return new Game({ ...config, parent });
+  return new Phaser.Game({ ...config, parent });
 };
 
 export default StartGame;
