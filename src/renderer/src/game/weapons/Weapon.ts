@@ -20,6 +20,7 @@ export abstract class Weapon {
     scene: Scene,
     name: string,
     description: string,
+    texture: string,
     player: Player,
     x: number,
     y: number,
@@ -38,7 +39,7 @@ export abstract class Weapon {
     this.speed = speed;
     this.lifetime = lifetime;
 
-    this.sprite = scene.add.sprite(x, y, '1');
+    this.sprite = scene.add.sprite(x, y, texture);
     scene.physics.add.existing(this.sprite);
     this.body = this.sprite.body as Physics.Arcade.Body;
 

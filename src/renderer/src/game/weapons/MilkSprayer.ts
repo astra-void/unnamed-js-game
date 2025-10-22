@@ -2,6 +2,7 @@ import { Scene } from 'phaser';
 import { Player } from '../entities/living';
 import { TestProjectile } from '../entities/projectiles';
 import { Game } from '../scenes/Game';
+import { getVelocityCoords } from '../utils/distance';
 import { Weapon } from './Weapon';
 
 export class MilkSprayer extends Weapon {
@@ -12,6 +13,7 @@ export class MilkSprayer extends Weapon {
       scene,
       '우유 분무기',
       '일정시간마다 전방 부채꼴 범위에 우유를 흩뿌려 데미지를 주고 맞은 적의 방어력 감소',
+      'milk_sprayer',
       player,
       0,
       0,
@@ -29,12 +31,13 @@ export class MilkSprayer extends Weapon {
     if (!this.speed || !this.lifetime) return;
 
     const pointer = this.scene.input.activePointer;
-    const dx = pointer.worldX - this.player.x;
-    const dy = pointer.worldY - this.player.y;
-    const len = Math.sqrt(dx * dx + dy * dy) || 1;
-
-    const vx = (dx / len) * this.speed;
-    const vy = (dy / len) * this.speed;
+    const { vx, vy } = getVelocityCoords(
+      pointer.worldX,
+      pointer.worldY,
+      this.player.x,
+      this.player.y,
+      this.speed
+    );
 
     const proj = new TestProjectile(
       this.scene,

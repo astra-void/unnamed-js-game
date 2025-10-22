@@ -7,7 +7,7 @@ import { EnemyManager } from '../managers/EnemyManager';
 import { InstanceManager } from '../managers/InstanceManager';
 import { ProjectileManager } from '../managers/ProjectileManager';
 import { UIManager } from '../managers/UIManager';
-import { Knife } from '../weapons';
+import { MorningStar } from '../weapons';
 
 export class Game extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;
@@ -61,6 +61,19 @@ export class Game extends Scene {
       .fillRect(6, 6, 64, 64)
       .generateTexture('test_object', 128, 128)
       .destroy();
+
+    /** End of placeholder test graphics */
+
+    this.load.image('1', 'assets/1.png');
+    this.load.image('2', 'assets/2.png');
+    this.load.image('3', 'assets/3.png');
+    this.load.image('4', 'assets/4.png');
+    this.load.image('5', 'assets/5.png');
+    this.load.image('6', 'assets/6.png');
+    this.load.image('7', 'assets/7.png');
+    this.load.image('8', 'assets/8.png');
+    this.load.image('9', 'assets/9.png');
+    this.load.image('10', 'assets/10.png');
   }
 
   create() {
@@ -74,15 +87,13 @@ export class Game extends Scene {
       import.meta.env.VITE_WIDTH / 2,
       import.meta.env.VITE_HEIGHT / 2
     );
-    this.player.weaponManager.add(new Knife(this, this.player)); // PLACEHOLDER
+    this.player.weaponManager.add(new MorningStar(this, this.player)); // PLACEHOLDER
     this.player.weaponManager.weapons.forEach((w) => w.levelUp(this.player)); // PLACEHOLDER
 
     this.enemyManager = new EnemyManager(this);
     this.projectileManager = new ProjectileManager(this);
     this.fusionManager = new FusionManager(this.player, FUSION_RECIPES);
     this.instanceManager = new InstanceManager(this);
-
-    this.instanceManager.add(this.add.sprite(100, 100, 'test_object'), 'test'); // PLACEHOLDER
 
     this.physics.world.setBounds(0, 0, this.scale.width, this.scale.height);
 

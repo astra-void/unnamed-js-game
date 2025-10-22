@@ -2,6 +2,7 @@ import { Scene } from 'phaser';
 import { Player } from '../entities/living';
 import { TestProjectile } from '../entities/projectiles';
 import { Game } from '../scenes/Game';
+import { getVelocityCoords } from '../utils/distance';
 import { Weapon } from './Weapon';
 
 export class MorningStar extends Weapon {
@@ -12,6 +13,7 @@ export class MorningStar extends Weapon {
       scene,
       '모닝스타',
       '눈 앞의 적을 내리찍으며 공격',
+      'morning_star',
       player,
       0,
       0,
@@ -29,12 +31,13 @@ export class MorningStar extends Weapon {
     if (!this.speed || !this.lifetime) return;
 
     const pointer = this.scene.input.activePointer;
-    const dx = pointer.worldX - this.player.x;
-    const dy = pointer.worldY - this.player.y;
-    const len = Math.sqrt(dx * dx + dy * dy) || 1;
-
-    const vx = (dx / len) * this.speed;
-    const vy = (dy / len) * this.speed;
+    const { vx, vy } = getVelocityCoords(
+      pointer.worldX,
+      pointer.worldY,
+      this.player.x,
+      this.player.y,
+      this.speed
+    );
 
     const proj = new TestProjectile(
       this.scene,

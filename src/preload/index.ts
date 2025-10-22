@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-
 import { electronAPI } from '@electron-toolkit/preload';
 import { contextBridge } from 'electron';
 
