@@ -71,6 +71,7 @@ export class HUDPanel
     EventBus.on(
       `player:${this.playerId}:healthChanged`,
       ({ hp }: { hp: number }) => {
+        console.log(hp);
         this.updateData({ health: hp });
       }
     );

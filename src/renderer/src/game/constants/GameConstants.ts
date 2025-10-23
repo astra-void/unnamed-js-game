@@ -36,7 +36,7 @@ export const GAME_CONFIG = {
 
   PLAYER: {
     DEFAULT_SPEED: 200, // 기본 이동속도
-    DEFAULT_MAX_HP: 100, // 기본 최대체력
+    DEFAULT_MAX_HP: 10, // 기본 최대체력
     HEALTH_BAR_OFFSET: 40 // 체력바 오프셋
   },
 
