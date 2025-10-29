@@ -74,12 +74,12 @@ export class Player extends LivingEntity {
   }
 
   private setupEventListeners() {
-    EventBus.on('player:levelUp', this.handleLevelUp.bind(this));
+    EventBus.on(`player:${this.id}:levelUp`, this.handleLevelUp.bind(this));
     EventBus.once(`player:${this.id}:dead`, () => this.handleDeath.bind(this));
   }
 
   private setupUI() {
-    const hud = new HUDPanel(this.scene, 20, 40);
+    const hud = new HUDPanel(this.scene, 20, 40, this.id);
     hud.updateData({
       health: this.healthManager.hp,
       maxHealth: this.healthManager.maxHp,

@@ -6,6 +6,7 @@ export interface HUDData {
   health?: number;
   maxHealth?: number;
   experience?: number;
+  nextExperience?: number;
   maxExperience?: number;
   level?: number;
   score?: number;
@@ -43,9 +44,9 @@ export class HUDPanel
   private currentScore: number = 0;
   private currentTime: number = 0;
 
-  private playerId?: string;
+  private playerId: string;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, playerId?: string) {
+  constructor(scene: Phaser.Scene, x: number, y: number, playerId: string) {
     super(scene, x, y);
 
     this.playerId = playerId;
@@ -85,8 +86,8 @@ export class HUDPanel
 
     EventBus.on(
       `player:${this.playerId}:expChanged`,
-      ({ exp, maxExp }: { exp: number; maxExp: number }) => {
-        this.updateData({ experience: exp, maxExperience: maxExp });
+      ({ exp, nextExp, maxExp }: { exp: number; nextExp: number, maxExp: number }) => {
+        this.updateData({ experience: exp, nextExperience: nextExp, maxExperience: maxExp });
       }
     );
 
