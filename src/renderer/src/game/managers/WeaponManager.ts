@@ -1,3 +1,4 @@
+import { GAME_CONFIG } from '../constants';
 import { Player } from '../entities/living';
 import { Weapon } from '../weapons';
 
@@ -9,6 +10,13 @@ export class WeaponManager {
   constructor(player: Player, scene: Phaser.Scene) {
     this.player = player;
     this.scene = scene;
+
+    const defaultWeapon = new GAME_CONFIG.DEFAULT_WEAPON(
+      this.scene,
+      this.player
+    );
+    defaultWeapon.levelUp();
+    this.add(defaultWeapon);
   }
 
   add(weapon: Weapon): void {

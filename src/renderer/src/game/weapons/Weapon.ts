@@ -53,14 +53,14 @@ export abstract class Weapon {
 
   abstract attack(): void;
 
-  levelUp(player: Player) {
+  levelUp() {
     if (!this.isMaxLevel) {
       this.level++;
-      this.onLevelUp(player);
+      this.onLevelUp();
     }
   }
 
-  protected onLevelUp(_player: Player): void {}
+  protected onLevelUp(): void {}
 
   destroy() {
     this.sprite.destroy();

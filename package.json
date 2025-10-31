@@ -4,9 +4,8 @@
   "version": "0.0.0",
   "main": "./out/main/index.js",
   "scripts": {
-    "format": "pnpm exec biome format --write",
-    "lint": "pnpm exec biome lint --write",
-    "check": "pnpm exec biome check --write",
+    "lint": "biome check .",
+    "lint:fix": "biome check . --fix --unsafe",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
     "typecheck": "pnpm run typecheck:node && pnpm run typecheck:web",

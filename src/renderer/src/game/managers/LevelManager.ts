@@ -20,7 +20,10 @@ export class LevelManager {
 
   gainExp(amount: number) {
     this.exp += amount;
-    EventBus.emit(`player:${this.player.id}:expChanged`, { exp: this.exp, maxExp: this.nextLevelExp });
+    EventBus.emit(`player:${this.player.id}:expChanged`, {
+      exp: this.exp,
+      maxExp: this.nextLevelExp
+    });
 
     while (this.exp >= this.nextLevelExp) {
       this.exp -= this.nextLevelExp;

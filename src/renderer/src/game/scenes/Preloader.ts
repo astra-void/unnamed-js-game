@@ -24,6 +24,18 @@ export class Preloader extends Scene {
 
   preload() {
     //  Load the assets for the game - Replace with your own assets
+    this.load.setPath('/assets/');
+
+    // Load weapons image
+    this.load.image('arrow', 'arrow.png');
+    this.load.image('gummy_soul', 'gummy_soul.png');
+    this.load.image('gummy_staff', 'gummy_staff.png');
+    this.load.image('jelly_bombard', 'jelly_bombard.png');
+    this.load.image('jelly_crossbow', 'jelly_crossbow.png');
+    this.load.image('jelly_flame', 'jelly_flame.png');
+    this.load.image('milk_sprayer', 'milk_sprayer.png');
+    this.load.image('morning_star', 'morning_star.png');
+    this.load.image('scythe', 'scythe.png');
   }
 
   create() {

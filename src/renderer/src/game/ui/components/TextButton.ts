@@ -69,7 +69,8 @@ export class TextButton extends Phaser.GameObjects.Container {
     this.add([this.bg, this.label]);
 
     this.setSize(this.bg.width, this.bg.height);
-    this.setInteractive({ useHandCursor: true });
+    this.setInteractive();
+    if (this.input) this.input.cursor = 'pointer';
 
     this.on('pointerdown', () => {
       this.scene.tweens.add({
@@ -148,6 +149,10 @@ export class TextButton extends Phaser.GameObjects.Container {
   updateTextContent(text: string): void {
     this.label.setText(text);
     this.updateButtonSize();
+    this.removeInteractive();
+
+    this.setInteractive();
+    if (this.input) this.input.cursor = 'pointer';
   }
 
   setEnabled(enabled: boolean): void {
@@ -163,5 +168,11 @@ export class TextButton extends Phaser.GameObjects.Container {
 
     this.label.setFontSize(newFontSize);
     this.updateButtonSize();
+
+    this.removeInteractive();
+    this.setInteractive();
+    if (this.input) {
+      this.input.cursor = 'pointer';
+    }
   }
 }

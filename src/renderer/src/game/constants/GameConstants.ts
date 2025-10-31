@@ -1,7 +1,11 @@
+import { Arrow } from '../weapons';
+
 export const GAME_CONFIG = {
   EXP_MULTIPLIER: 5, // 다음 레벨까지 필요한 경험치 배수 (level * EXP_MULTIPLIER)
   MAX_ITEM_LEVEL: 5, // 아이템 최대 레벨
   MAX_WEAPON_LEVEL: 5, // 무기 최대 레벨
+
+  DEFAULT_WEAPON: Arrow, // 기본 무기
 
   SELECTION_PANEL: {
     PANEL_WIDTH: 650, // 아이템 선택 패널 폭
@@ -35,12 +39,14 @@ export const GAME_CONFIG = {
   },
 
   PLAYER: {
-    DEFAULT_SPEED: 200, // 기본 이동속도
-    DEFAULT_MAX_HP: 10, // 기본 최대체력
+    DEFAULT_SPEED: 10, // 기본 이동속도
+    DEFAULT_MAX_HP: 100, // 기본 최대체력
     HEALTH_BAR_OFFSET: 40 // 체력바 오프셋
   },
 
   ENEMY: {
+    DEFAULT_SPEED: 5, // 기본 이동속도
+    DEFAULT_DAMAGE: 10, // 기본 공격력
     SPAWN_INTERVAL: 2000, // (ms)
     MIN_SPAWN_INTERVAL: 500 // (ms)
   }

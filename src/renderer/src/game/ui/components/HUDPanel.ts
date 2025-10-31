@@ -86,8 +86,20 @@ export class HUDPanel
 
     EventBus.on(
       `player:${this.playerId}:expChanged`,
-      ({ exp, nextExp, maxExp }: { exp: number; nextExp: number, maxExp: number }) => {
-        this.updateData({ experience: exp, nextExperience: nextExp, maxExperience: maxExp });
+      ({
+        exp,
+        nextExp,
+        maxExp
+      }: {
+        exp: number;
+        nextExp: number;
+        maxExp: number;
+      }) => {
+        this.updateData({
+          experience: exp,
+          nextExperience: nextExp,
+          maxExperience: maxExp
+        });
       }
     );
 
@@ -224,6 +236,15 @@ export class HUDPanel
   }
 
   updateData(data: HUDData): void {
+    if (
+      !this.scene ||
+      !this.active ||
+      !this.healthText ||
+      !this.healthText.scene
+    ) {
+      return;
+    }
+
     if (data.health !== undefined) {
       this.currentHealth = data.health;
     }

@@ -19,7 +19,8 @@ export class HealthManager {
   private emitHealthChanged() {
     EventBus.emit(`${this.entity.name}:${this.entity.id}:healthChanged`, {
       hp: this.hp,
-      maxHp: this.maxHp
+      maxHp: this.maxHp,
+      isDead: this.isDead
     });
   }
 
@@ -27,12 +28,10 @@ export class HealthManager {
     if (this.isDead || amount < 0) return;
 
     this.hp = Math.max(0, this.hp - amount);
-    this.emitHealthChanged();
-    
     if (this.hp <= 0 && !this.isDead) {
       this.isDead = true;
-      EventBus.emit(`${this.entity.name}:${this.entity.id}:dead`, this.entity);
     }
+    this.emitHealthChanged();
   }
 
   heal(amount: number) {
@@ -44,7 +43,7 @@ export class HealthManager {
 
   setMaxHp(newMaxHp: number) {
     if (newMaxHp <= 0) return;
-    
+
     const hpRatio = this.hp / this.maxHp;
     this.maxHp = newMaxHp;
     this.hp = Math.min(this.maxHp, Math.floor(this.maxHp * hpRatio));

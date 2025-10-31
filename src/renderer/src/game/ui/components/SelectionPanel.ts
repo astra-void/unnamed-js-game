@@ -223,21 +223,52 @@ export class SelectionPanel extends Phaser.GameObjects.Container {
     });
   }
 
+  private repositionCards(uiScale: UIScale): void {
+    const cardWidth = uiScale.cardWidth;
+    const cardHeight = uiScale.cardHeight;
+    const spacing = uiScale.spacing.lg;
+
+    const titleHeight = this.titleText ? this.titleText.height + 40 : 40;
+    const availableHeight = this.panelHeight - titleHeight - 40;
+    const availableWidth = this.panelWidth - 40;
+
+    const positions = UIConfig.calculateCardGrid(
+      availableWidth,
+      availableHeight,
+      cardWidth,
+      cardHeight,
+      spacing,
+      this.cards.length
+    );
+
+    const yOffset = titleHeight / 2;
+
+    this.cards.forEach((card, index) => {
+      const pos = positions[index];
+
+      card.setPosition(
+        pos.x - availableWidth / 2,
+        pos.y - availableHeight / 2 + yOffset
+      );
+    });
+  }
+
   onResize(width: number, height: number): void {
     const uiScale = UIConfig.getScale(width, height);
 
     this.overlay.setSize(width, height);
-
     this.panelWidth = uiScale.panelWidth;
     this.panelHeight = uiScale.panelHeight;
     this.panelBg.setSize(this.panelWidth, this.panelHeight);
-
     this.setPosition(width / 2, height / 2);
+
+    if (this.titleText) {
+      this.titleText.setFontSize(`${uiScale.fontSize.xl}px`);
+      this.titleText.setY(-this.panelHeight / 2 + 30);
+    }
 
     this.cards.forEach((card) => card.onResize(width, height));
 
-    if (this.titleText) {
-      this.titleText.setFontSize(uiScale.fontSize.xl);
-    }
+    this.repositionCards(uiScale);
   }
 }

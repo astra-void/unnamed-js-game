@@ -30,6 +30,8 @@ export class InfoCard extends Phaser.GameObjects.Container {
   private padding: number;
   private style: Required<CardStyle>;
 
+  private visualElements: Phaser.GameObjects.GameObject[];
+
   constructor(
     scene: Phaser.Scene,
     x: number,
@@ -38,6 +40,8 @@ export class InfoCard extends Phaser.GameObjects.Container {
     style: CardStyle = {}
   ) {
     super(scene, x, y);
+
+    this.visualElements = [];
 
     const uiScale =
       style.responsive !== false
@@ -63,71 +67,113 @@ export class InfoCard extends Phaser.GameObjects.Container {
     this.bg.setStrokeStyle(3, this.style.borderColor, 0.8);
     this.bg.setOrigin(0.5);
     this.add(this.bg);
+    this.visualElements.push(this.bg);
 
+    this.updateLayout(content, uiScale);
+
+    this.setSize(this.cardWidth, this.cardHeight);
+    scene.add.existing(this);
+  }
+
+  private updateLayout(
+    content: Partial<CardContent>,
+    uiScale: UIScale | null
+  ): void {
     const contentWidth = this.cardWidth - this.padding * 2;
     const contentHeight = this.cardHeight - this.padding * 2;
 
     let currentY = -this.cardHeight / 2 + this.padding;
 
-    if (content.icon) {
+    if (content.icon && !this.iconSprite) {
       try {
-        this.iconSprite = scene.add.sprite(0, currentY + 20, content.icon);
+        this.iconSprite = this.scene.add.sprite(0, currentY + 20, content.icon);
         this.iconSprite.setOrigin(0.5, 0);
         this.iconSprite.setDisplaySize(40, 40);
         this.add(this.iconSprite);
-        currentY += 50;
+        this.visualElements.push(this.iconSprite);
       } catch {
         console.warn(`Icon texture not found: ${content.icon}`);
       }
     }
+    if (this.iconSprite) {
+      this.iconSprite.setPosition(0, currentY + 20);
+      currentY += 50;
+    }
 
     const titleFontSize = uiScale?.fontSize.lg ?? 20;
+    const titleText = content.title ?? this.titleText?.text ?? '';
     const titleStyle = UIConfig.getMultilineTextStyle(
-      content.title,
+      titleText,
       contentWidth,
       titleFontSize * 2,
       titleFontSize
     );
 
-    this.titleText = scene.add.text(0, currentY, content.title, {
-      fontSize: `${titleStyle.fontSize}px`,
-      fontFamily: 'sans-serif',
-      fontStyle: 'bold',
-      color: this.style.titleColor,
-      align: 'center',
-      wordWrap: { width: contentWidth }
-    });
-    this.titleText.setOrigin(0.5, 0);
-    this.add(this.titleText);
+    if (!this.titleText) {
+      this.titleText = this.scene.add.text(0, currentY, titleText, {
+        fontSize: `${titleStyle.fontSize}px`,
+        fontFamily: 'sans-serif',
+        fontStyle: 'bold',
+        color: this.style.titleColor,
+        align: 'center',
+        wordWrap: { width: contentWidth }
+      });
+      this.titleText.setOrigin(0.5, 0);
+      this.add(this.titleText);
+      this.visualElements.push(this.titleText);
+    } else {
+      this.titleText.setText(titleText);
+      this.titleText.setFontSize(titleStyle.fontSize);
+      this.titleText.setWordWrapWidth(contentWidth);
+      this.titleText.setPosition(0, currentY);
+    }
     currentY += this.titleText.height + (uiScale?.spacing.sm ?? 8);
 
-    if (content.level !== undefined) {
-      this.levelBadge = this.createLevelBadge(content.level, uiScale!);
-      this.levelBadge.setPosition(0, currentY);
+    const level = content.level;
+    if (level !== undefined && !this.levelBadge) {
+      this.levelBadge = this.createLevelBadge(level, uiScale!);
       this.add(this.levelBadge);
+      this.visualElements.push(this.levelBadge);
+    }
+    if (this.levelBadge) {
+      if (level !== undefined) {
+        (this.levelBadge.getAt(1) as Phaser.GameObjects.Text).setText(
+          `Lv.${level}`
+        );
+      }
+      (this.levelBadge.getAt(1) as Phaser.GameObjects.Text).setFontSize(
+        uiScale?.fontSize.sm ?? 14
+      );
+      this.levelBadge.setPosition(0, currentY);
       currentY += 24 + (uiScale?.spacing.xs ?? 6);
     }
 
     const descFontSize = uiScale?.fontSize.sm ?? 14;
+    const descText = content.description ?? this.descriptionText?.text ?? '';
     const descStyle = UIConfig.getMultilineTextStyle(
-      content.description,
+      descText,
       contentWidth,
       contentHeight - (currentY + this.cardHeight / 2 - this.padding),
       descFontSize
     );
 
-    this.descriptionText = scene.add.text(0, currentY, content.description, {
-      fontSize: `${descStyle.fontSize}px`,
-      fontFamily: 'sans-serif',
-      color: this.style.descriptionColor,
-      align: 'center',
-      wordWrap: { width: contentWidth }
-    });
-    this.descriptionText.setOrigin(0.5, 0);
-    this.add(this.descriptionText);
-
-    this.setSize(this.cardWidth, this.cardHeight);
-    scene.add.existing(this);
+    if (!this.descriptionText) {
+      this.descriptionText = this.scene.add.text(0, currentY, descText, {
+        fontSize: `${descStyle.fontSize}px`,
+        fontFamily: 'sans-serif',
+        color: this.style.descriptionColor,
+        align: 'center',
+        wordWrap: { width: contentWidth }
+      });
+      this.descriptionText.setOrigin(0.5, 0);
+      this.add(this.descriptionText);
+      this.visualElements.push(this.descriptionText);
+    } else {
+      this.descriptionText.setText(descText);
+      this.descriptionText.setFontSize(descStyle.fontSize);
+      this.descriptionText.setWordWrapWidth(contentWidth);
+      this.descriptionText.setPosition(0, currentY);
+    }
   }
 
   private createLevelBadge(
@@ -180,23 +226,14 @@ export class InfoCard extends Phaser.GameObjects.Container {
     onOut?: () => void,
     onClick?: () => void
   ): void {
-    this.setInteractive(
-      new Phaser.Geom.Rectangle(
-        -this.cardWidth / 2,
-        -this.cardHeight / 2,
-        this.cardWidth,
-        this.cardHeight
-      ),
-      Phaser.Geom.Rectangle.Contains
-    );
-
     this.setInteractive({ useHandCursor: true });
+
+    const children = this.visualElements;
 
     this.on('pointerover', () => {
       this.scene.tweens.add({
-        targets: this,
+        targets: children,
         scale: 1.05,
-        y: this.y - 10,
         duration: 150,
         ease: 'Back.easeOut'
       });
@@ -206,9 +243,8 @@ export class InfoCard extends Phaser.GameObjects.Container {
 
     this.on('pointerout', () => {
       this.scene.tweens.add({
-        targets: this,
+        targets: children,
         scale: 1,
-        y: this.y + 10,
         duration: 150,
         ease: 'Back.easeIn'
       });
@@ -219,7 +255,7 @@ export class InfoCard extends Phaser.GameObjects.Container {
     if (onClick) {
       this.on('pointerdown', () => {
         this.scene.tweens.add({
-          targets: this,
+          targets: children,
           scale: 0.95,
           duration: 50,
           yoyo: true,
@@ -230,16 +266,10 @@ export class InfoCard extends Phaser.GameObjects.Container {
   }
 
   updateContent(content: Partial<CardContent>): void {
-    if (content.title) {
-      this.titleText.setText(content.title);
-    }
-    if (content.description) {
-      this.descriptionText.setText(content.description);
-    }
-    if (content.level !== undefined && this.levelBadge) {
-      const levelText = this.levelBadge.getAt(1) as Phaser.GameObjects.Text;
-      levelText.setText(`Lv.${content.level}`);
-    }
+    const uiScale = this.style.responsive
+      ? UIConfig.getScale(this.scene.scale.width, this.scene.scale.height)
+      : null;
+    this.updateLayout(content, uiScale);
   }
 
   onResize(width: number, height: number): void {
@@ -247,7 +277,27 @@ export class InfoCard extends Phaser.GameObjects.Container {
 
     const uiScale = UIConfig.getScale(width, height);
 
-    this.titleText.setFontSize(uiScale.fontSize.lg);
-    this.descriptionText.setFontSize(uiScale.fontSize.sm);
+    this.cardWidth = uiScale.cardWidth ?? this.style.width;
+    this.cardHeight = uiScale.cardHeight ?? this.style.height;
+    this.padding = uiScale.spacing.md;
+
+    this.bg.setSize(this.cardWidth, this.cardHeight);
+    this.setSize(this.cardWidth, this.cardHeight);
+
+    this.updateLayout({}, uiScale);
+
+    if (this.input) {
+      this.removeInteractive();
+      this.setInteractive({
+        hitArea: new Phaser.Geom.Rectangle(
+          -this.cardWidth / 2,
+          -this.cardHeight / 2,
+          this.cardWidth,
+          this.cardHeight
+        ),
+        hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+        useHandCursor: true
+      });
+    }
   }
 }

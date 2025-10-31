@@ -30,12 +30,17 @@ export class Enemy extends LivingEntity {
       true
     );
 
-    EventBus.once(`enemy:${this.id}:dead`, () => {
-      this.destroy();
-      if (this.target instanceof Player)
-        this.target.levelManager.gainExp(this.damage / 5);
-      super.destroy();
-    });
+    EventBus.on(
+      `enemy:${this.id}:healthChanged`,
+      ({ isDead }: { isDead: boolean }) => {
+        if (isDead) {
+          this.destroy();
+          if (this.target instanceof Player)
+            this.target.levelManager.gainExp(this.damage / 5);
+          super.destroy();
+        }
+      }
+    );
   }
 
   update(_time: number, _delta: number): void {

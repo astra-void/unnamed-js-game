@@ -1,3 +1,4 @@
+export * from './Arrow';
 export * from './GummySoul';
 export * from './GummyStaff';
 export * from './JellyBombard';

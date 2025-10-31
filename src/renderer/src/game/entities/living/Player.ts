@@ -75,7 +75,12 @@ export class Player extends LivingEntity {
 
   private setupEventListeners() {
     EventBus.on(`player:${this.id}:levelUp`, this.handleLevelUp.bind(this));
-    EventBus.once(`player:${this.id}:dead`, () => this.handleDeath.bind(this));
+    EventBus.on(
+      `player:${this.id}:healthChanged`,
+      ({ isDead }: { isDead: boolean }) => {
+        if (isDead) this.handleDeath();
+      }
+    );
   }
 
   private setupUI() {
@@ -92,6 +97,9 @@ export class Player extends LivingEntity {
   }
 
   private handleDeath() {
+    EventBus.off(`player:${this.id}:levelUp`);
+    EventBus.off(`player:${this.id}:healthChanged`);
+
     this.weaponManager.clear();
     this.itemManager.clear();
     this.scene.uiManager.clear();
@@ -220,10 +228,10 @@ export class Player extends LivingEntity {
             const weapon = new WpnCtor(this.scene, this);
             const existing = this.weaponManager.find(weapon.name);
             if (existing) {
-              existing.levelUp(this);
+              existing.levelUp();
               weapon.destroy();
             } else {
-              weapon.levelUp(this);
+              weapon.levelUp();
               this.weaponManager.add(weapon);
             }
             break;
