@@ -38,7 +38,7 @@ export class Player extends LivingEntity {
 
   constructor(scene: Game, x: number, y: number) {
     super(scene, x, y, 'player', 'player', 'player');
-    this.speed = GAME_CONFIG.PLAYER.DEFAULT_SPEED;
+    this.speed = GAME_CONFIG.PLAYER.DEFAULT_SPEED * 10;
 
     this.initializeManagers();
     this.setupPhysics();
