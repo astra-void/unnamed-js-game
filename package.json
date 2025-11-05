@@ -20,30 +20,31 @@
     "build:linux": "electron-vite build && electron-builder --linux"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.2.6",
+    "@biomejs/biome": "2.3.3",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
-    "@vitejs/plugin-react": "^5.0.4",
-    "electron": "^38.3.0",
+    "@vitejs/plugin-react": "^5.1.0",
+    "electron": "^38.5.0",
     "electron-builder": "^26.0.12",
     "electron-vite": "^4.0.1",
-    "globals": "^16.4.0",
+    "globals": "^16.5.0",
     "jiti": "^2.6.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "terser": "^5.44.0",
     "typescript": "~5.9.3",
-    "vite": "^7.1.11",
+    "vite": "^7.1.12",
     "vite-tsconfig-paths": "^5.1.4"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
-    "@tailwindcss/vite": "^4.1.15",
+    "@tailwindcss/vite": "^4.1.16",
     "dotenv": "^17.2.3",
     "electron-updater": "^6.6.2",
     "phaser": "^3.90.0",
-    "tailwindcss": "^4.1.15"
+    "phaser3-rex-plugins": "^1.80.17",
+    "tailwindcss": "^4.1.16"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
