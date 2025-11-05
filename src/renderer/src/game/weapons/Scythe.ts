@@ -14,8 +14,6 @@ export class Scythe extends Weapon {
       '아래에서 위로 휘두르며 공격 공중으로 띄움',
       'scythe',
       player,
-      0,
-      0,
       0.1,
       10,
       300,

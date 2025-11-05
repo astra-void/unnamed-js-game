@@ -23,8 +23,7 @@ export class Preloader extends Scene {
   }
 
   preload() {
-    //  Load the assets for the game - Replace with your own assets
-    this.load.setPath('/assets/');
+    this.load.setPath('assets');
 
     // Load weapons image
     this.load.image('arrow', 'arrow.png');

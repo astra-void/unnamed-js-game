@@ -14,8 +14,6 @@ export class MorningStar extends Weapon {
       '눈 앞의 적을 내리찍으며 공격',
       'morning_star',
       player,
-      0,
-      0,
       0.1,
       10,
       300,

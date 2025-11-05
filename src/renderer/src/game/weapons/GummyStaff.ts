@@ -14,8 +14,6 @@ export class GummyStaff extends Weapon {
       '주변에 곰젤리 머리를 소환하여 주변을 돔',
       'gummy_staff',
       player,
-      0,
-      0,
       0.1,
       10,
       300,

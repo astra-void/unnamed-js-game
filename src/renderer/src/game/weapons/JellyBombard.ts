@@ -14,8 +14,6 @@ export class JellyBombard extends Weapon {
       '20초마다, 적이 있는 지점에 미사일 3회 포격',
       'jelly_bombard',
       player,
-      0,
-      0,
       0.1,
       10,
       300,

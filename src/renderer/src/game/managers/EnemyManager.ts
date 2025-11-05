@@ -139,7 +139,7 @@ export class EnemyManager {
       y,
       100,
       10,
-      200,
+      GAME_CONFIG.ENEMY.DEFAULT_SPEED,
       this.scene.player
     );
     this.nextEnemyId++;

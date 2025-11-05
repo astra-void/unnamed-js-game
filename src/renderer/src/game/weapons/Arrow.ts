@@ -8,7 +8,7 @@ export class Arrow extends Weapon {
   player: Player;
 
   constructor(scene: Scene, player: Player) {
-    super(scene, '화살', '화살임', 'arrow', player, 0, 0, 1, 10, 300, 3);
+    super(scene, '화살', '화살임', 'arrow', player, 1, 10, 300, 3);
     this.player = player;
   }
 

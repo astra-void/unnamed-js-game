@@ -39,13 +39,13 @@ export const GAME_CONFIG = {
   },
 
   PLAYER: {
-    DEFAULT_SPEED: 10, // 기본 이동속도
+    DEFAULT_SPEED: 240, // 기본 이동속도
     DEFAULT_MAX_HP: 100, // 기본 최대체력
     HEALTH_BAR_OFFSET: 40 // 체력바 오프셋
   },
 
   ENEMY: {
-    DEFAULT_SPEED: 5, // 기본 이동속도
+    DEFAULT_SPEED: 220, // 기본 이동속도
     DEFAULT_DAMAGE: 10, // 기본 공격력
     SPAWN_INTERVAL: 2000, // (ms)
     MIN_SPAWN_INTERVAL: 500 // (ms)

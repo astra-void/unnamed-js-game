@@ -14,8 +14,6 @@ export class Test extends Weapon {
       '자신을 중심으로하여 원형태의 도트딜지대 형성',
       'jelly_flame',
       player,
-      0,
-      0,
       0.1,
       10,
       300,

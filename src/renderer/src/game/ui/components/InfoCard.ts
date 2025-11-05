@@ -84,15 +84,21 @@ export class InfoCard extends Phaser.GameObjects.Container {
 
     let currentY = -this.cardHeight / 2 + this.padding;
 
-    if (content.icon && !this.iconSprite) {
-      try {
-        this.iconSprite = this.scene.add.sprite(0, currentY + 20, content.icon);
-        this.iconSprite.setOrigin(0.5, 0);
-        this.iconSprite.setDisplaySize(40, 40);
-        this.add(this.iconSprite);
-        this.visualElements.push(this.iconSprite);
-      } catch {
-        console.warn(`Icon texture not found: ${content.icon}`);
+    if (content.icon) {
+      if (!this.iconSprite) {
+        if (this.scene.textures.exists(content.icon)) {
+          this.iconSprite = this.scene.add.sprite(0, currentY + 20, content.icon);
+          this.iconSprite.setOrigin(0.5, 0);
+          this.iconSprite.setDisplaySize(40, 40);
+          this.add(this.iconSprite);
+          this.visualElements.push(this.iconSprite);
+        } else {
+          console.warn(`Icon texture not found: ${content.icon}`);
+        }
+      } else {
+        if (this.scene.textures.exists(content.icon)) {
+          this.iconSprite.setTexture(content.icon);
+        }
       }
     }
     if (this.iconSprite) {

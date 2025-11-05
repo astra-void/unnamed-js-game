@@ -22,8 +22,6 @@ export abstract class Weapon {
     description: string,
     texture: string,
     player: Player,
-    x: number,
-    y: number,
     cooldown: number,
     damage: number,
     speed?: number,
@@ -39,7 +37,7 @@ export abstract class Weapon {
     this.speed = speed;
     this.lifetime = lifetime;
 
-    this.sprite = scene.add.sprite(x, y, texture);
+    this.sprite = scene.add.sprite(100, 100, texture);
     scene.physics.add.existing(this.sprite);
     this.body = this.sprite.body as Physics.Arcade.Body;
 

@@ -14,8 +14,6 @@ export class JellyCrossbow extends Weapon {
       '자신이 가지고있는 화살 1/1/2/2/3 개를 발사하며 눈앞의 적을 공격 공격은 적을 관통한다. (주의. 화살없으면 공격불가)',
       'jelly_crossbow',
       player,
-      0,
-      0,
       0.1,
       10,
       300,

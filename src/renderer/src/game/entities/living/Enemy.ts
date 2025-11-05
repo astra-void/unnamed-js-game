@@ -1,3 +1,4 @@
+import { GAME_CONFIG } from '../../constants';
 import { EventBus } from '../../EventBus';
 import { HealthManager } from '../../managers';
 import { LivingEntity } from './LivingEntity';
@@ -15,7 +16,7 @@ export class Enemy extends LivingEntity {
     y: number,
     maxHp: number,
     damage: number,
-    speed = 200,
+    speed = GAME_CONFIG.ENEMY.DEFAULT_SPEED,
     target: LivingEntity
   ) {
     super(scene, x, y, 'enemy', id, 'enemy');

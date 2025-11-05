@@ -14,8 +14,6 @@ export class GummySoul extends Weapon {
       '10초마다 곰젤리영혼(폭탄) 소환하여 펑!',
       'gummy_soul',
       player,
-      0,
-      0,
       0.1,
       10,
       300,
