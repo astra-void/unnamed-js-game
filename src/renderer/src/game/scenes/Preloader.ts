@@ -23,9 +23,9 @@ export class Preloader extends Scene {
   }
 
   preload() {
+    // Load weapons image
     this.load.setPath('assets');
 
-    // Load weapons image
     this.load.image('arrow', 'arrow.png');
     this.load.image('gummy_soul', 'gummy_soul.png');
     this.load.image('gummy_staff', 'gummy_staff.png');
@@ -35,6 +35,11 @@ export class Preloader extends Scene {
     this.load.image('milk_sprayer', 'milk_sprayer.png');
     this.load.image('morning_star', 'morning_star.png');
     this.load.image('scythe', 'scythe.png');
+
+    // Load projectiles image
+    this.load.setPath('assets/projectiles');
+
+    this.load.image('arrow_projectiles', 'arrow.png');
   }
 
   create() {

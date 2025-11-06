@@ -12,10 +12,12 @@ export default defineConfig({
     plugins: [externalizeDepsPlugin(), tsconfigPaths()]
   },
   renderer: {
+    publicDir: resolve(__dirname, 'public'),
     resolve: {
       alias: {
         '@renderer': resolve(__dirname, 'src/renderer/src'),
         '@game': resolve(__dirname, 'src/renderer/src/game'),
+        '@public': resolve(__dirname, 'public/assets'),
         '@': resolve(__dirname, 'src/renderer/src')
       }
     },

@@ -1,10 +1,12 @@
 export * from './Arrow';
+/*
 export * from './GummySoul';
 export * from './GummyStaff';
 export * from './JellyBombard';
 export * from './JellyCrossbow';
 export * from './JellyFlame';
 export * from './MilkSprayer';
+*/
 export * from './MorningStar';
 export * from './Scythe';
 export * from './Weapon';

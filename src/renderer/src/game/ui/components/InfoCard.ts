@@ -4,7 +4,7 @@ export interface CardContent {
   title: string;
   description: string;
   level?: number;
-  icon?: string;
+  icon?: string
   rarity?: 'common' | 'rare' | 'epic' | 'legendary';
 }
 
@@ -87,7 +87,11 @@ export class InfoCard extends Phaser.GameObjects.Container {
     if (content.icon) {
       if (!this.iconSprite) {
         if (this.scene.textures.exists(content.icon)) {
-          this.iconSprite = this.scene.add.sprite(0, currentY + 20, content.icon);
+          this.iconSprite = this.scene.add.sprite(
+            0,
+            currentY + 20,
+            content.icon
+          );
           this.iconSprite.setOrigin(0.5, 0);
           this.iconSprite.setDisplaySize(40, 40);
           this.add(this.iconSprite);

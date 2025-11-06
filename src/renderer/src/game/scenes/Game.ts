@@ -1,8 +1,6 @@
 import { Scene } from 'phaser';
-import { FUSION_RECIPES } from '../constants/FusionRecipes';
 import { EventBus } from '../EventBus';
 import { Player } from '../entities/living/Player';
-import { FusionManager } from '../fusion';
 import { EnemyManager } from '../managers/EnemyManager';
 import { InstanceManager } from '../managers/InstanceManager';
 import { ProjectileManager } from '../managers/ProjectileManager';
@@ -15,7 +13,6 @@ export class Game extends Scene {
 
   enemyManager: EnemyManager;
   projectileManager: ProjectileManager;
-  fusionManager: FusionManager;
   uiManager: UIManager;
   instanceManager: InstanceManager;
 
@@ -75,7 +72,6 @@ export class Game extends Scene {
 
     this.enemyManager = new EnemyManager(this);
     this.projectileManager = new ProjectileManager(this);
-    this.fusionManager = new FusionManager(this.player, FUSION_RECIPES);
     this.instanceManager = new InstanceManager(this);
 
     this.physics.world.setBounds(0, 0, this.scale.width, this.scale.height);

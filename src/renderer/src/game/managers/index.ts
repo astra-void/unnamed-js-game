@@ -1,5 +1,4 @@
 export * from './EnemyManager';
-export * from './FusionManager';
 export * from './HealthManager';
 export * from './InstanceManager';
 export * from './ItemManager';

@@ -2,7 +2,7 @@ import { EventBus } from '../../EventBus';
 import { UIComponent } from '../../types/ui';
 import { UIConfig, UIScale } from '../UIConfig';
 
-export interface HUDData {
+interface HUDData {
   health?: number;
   maxHealth?: number;
   experience?: number;
@@ -71,16 +71,8 @@ export class HUDPanel
   private setupEventListeners(): void {
     EventBus.on(
       `player:${this.playerId}:healthChanged`,
-      ({ hp }: { hp: number }) => {
-        console.log(hp);
-        this.updateData({ health: hp });
-      }
-    );
-
-    EventBus.on(
-      `player:${this.playerId}:maxHealthChanged`,
-      ({ maxHp }: { maxHp: number }) => {
-        this.updateData({ maxHealth: maxHp });
+      ({ hp, maxHp }: { hp: number; maxHp: number }) => {
+        this.updateData({ health: hp, maxHealth: maxHp });
       }
     );
 

@@ -13,6 +13,7 @@ export abstract class Weapon {
   currentCooldown: number;
   cooldown: number;
   damage: number;
+  texture: string;
   speed?: number;
   lifetime?: number;
 
@@ -34,10 +35,11 @@ export abstract class Weapon {
     this.currentCooldown = cooldown;
     this.cooldown = cooldown;
     this.damage = damage;
+    this.texture = texture;
     this.speed = speed;
     this.lifetime = lifetime;
 
-    this.sprite = scene.add.sprite(100, 100, texture);
+    this.sprite = scene.add.sprite(0, 0, texture);
     scene.physics.add.existing(this.sprite);
     this.body = this.sprite.body as Physics.Arcade.Body;
 

@@ -1,6 +1,5 @@
 import { GAME_CONFIG } from '../../constants';
 import { EventBus } from '../../EventBus';
-import { FusionRecipe } from '../../fusion';
 import * as Items from '../../items';
 import { Item } from '../../items';
 import {
@@ -20,8 +19,8 @@ import { Weapon } from '../../weapons';
 import { LivingEntity } from './LivingEntity';
 
 type Candidate = {
-  kind: 'weapon' | 'item' | 'fusion';
-  value: WeaponConstructor | ItemConstructor | FusionRecipe;
+  kind: 'weapon' | 'item';
+  value: WeaponConstructor | ItemConstructor;
 };
 
 export class Player extends LivingEntity {
@@ -121,14 +120,10 @@ export class Player extends LivingEntity {
   private getCandidates() {
     const weapons = this.getAvailableWeapons();
     const items = this.getAvailableItems();
-    const fusions = (
-      this.scene as Game
-    ).fusionManager.getAvailableFusionsForMaxLevel();
 
     return [
       ...weapons.map((w) => ({ kind: 'weapon' as const, value: w })),
-      ...items.map((i) => ({ kind: 'item' as const, value: i })),
-      ...fusions.map((f) => ({ kind: 'fusion' as const, value: f }))
+      ...items.map((i) => ({ kind: 'item' as const, value: i }))
     ] as Candidate[];
   }
 
@@ -187,31 +182,22 @@ export class Player extends LivingEntity {
           title: tempWeapon.name,
           description: existing
             ? `레벨업! (Lv.${existing.level} -> Lv.${existing.level + 1})`
-            : '새로운 무기'
+            : '새로운 무기',
+          icon: tempWeapon.texture
         };
         tempWeapon.destroy();
         return card;
       }
 
-      if (candidate.kind === 'item') {
-        const ItmCtor = candidate.value as ItemConstructor;
-        const tempItem = new ItmCtor();
-        const existing = this.itemManager.find(tempItem.name);
-        return {
-          title: tempItem.name,
-          description: existing
-            ? `레벨업! (Lv.${existing.level} -> Lv.${existing.level + 1})`
-            : '새로운 아이템'
-        };
-      }
-
-      const recipe = candidate.value as FusionRecipe;
-      const ingredients = recipe.ingredients
-        .map((ing) => ing.ctor.prototype.name || 'Unknown')
-        .join(' + ');
+      const ItmCtor = candidate.value as ItemConstructor;
+      const tempItem = new ItmCtor();
+      const existing = this.itemManager.find(tempItem.name);
       return {
-        title: `합성: ${recipe.result.name}`,
-        description: `${ingredients}`
+        title: tempItem.name,
+        description: existing
+          ? `레벨업! (Lv.${existing.level} -> Lv.${existing.level + 1})`
+          : '새로운 아이템',
+        icon: tempItem.texture
       };
     });
 
@@ -247,14 +233,6 @@ export class Player extends LivingEntity {
               this.itemManager.add(item);
               item.applyEffect(this);
             }
-            break;
-          }
-          case 'fusion': {
-            const recipe = selected.value as FusionRecipe;
-            const result = (this.scene as Game).fusionManager.fuse(recipe);
-            console.log(
-              result ? `Fusion Success: ${result.name}` : 'Fusion failed'
-            );
             break;
           }
         }
