@@ -4,7 +4,7 @@ export interface CardContent {
   title: string;
   description: string;
   level?: number;
-  icon?: string
+  icon?: string;
   rarity?: 'common' | 'rare' | 'epic' | 'legendary';
 }
 
