@@ -16,6 +16,7 @@ export interface CardStyle {
   titleColor?: string;
   descriptionColor?: string;
   responsive?: boolean;
+  iconSize?: number;
 }
 
 export class InfoCard extends Phaser.GameObjects.Container {
@@ -50,12 +51,13 @@ export class InfoCard extends Phaser.GameObjects.Container {
 
     this.style = {
       width: style.width ?? uiScale?.cardWidth ?? 220,
-      height: style.height ?? uiScale?.cardHeight ?? 160,
+      height: style.height ?? uiScale?.cardHeight ?? 240,
       backgroundColor: style.backgroundColor ?? 0x2b2b2b,
       borderColor: style.borderColor ?? this.getRarityColor(content.rarity),
       titleColor: style.titleColor ?? '#ffffff',
       descriptionColor: style.descriptionColor ?? '#cccccc',
-      responsive: style.responsive ?? true
+      responsive: style.responsive ?? true,
+      iconSize: style.iconSize ?? 50
     };
 
     this.cardWidth = this.style.width;
@@ -89,11 +91,14 @@ export class InfoCard extends Phaser.GameObjects.Container {
         if (this.scene.textures.exists(content.icon)) {
           this.iconSprite = this.scene.add.sprite(
             0,
-            currentY + 20,
+            currentY + this.style.iconSize / 2,
             content.icon
           );
-          this.iconSprite.setOrigin(0.5, 0);
-          this.iconSprite.setDisplaySize(40, 40);
+          this.iconSprite.setOrigin(0.5);
+
+          const scale = this.style.iconSize / 600;
+          this.iconSprite.setScale(scale);
+
           this.add(this.iconSprite);
           this.visualElements.push(this.iconSprite);
         } else {
@@ -102,12 +107,14 @@ export class InfoCard extends Phaser.GameObjects.Container {
       } else {
         if (this.scene.textures.exists(content.icon)) {
           this.iconSprite.setTexture(content.icon);
+          const scale = this.style.iconSize / 600;
+          this.iconSprite.setScale(scale);
         }
       }
     }
     if (this.iconSprite) {
-      this.iconSprite.setPosition(0, currentY + 20);
-      currentY += 50;
+      this.iconSprite.setPosition(0, currentY + this.style.iconSize / 2);
+      currentY += this.style.iconSize + (uiScale?.spacing.sm ?? 8);
     }
 
     const titleFontSize = uiScale?.fontSize.lg ?? 20;
@@ -238,7 +245,7 @@ export class InfoCard extends Phaser.GameObjects.Container {
   ): void {
     this.setInteractive({ useHandCursor: true });
 
-    const children = this.visualElements;
+    const children = this.visualElements.filter((el) => el !== this.iconSprite);
 
     this.on('pointerover', () => {
       this.scene.tweens.add({

@@ -138,8 +138,6 @@ export class SelectionPanel extends Phaser.GameObjects.Container {
   }
 
   private handleCardSelect(index: number): void {
-    // this.cards[index].setTint(0x00ff00); DEBUG PLACEHOLDER
-
     this.scene.time.delayedCall(150, () => {
       this.options.onSelect(index);
       this.close();

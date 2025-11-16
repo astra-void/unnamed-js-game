@@ -39,7 +39,7 @@ export class Preloader extends Scene {
     // Load projectiles image
     this.load.setPath('assets/projectiles');
 
-    this.load.image('arrow_projectiles', 'arrow.png');
+    this.load.image('arrow_projectile', 'arrow.png');
   }
 
   create() {

@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
 import { Player } from '../entities/living';
-import { TestProjectile } from '../entities/projectiles';
+import { ArrowProjectile } from '../projectiles';
 import { Game } from '../scenes/Game';
 import { Weapon } from './Weapon';
 
@@ -20,15 +20,13 @@ export class Arrow extends Weapon {
     const pointer = this.scene.input.activePointer;
     const dx = pointer.worldX - this.player.x;
     const dy = pointer.worldY - this.player.y;
-    const len = Math.sqrt(dx * dx + dy * dy) || 1;
+    const len = Math.hypot(dx, dy) || 1;
 
     const vx = (dx / len) * this.speed;
     const vy = (dy / len) * this.speed;
 
-    const proj = new TestProjectile(
+    const proj = new ArrowProjectile(
       this.scene,
-      this.player.x,
-      this.player.y,
       vx,
       vy,
       this.damage,

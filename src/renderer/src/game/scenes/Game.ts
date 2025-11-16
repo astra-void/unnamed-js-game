@@ -38,12 +38,6 @@ export class Game extends Scene {
       .destroy();
     this.add
       .graphics()
-      .fillStyle(0xffffff, 0.5)
-      .fillCircle(6, 6, 6)
-      .generateTexture('knife_projectile', 12, 12)
-      .destroy();
-    this.add
-      .graphics()
       .fillStyle(0x00ff00, 0.5)
       .fillCircle(6, 6, 6)
       .generateTexture('projectile', 12, 12)

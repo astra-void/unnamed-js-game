@@ -1,14 +1,15 @@
 import { GAME_CONFIG } from '../constants';
 import { EventBus } from '../EventBus';
 import { LivingEntity } from '../entities/living';
+import { Projectile } from '../projectiles';
 
 export class HealthManager {
-  entity: LivingEntity;
+  entity: LivingEntity | Projectile;
   maxHp: number;
   hp: number;
   private isDead: boolean = false;
 
-  constructor(entity: LivingEntity, maxHp?: number) {
+  constructor(entity: LivingEntity | Projectile, maxHp?: number) {
     this.entity = entity;
     this.maxHp = maxHp ?? GAME_CONFIG.PLAYER.DEFAULT_MAX_HP;
     this.hp = this.maxHp;

@@ -51,9 +51,9 @@ export class UIConfig {
         xl: Math.max(24, Math.round(32 * scale))
       },
       cardWidth: Math.max(150, Math.round(220 * scale)),
-      cardHeight: Math.max(100, Math.round(160 * scale)),
+      cardHeight: Math.max(100, Math.round(240 * scale)),
       panelWidth: Math.max(500, Math.round(720 * scale)),
-      panelHeight: Math.max(300, Math.round(400 * scale))
+      panelHeight: Math.max(400, Math.round(720 * scale))
     };
   }
 

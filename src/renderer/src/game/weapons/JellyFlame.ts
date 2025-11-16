@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
 import { Player } from '../entities/living';
-import { TestProjectile } from '../entities/projectiles';
+import { TestProjectile } from '../projectiles';
 import { Game } from '../scenes/Game';
 import { Weapon } from './Weapon';
 
@@ -36,8 +36,6 @@ export class Test extends Weapon {
     const vy = (dy / len) * this.speed;
     const proj = new TestProjectile(
       this.scene,
-      this.player.x,
-      this.player.y,
       vx,
       vy,
       this.damage,

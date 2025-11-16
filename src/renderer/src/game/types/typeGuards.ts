@@ -1,5 +1,5 @@
 import { Enemy } from '../entities/living/Enemy';
-import { Projectile } from '../entities/projectiles';
+import { Projectile } from '../projectiles';
 
 export type EnemySprite = Phaser.GameObjects.Sprite & { entity: Enemy };
 
