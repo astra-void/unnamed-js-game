@@ -86,35 +86,39 @@ export class InfoCard extends Phaser.GameObjects.Container {
 
     let currentY = -this.cardHeight / 2 + this.padding;
 
-    if (content.icon) {
+    const iconKey = content.icon && this.scene.textures.exists(content.icon)
+      ? content.icon
+      : this.scene.textures.exists('test_object')
+        ? 'test_object'
+        : undefined;
+
+    if (iconKey) {
       if (!this.iconSprite) {
-        if (this.scene.textures.exists(content.icon)) {
-          this.iconSprite = this.scene.add.sprite(
-            0,
-            currentY + this.style.iconSize / 2,
-            content.icon
-          );
-          this.iconSprite.setOrigin(0.5);
-
-          const scale = this.style.iconSize / 600;
-          this.iconSprite.setScale(scale);
-
-          this.add(this.iconSprite);
-          this.visualElements.push(this.iconSprite);
-        } else {
-          console.warn(`Icon texture not found: ${content.icon}`);
-        }
+        this.iconSprite = this.scene.add.image(
+          0,
+          currentY + this.style.iconSize / 2,
+          iconKey
+        );
+        this.iconSprite.setOrigin(0.5);
+        this.add(this.iconSprite);
+        this.visualElements.push(this.iconSprite);
       } else {
-        if (this.scene.textures.exists(content.icon)) {
-          this.iconSprite.setTexture(content.icon);
-          const scale = this.style.iconSize / 600;
-          this.iconSprite.setScale(scale);
-        }
+        this.iconSprite.setTexture(iconKey);
       }
+
+      const textureFrame = this.scene.textures.get(iconKey).getSourceImage();
+      const iconWidth = textureFrame.width || 1;
+      const iconHeight = textureFrame.height || 1;
+      const maxSize = this.style.iconSize;
+      const aspect = iconWidth / iconHeight;
+      const targetWidth = aspect >= 1 ? maxSize : maxSize * aspect;
+      const targetHeight = aspect >= 1 ? maxSize / aspect : maxSize;
+
+      this.iconSprite.setDisplaySize(targetWidth, targetHeight);
     }
     if (this.iconSprite) {
-      this.iconSprite.setPosition(0, currentY + this.style.iconSize / 2);
-      currentY += this.style.iconSize + (uiScale?.spacing.sm ?? 8);
+      this.iconSprite.setPosition(0, currentY + this.iconSprite.displayHeight / 2);
+      currentY += this.iconSprite.displayHeight + (uiScale?.spacing.sm ?? 8);
     }
 
     const titleFontSize = uiScale?.fontSize.lg ?? 20;
