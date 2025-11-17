@@ -194,12 +194,14 @@ export class Player extends LivingEntity {
       const ItmCtor = candidate.value as ItemConstructor;
       const tempItem = new ItmCtor();
       const existing = this.itemManager.find(tempItem.name);
+      const nextLevel = (existing ?? tempItem).level + 1;
+
       return {
         title: tempItem.name,
         description: existing
           ? `레벨업! (Lv.${existing.level} -> Lv.${existing.level + 1})`
           : '새로운 아이템',
-        icon: tempItem.texture
+        icon: (existing ?? tempItem).getTextureForLevel(nextLevel)
       };
     });
 

@@ -27,6 +27,8 @@ export class Arrow extends Weapon {
 
     const proj = new ArrowProjectile(
       this.scene,
+      this.player.x,
+      this.player.y,
       vx,
       vy,
       this.damage,

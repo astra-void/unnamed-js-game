@@ -86,11 +86,12 @@ export class InfoCard extends Phaser.GameObjects.Container {
 
     let currentY = -this.cardHeight / 2 + this.padding;
 
-    const iconKey = content.icon && this.scene.textures.exists(content.icon)
-      ? content.icon
-      : this.scene.textures.exists('test_object')
-        ? 'test_object'
-        : undefined;
+    const iconKey =
+      content.icon && this.scene.textures.exists(content.icon)
+        ? content.icon
+        : this.scene.textures.exists('test_object')
+          ? 'test_object'
+          : undefined;
 
     if (iconKey) {
       if (!this.iconSprite) {
@@ -117,7 +118,10 @@ export class InfoCard extends Phaser.GameObjects.Container {
       this.iconSprite.setDisplaySize(targetWidth, targetHeight);
     }
     if (this.iconSprite) {
-      this.iconSprite.setPosition(0, currentY + this.iconSprite.displayHeight / 2);
+      this.iconSprite.setPosition(
+        0,
+        currentY + this.iconSprite.displayHeight / 2
+      );
       currentY += this.iconSprite.displayHeight + (uiScale?.spacing.sm ?? 8);
     }
 

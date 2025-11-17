@@ -1,25 +1,19 @@
-import { GameObjects, Scene } from 'phaser';
-import { HealthManager } from '../managers';
+import { Scene } from 'phaser';
 import { LivingEntity } from '../entities/living';
+import { HealthManager } from '../managers';
 
-export abstract class Projectile {
-  scene: Scene;
-  x: number;
-  y: number;
-  name: string;
-  id: string;
-  texture: string;
+export abstract class Projectile extends LivingEntity {
   vx: number;
   vy: number;
   lifetime: number;
   damage: number;
   speed: number;
-  sprite: GameObjects.Sprite;
-
-  healthManager: HealthManager;
+  destroyed: boolean = false;
 
   constructor(
     scene: Scene,
+    x: number,
+    y: number,
     vx: number,
     vy: number,
     damage: number,
@@ -28,16 +22,12 @@ export abstract class Projectile {
     speed = 200,
     texture: string = 'projectile'
   ) {
-    this.scene = scene;
-    this.name = 'projcetile';
-    this.id = 'projectile';
-    this.texture = texture;
+    super(scene, x, y, 'projectile', 'projectile', texture);
     this.vx = vx;
     this.vy = vy;
     this.lifetime = lifetime;
     this.damage = damage;
     this.speed = speed;
-    this.sprite = scene.add.sprite(0, 0, texture);
 
     this.healthManager = new HealthManager(this, maxHp);
 
@@ -61,6 +51,7 @@ export abstract class Projectile {
   abstract onHit(target: LivingEntity): void;
 
   destroy() {
-    this.sprite.destroy();
+    if (this.destroyed) return;
+    this.destroyed = true;
   }
 }

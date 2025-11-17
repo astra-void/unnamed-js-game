@@ -2,12 +2,18 @@ import { Player } from '../entities/living';
 import { Game } from '../scenes/Game';
 import { Item } from './Item';
 
-export class CreamCloak extends Item {
+export class Cape extends Item {
   private slowRates = [0.05, 0.07, 0.1, 0.15, 0.2];
   private radius = 120;
 
   constructor() {
-    super('슈크림 망토', '주변 적의 속도를 감소시킨다', 'cream_cloak_icon');
+    super('슈크림 망토', '주변 적의 속도를 감소시킨다', [
+      'cape_1',
+      'cape_2',
+      'cape_3',
+      'cape_4',
+      'cape_5'
+    ]);
   }
 
   applyEffect(_player: Player): void {}

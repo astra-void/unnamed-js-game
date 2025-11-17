@@ -30,7 +30,7 @@ export class ProjectileManager {
   }
 
   get projectileCount() {
-    return this.projectiles.children.size;
+    return this.projectiles.getLength();
   }
 
   add(sprite: Phaser.GameObjects.Sprite) {
@@ -39,26 +39,31 @@ export class ProjectileManager {
 
   update(time: number, delta: number) {
     this.projectiles.getChildren().forEach((proj: unknown) => {
-      if (isProjectileSprite(proj)) {
-        proj.entity.update(time, delta);
+      if (!isProjectileSprite(proj)) return;
+
+      const projectile = proj.entity;
+
+      if (projectile.destroyed) {
+        this.projectiles.remove(proj, true, true);
+        return;
       }
+
+      projectile.update(time, delta);
     });
   }
 
   clear() {
-    this.projectiles.children.each((sprite: unknown) => {
-      if (!isProjectileSprite(sprite)) return false;
+    this.projectiles.getChildren().forEach((proj: unknown) => {
+      if (!isProjectileSprite(proj)) return;
 
-      const projectile = sprite.entity;
-      projectile.destroy();
-      return true;
+      this.projectiles.remove(proj, true, true);
     });
 
-    this.projectiles.clear(true, true);
+    this.projectiles.clear(false, false);
   }
 
   destroy() {
     this.clear();
-    this.projectiles.destroy();
+    this.projectiles.destroy(true);
   }
 }

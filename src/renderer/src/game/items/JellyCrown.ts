@@ -5,7 +5,13 @@ export class JellyCrown extends Item {
   private bonusRates = [0.05, 0.1, 0.15, 0.2, 0.25];
 
   constructor() {
-    super('곰젤리 왕관', '최대 체력이 증가한다', 'jelly_crown_icon');
+    super('곰젤리 왕관', '최대 체력이 증가한다', [
+      'crown_1',
+      'crown_2',
+      'crown_3',
+      'crown_4',
+      'crown_5'
+    ]);
   }
 
   applyEffect(player: Player): void {

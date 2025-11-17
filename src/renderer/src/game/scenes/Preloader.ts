@@ -24,7 +24,7 @@ export class Preloader extends Scene {
 
   preload() {
     // Load weapons image
-    this.load.setPath('assets');
+    this.load.setPath('assets/weapons');
 
     this.load.image('arrow', 'arrow.png');
     this.load.image('gummy_soul', 'gummy_soul.png');
@@ -35,6 +35,22 @@ export class Preloader extends Scene {
     this.load.image('milk_sprayer', 'milk_sprayer.png');
     this.load.image('morning_star', 'morning_star.png');
     this.load.image('scythe', 'scythe.png');
+
+    // Load items image
+    this.load.setPath('assets/items');
+
+    const loadItem = (name: string, start: number = 1, end: number = 5) => {
+      for (let i = start; i <= end; i++) {
+        this.load.image(`${name}_${i}`, `${name}_${i}.png`);
+      }
+    };
+
+    loadItem('blessed_necklace', 1, 5);
+    loadItem('broken_glasses', 1, 5);
+    loadItem('cape', 1, 5);
+    loadItem('chocolate_chip', 1, 5);
+    loadItem('crown', 1, 5);
+    loadItem('martial_codex', 0, 5);
 
     // Load projectiles image
     this.load.setPath('assets/projectiles');

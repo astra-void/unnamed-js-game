@@ -1,12 +1,12 @@
 import { Player } from '../entities/living';
 import { Item } from './Item';
 
-export class ChocolateChip extends Item {
+export class BrokenGlasses extends Item {
   private cooldowns = [60, 55, 50, 45, 40];
   private timer = 0;
 
   constructor() {
-    super('초콜릿 칩', '주기적으로 회복 아이템을 생성한다', [
+    super('부러진 안경', '주기적으로 회복 아이템을 생성한다', [
       'chocolate_chip_1',
       'chocolate_chip_2',
       'chocolate_chip_3',

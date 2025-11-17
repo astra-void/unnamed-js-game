@@ -38,20 +38,36 @@ export class Game extends Scene {
     };
 
     /** Placeholder test graphics */
-    ensureTexture('player', (g) => g.fillStyle(0xffffff).fillCircle(8, 8, 8), 16, 16);
-    ensureTexture('enemy', (g) => g.fillStyle(0xff0000).fillCircle(8, 8, 8), 16, 16);
+    ensureTexture(
+      'player',
+      (g) => g.fillStyle(0xffffff).fillCircle(8, 8, 8),
+      16,
+      16
+    );
+    ensureTexture(
+      'enemy',
+      (g) => g.fillStyle(0xff0000).fillCircle(8, 8, 8),
+      16,
+      16
+    );
     ensureTexture(
       'projectile',
       (g) => g.fillStyle(0x00ff00, 0.7).fillCircle(6, 6, 6),
       12,
       12
     );
-    ensureTexture('test_object', (g) => g.fillStyle(0xffffff).fillRect(0, 0, 64, 64), 64, 64);
+    ensureTexture(
+      'test_object',
+      (g) => g.fillStyle(0xffffff).fillRect(0, 0, 64, 64),
+      64,
+      64
+    );
 
     ensureTexture(
       'arrow',
       (g) =>
-        g.fillStyle(0xf5deb3)
+        g
+          .fillStyle(0xf5deb3)
           .fillRect(20, 28, 24, 8)
           .fillTriangle(10, 16, 10, 48, 32, 32),
       64,
@@ -66,7 +82,8 @@ export class Game extends Scene {
     ensureTexture(
       'jelly_bombard',
       (g) =>
-        g.fillStyle(0x8a2be2)
+        g
+          .fillStyle(0x8a2be2)
           .fillCircle(32, 32, 18)
           .lineStyle(4, 0xffffff)
           .strokeCircle(32, 32, 22),
@@ -76,7 +93,8 @@ export class Game extends Scene {
     ensureTexture(
       'jelly_flame',
       (g) =>
-        g.fillStyle(0xff7f50)
+        g
+          .fillStyle(0xff7f50)
           .fillCircle(32, 42, 14)
           .fillTriangle(32, 8, 18, 42, 46, 42),
       64,
@@ -85,7 +103,8 @@ export class Game extends Scene {
     ensureTexture(
       'jelly_crossbow',
       (g) =>
-        g.fillStyle(0xdeb887)
+        g
+          .fillStyle(0xdeb887)
           .fillRect(14, 28, 36, 8)
           .lineStyle(4, 0x8b4513)
           .strokeTriangle(10, 24, 10, 40, 28, 32)
@@ -108,7 +127,8 @@ export class Game extends Scene {
     ensureTexture(
       'morning_star',
       (g) =>
-        g.fillStyle(0xc0c0c0)
+        g
+          .fillStyle(0xc0c0c0)
           .fillCircle(18, 32, 8)
           .fillCircle(46, 32, 12)
           .lineStyle(3, 0x444444)
@@ -125,7 +145,8 @@ export class Game extends Scene {
     ensureTexture(
       'gummy_staff',
       (g) =>
-        g.fillStyle(0x8b4513)
+        g
+          .fillStyle(0x8b4513)
           .fillRect(28, 12, 8, 40)
           .fillStyle(0x98fb98)
           .fillCircle(32, 12, 8),
@@ -135,7 +156,8 @@ export class Game extends Scene {
     ensureTexture(
       'scythe',
       (g) =>
-        g.fillStyle(0x696969)
+        g
+          .fillStyle(0x696969)
           .fillRect(30, 12, 6, 40)
           .fillStyle(0xc0c0c0)
           .fillCircle(20, 16, 10)
@@ -146,7 +168,8 @@ export class Game extends Scene {
     ensureTexture(
       'choco_chip_icon',
       (g) =>
-        g.fillStyle(0x8b4513)
+        g
+          .fillStyle(0x8b4513)
           .fillCircle(32, 32, 20)
           .fillStyle(0x5d3412)
           .fillCircle(24, 26, 4)
@@ -158,7 +181,8 @@ export class Game extends Scene {
     ensureTexture(
       'cream_cloak_icon',
       (g) =>
-        g.fillStyle(0xfffdd0)
+        g
+          .fillStyle(0xfffdd0)
           .fillRoundedRect(10, 10, 44, 44, 12)
           .lineStyle(3, 0xffd700)
           .strokeRoundedRect(10, 10, 44, 44, 12),
