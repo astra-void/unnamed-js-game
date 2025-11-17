@@ -11,7 +11,7 @@ export class ArrowProjectile extends Projectile {
     vy: number,
     damage: number,
     speed: number = 300,
-    lifetime: number = 2
+    lifetime: number
   ) {
     super(scene, x, y, vx, vy, damage, 5, lifetime, speed, 'arrow_projectile');
 

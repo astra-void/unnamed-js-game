@@ -41,8 +41,11 @@ export abstract class Projectile extends LivingEntity {
   }
 
   update(_time: number, delta: number): void {
+    if (this.destroyed) return;
+
     const dt = delta / 1000;
     this.lifetime -= dt;
+
     if (this.lifetime <= 0) {
       this.destroy();
     }

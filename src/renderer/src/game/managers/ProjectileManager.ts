@@ -38,18 +38,24 @@ export class ProjectileManager {
   }
 
   update(time: number, delta: number) {
-    this.projectiles.getChildren().forEach((proj: unknown) => {
-      if (!isProjectileSprite(proj)) return;
+    const children = [...this.projectiles.getChildren()]; // 복사본 사용
+
+    for (const proj of children) {
+      if (!isProjectileSprite(proj)) continue;
 
       const projectile = proj.entity;
 
       if (projectile.destroyed) {
-        this.projectiles.remove(proj, true, true);
-        return;
+        if (proj.active && proj.scene) {
+          proj.destroy();
+        }
+
+        this.projectiles.remove(proj, false, false);
+        continue;
       }
 
       projectile.update(time, delta);
-    });
+    }
   }
 
   clear() {
