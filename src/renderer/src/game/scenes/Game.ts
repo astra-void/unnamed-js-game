@@ -23,31 +23,148 @@ export class Game extends Scene {
   }
 
   preload() {
+    const ensureTexture = (
+      key: string,
+      drawer: (graphics: Phaser.GameObjects.Graphics) => void,
+      width: number = 64,
+      height: number = 64
+    ) => {
+      if (this.textures.exists(key)) return;
+
+      const graphics = this.add.graphics();
+      drawer(graphics);
+      graphics.generateTexture(key, width, height);
+      graphics.destroy();
+    };
+
     /** Placeholder test graphics */
-    this.add
-      .graphics()
-      .fillStyle(0xffffff, 1)
-      .fillCircle(8, 8, 8)
-      .generateTexture('player', 16, 16)
-      .destroy();
-    this.add
-      .graphics()
-      .fillStyle(0xff0000, 1)
-      .fillCircle(8, 8, 8)
-      .generateTexture('enemy', 16, 16)
-      .destroy();
-    this.add
-      .graphics()
-      .fillStyle(0x00ff00, 0.5)
-      .fillCircle(6, 6, 6)
-      .generateTexture('projectile', 12, 12)
-      .destroy();
-    this.add
-      .graphics()
-      .fillStyle(0xffffff, 1)
-      .fillRect(6, 6, 64, 64)
-      .generateTexture('test_object', 128, 128)
-      .destroy();
+    ensureTexture('player', (g) => g.fillStyle(0xffffff).fillCircle(8, 8, 8), 16, 16);
+    ensureTexture('enemy', (g) => g.fillStyle(0xff0000).fillCircle(8, 8, 8), 16, 16);
+    ensureTexture(
+      'projectile',
+      (g) => g.fillStyle(0x00ff00, 0.7).fillCircle(6, 6, 6),
+      12,
+      12
+    );
+    ensureTexture('test_object', (g) => g.fillStyle(0xffffff).fillRect(0, 0, 64, 64), 64, 64);
+
+    ensureTexture(
+      'arrow',
+      (g) =>
+        g.fillStyle(0xf5deb3)
+          .fillRect(20, 28, 24, 8)
+          .fillTriangle(10, 16, 10, 48, 32, 32),
+      64,
+      64
+    );
+    ensureTexture(
+      'arrow_projectile',
+      (g) => g.fillStyle(0xf5deb3).fillTriangle(2, 6, 10, 0, 10, 12),
+      12,
+      12
+    );
+    ensureTexture(
+      'jelly_bombard',
+      (g) =>
+        g.fillStyle(0x8a2be2)
+          .fillCircle(32, 32, 18)
+          .lineStyle(4, 0xffffff)
+          .strokeCircle(32, 32, 22),
+      64,
+      64
+    );
+    ensureTexture(
+      'jelly_flame',
+      (g) =>
+        g.fillStyle(0xff7f50)
+          .fillCircle(32, 42, 14)
+          .fillTriangle(32, 8, 18, 42, 46, 42),
+      64,
+      64
+    );
+    ensureTexture(
+      'jelly_crossbow',
+      (g) =>
+        g.fillStyle(0xdeb887)
+          .fillRect(14, 28, 36, 8)
+          .lineStyle(4, 0x8b4513)
+          .strokeTriangle(10, 24, 10, 40, 28, 32)
+          .strokeTriangle(54, 24, 54, 40, 36, 32),
+      64,
+      64
+    );
+    ensureTexture(
+      'jelly_crown_icon',
+      (g) => g.fillStyle(0xffd700).fillTriangle(8, 48, 32, 12, 56, 48),
+      64,
+      64
+    );
+    ensureTexture(
+      'milk_sprayer',
+      (g) => g.fillStyle(0xffffff).fillRoundedRect(12, 12, 40, 40, 8),
+      64,
+      64
+    );
+    ensureTexture(
+      'morning_star',
+      (g) =>
+        g.fillStyle(0xc0c0c0)
+          .fillCircle(18, 32, 8)
+          .fillCircle(46, 32, 12)
+          .lineStyle(3, 0x444444)
+          .strokeCircle(46, 32, 16),
+      64,
+      64
+    );
+    ensureTexture(
+      'gummy_soul',
+      (g) => g.fillStyle(0x98fb98).fillCircle(32, 32, 18),
+      64,
+      64
+    );
+    ensureTexture(
+      'gummy_staff',
+      (g) =>
+        g.fillStyle(0x8b4513)
+          .fillRect(28, 12, 8, 40)
+          .fillStyle(0x98fb98)
+          .fillCircle(32, 12, 8),
+      64,
+      64
+    );
+    ensureTexture(
+      'scythe',
+      (g) =>
+        g.fillStyle(0x696969)
+          .fillRect(30, 12, 6, 40)
+          .fillStyle(0xc0c0c0)
+          .fillCircle(20, 16, 10)
+          .fillRect(12, 8, 12, 16),
+      64,
+      64
+    );
+    ensureTexture(
+      'choco_chip_icon',
+      (g) =>
+        g.fillStyle(0x8b4513)
+          .fillCircle(32, 32, 20)
+          .fillStyle(0x5d3412)
+          .fillCircle(24, 26, 4)
+          .fillCircle(40, 38, 3)
+          .fillCircle(36, 24, 3),
+      64,
+      64
+    );
+    ensureTexture(
+      'cream_cloak_icon',
+      (g) =>
+        g.fillStyle(0xfffdd0)
+          .fillRoundedRect(10, 10, 44, 44, 12)
+          .lineStyle(3, 0xffd700)
+          .strokeRoundedRect(10, 10, 44, 44, 12),
+      64,
+      64
+    );
 
     /** End of placeholder test graphics */
   }

@@ -149,7 +149,9 @@ export class Player extends LivingEntity {
         ? new (item as WeaponConstructor)(this.scene, this)
         : new (item as ItemConstructor)();
       const existing = findMethod(temp.name);
-      if (isWeapon && 'destory' in temp) (temp as Weapon).destroy();
+      if (isWeapon && 'destroy' in temp && typeof temp.destroy === 'function') {
+        (temp as Weapon).destroy();
+      }
       return !existing || !existing.isMaxLevel;
     }) as C[];
   }
