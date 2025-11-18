@@ -20,7 +20,8 @@ export abstract class Projectile extends LivingEntity {
     maxHp: number = damage,
     lifetime: number,
     speed = 200,
-    texture: string = 'projectile'
+    texture: string = 'projectile',
+    size: number = 1
   ) {
     super(scene, x, y, 'projectile', 'projectile', texture);
     this.vx = vx;
@@ -35,6 +36,8 @@ export abstract class Projectile extends LivingEntity {
       this;
 
     scene.physics.add.existing(this.sprite);
+    this.sprite.setScale(size);
+
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
     body.setVelocity(vx, vy);
     body.setCollideWorldBounds(false);

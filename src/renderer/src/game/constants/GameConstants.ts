@@ -1,11 +1,11 @@
-import { Arrow } from '../weapons';
+import { Needle } from '../weapons';
 
 export const GAME_CONFIG = {
-  EXP_MULTIPLIER: 2, // 다음 레벨까지 필요한 경험치 배수 (level * EXP_MULTIPLIER)
+  EXP_MULTIPLIER: 2, // 다음 레벨까지 필요한 경험치 배수 (level * EXP_MULTIPLIER) DEBUG
   MAX_ITEM_LEVEL: 5, // 아이템 최대 레벨
   MAX_WEAPON_LEVEL: 5, // 무기 최대 레벨
 
-  DEFAULT_WEAPON: Arrow, // 기본 무기
+  DEFAULT_WEAPON: Needle, // 기본 무기
 
   SELECTION_PANEL: {
     PANEL_WIDTH: 650, // 아이템 선택 패널 폭

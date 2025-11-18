@@ -5,12 +5,14 @@ import { Projectile } from '../projectiles';
 
 export class HealthManager {
   entity: LivingEntity | Projectile;
+  baseMaxHp: number;
   maxHp: number;
   hp: number;
   private isDead: boolean = false;
 
   constructor(entity: LivingEntity | Projectile, maxHp?: number) {
     this.entity = entity;
+    this.baseMaxHp = maxHp ?? GAME_CONFIG.PLAYER.DEFAULT_MAX_HP;
     this.maxHp = maxHp ?? GAME_CONFIG.PLAYER.DEFAULT_MAX_HP;
     this.hp = this.maxHp;
 

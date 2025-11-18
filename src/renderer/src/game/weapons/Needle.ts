@@ -1,14 +1,14 @@
 import { Scene } from 'phaser';
 import { Player } from '../entities/living';
-import { ArrowProjectile } from '../projectiles';
+import { NeedleProjectile } from '../projectiles';
 import { Game } from '../scenes/Game';
 import { Weapon } from './Weapon';
 
-export class Arrow extends Weapon {
+export class Needle extends Weapon {
   player: Player;
 
   constructor(scene: Scene, player: Player) {
-    super(scene, '화살', '화살임', 'arrow', player, 1, 10, 300, 3);
+    super(scene, '바늘', '바늘임', 'needle', player, 1, 10, 300, 1);
     this.player = player;
   }
 
@@ -25,7 +25,7 @@ export class Arrow extends Weapon {
     const vx = (dx / len) * this.speed;
     const vy = (dy / len) * this.speed;
 
-    const proj = new ArrowProjectile(
+    const proj = new NeedleProjectile(
       this.scene,
       this.player.x,
       this.player.y,

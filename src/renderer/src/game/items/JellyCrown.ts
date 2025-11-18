@@ -25,9 +25,11 @@ export class JellyCrown extends Item {
 
   private recalc(player: Player) {
     const bonus = this.bonusRates[this.level - 1];
-    player.healthManager.maxHp = Math.floor(
-      player.healthManager.maxHp * (1 + bonus)
-    );
+
+    const newMaxHp = Math.floor(player.healthManager.baseMaxHp * (1 + bonus));
+
+    player.healthManager.maxHp = newMaxHp;
+
     player.healthManager.heal(Number.POSITIVE_INFINITY);
   }
 }

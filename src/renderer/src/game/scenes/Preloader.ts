@@ -26,15 +26,12 @@ export class Preloader extends Scene {
     // Load weapons image
     this.load.setPath('assets/weapons');
 
-    this.load.image('arrow', 'arrow.png');
+    this.load.image('needle', 'needle.png');
     this.load.image('gummy_soul', 'gummy_soul.png');
     this.load.image('gummy_staff', 'gummy_staff.png');
     this.load.image('jelly_bombard', 'jelly_bombard.png');
-    this.load.image('jelly_crossbow', 'jelly_crossbow.png');
     this.load.image('jelly_flame', 'jelly_flame.png');
-    this.load.image('milk_sprayer', 'milk_sprayer.png');
     this.load.image('morning_star', 'morning_star.png');
-    this.load.image('scythe', 'scythe.png');
 
     // Load items image
     this.load.setPath('assets/items');
@@ -55,7 +52,7 @@ export class Preloader extends Scene {
     // Load projectiles image
     this.load.setPath('assets/projectiles');
 
-    this.load.image('arrow_projectile', 'arrow.png');
+    this.load.image('needle_projectile', 'needle.png');
   }
 
   create() {

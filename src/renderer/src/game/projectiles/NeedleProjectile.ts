@@ -1,8 +1,8 @@
 import { Scene } from 'phaser';
-import { LivingEntity } from '../entities/living';
+import { Enemy, LivingEntity } from '../entities/living';
 import { Projectile } from './Projectile';
 
-export class ArrowProjectile extends Projectile {
+export class NeedleProjectile extends Projectile {
   constructor(
     scene: Scene,
     x: number,
@@ -13,10 +13,19 @@ export class ArrowProjectile extends Projectile {
     speed: number = 300,
     lifetime: number
   ) {
-    super(scene, x, y, vx, vy, damage, 5, lifetime, speed, 'arrow_projectile');
-
-    const scale = 0.1;
-    this.sprite.setScale(scale);
+    super(
+      scene,
+      x,
+      y,
+      vx,
+      vy,
+      damage,
+      5,
+      lifetime,
+      speed,
+      'needle_projectile',
+      0.15
+    );
 
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
     body.allowRotation = true;
@@ -28,6 +37,11 @@ export class ArrowProjectile extends Projectile {
 
   onHit(target: LivingEntity): void {
     target.healthManager.takeDamage(this.damage);
+
+    if ('applyStun' in target) {
+      (target as Enemy).applyStun(1000);
+    }
+
     this.healthManager.takeDamage(this.damage);
   }
 }

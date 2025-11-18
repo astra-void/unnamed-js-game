@@ -1,10 +1,13 @@
-import { Player } from '../entities/living';
+import { Enemy, Player } from '../entities/living';
 import { Game } from '../scenes/Game';
+import { isEnemySprite } from '../types/typeGuards';
 import { Item } from './Item';
 
 export class Cape extends Item {
-  private slowRates = [0.05, 0.07, 0.1, 0.15, 0.2];
+  private slowRates = [0.25, 0.3, 0.35, 0.4, 0.5];
   private radius = 120;
+
+  private slowedEnemies = new Set<Enemy>();
 
   constructor() {
     super('슈크림 망토', '주변 적의 속도를 감소시킨다', [
@@ -21,16 +24,32 @@ export class Cape extends Item {
 
   update(player: Player, _time: number, _delta: number): void {
     if (!(player.scene instanceof Game)) return;
+
     const slow = this.slowRates[this.level - 1];
-    const enemies =
-      player.scene.enemyManager.enemiesGroup.getChildren() as Phaser.GameObjects.Sprite[];
-    for (const enemy of enemies) {
-      const dx = enemy.x - player.x;
-      const dy = enemy.y - player.y;
-      if (dx * dx + dy * dy <= this.radius * this.radius) {
-        const body = enemy.body as Phaser.Physics.Arcade.Body;
-        body.velocity.scale(1 - slow);
+    const radiusSq = this.radius * this.radius;
+
+    const enemies = player.scene.enemyManager.enemiesGroup.getChildren();
+    const currentSlowed = new Set<Enemy>();
+
+    for (const sprite of enemies) {
+      if (!isEnemySprite(sprite)) continue;
+      const enemy = sprite.entity;
+
+      const dx = sprite.x - player.x;
+      const dy = sprite.y - player.y;
+
+      if (dx * dx + dy * dy <= radiusSq) {
+        enemy.speedMultiplier = 1 - slow;
+        currentSlowed.add(enemy);
       }
     }
+
+    for (const enemy of this.slowedEnemies) {
+      if (!currentSlowed.has(enemy)) {
+        enemy.speedMultiplier = 1;
+      }
+    }
+
+    this.slowedEnemies = currentSlowed;
   }
 }
