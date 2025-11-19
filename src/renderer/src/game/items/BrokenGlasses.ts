@@ -2,30 +2,18 @@ import { Player } from '../entities/living';
 import { Item } from './Item';
 
 export class BrokenGlasses extends Item {
-  private cooldowns = [60, 55, 50, 45, 40];
-  private timer = 0;
-
   constructor() {
-    super('부러진 안경', '주기적으로 회복 아이템을 생성한다', [
-      'chocolate_chip_1',
-      'chocolate_chip_2',
-      'chocolate_chip_3',
-      'chocolate_chip_4',
-      'chocolate_chip_5'
+    super('부러진 안경', '공격범위 5/10/12.5/15/20% 증가', [
+      'broken_glasses_1',
+      'broken_glasses_2',
+      'broken_glasses_3',
+      'broken_glasses_4',
+      'broken_glasses_5'
     ]);
   }
 
-  applyEffect(_player: Player): void {
-    this.timer = 0;
-  }
+  applyEffect(_player: Player): void {}
   removeEffect(_player: Player): void {}
 
-  update(_player: Player, _time: number, delta: number): void {
-    this.timer += delta / 1000;
-    if (this.timer >= this.cooldowns[this.level - 1]) {
-      this.timer = 0;
-      // TODO: 실제 회복 오브젝트 스폰 로직 추가
-      console.log('Spawn chocolate heal item');
-    }
-  }
+  update(_player: Player, _time: number, _delta: number): void {}
 }

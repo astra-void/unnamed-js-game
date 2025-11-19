@@ -62,6 +62,12 @@ export class Game extends Scene {
       64,
       64
     );
+    ensureTexture(
+      'healing_chocolate',
+      (g) => g.fillStyle(0x00ffff, 1).fillCircle(6, 6, 4),
+      12,
+      12
+    );
     /** End of placeholder test graphics */
   }
 

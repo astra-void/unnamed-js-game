@@ -1,5 +1,6 @@
 import { Entity } from '../entities/Entity';
 import { Game } from '../scenes/Game';
+import { isSprite } from '../types/typeGuards';
 
 export class InstanceManager {
   game: Game;
@@ -32,8 +33,8 @@ export class InstanceManager {
 
   update(time: number, delta: number) {
     this.instances.forEach((instance) => {
-      if (instance instanceof Entity) {
-        instance.sprite.update(time, delta);
+      if (isSprite(instance) && instance.entity instanceof Entity) {
+        instance.entity.update(time, delta);
       }
     });
   }

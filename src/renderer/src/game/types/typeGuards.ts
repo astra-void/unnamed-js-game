@@ -16,3 +16,10 @@ export function isProjectileSprite(
 ): sprite is ProjectileSprite {
   return (sprite as ProjectileSprite).entity instanceof Projectile;
 }
+
+export function isSprite(
+  sprite: unknown
+): sprite is EnemySprite | ProjectileSprite {
+  const entity = (sprite as EnemySprite | ProjectileSprite).entity;
+  return entity instanceof Enemy || entity instanceof Projectile;
+}
