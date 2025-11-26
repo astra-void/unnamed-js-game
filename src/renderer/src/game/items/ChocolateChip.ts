@@ -2,7 +2,8 @@ import { Player } from '../entities/living';
 import { Item } from './Item';
 
 export class ChocolateChip extends Item {
-  private cooldowns = [60, 55, 50, 45, 40];
+  private cooldowns = [16, 14, 12, 10, 10];
+  private healAmounts = [10, 14, 18, 21, 20];
   private timer = 0;
 
   constructor() {
@@ -18,8 +19,12 @@ export class ChocolateChip extends Item {
     this.timer += delta / 1000;
     if (this.timer >= this.cooldowns[this.level - 1]) {
       this.timer = 0;
-      // TODO: 실제 회복 오브젝트 스폰 로직 추가
-      console.log('Spawn chocolate heal item');
+      const healTicks = this.level >= 5 ? 2 : 1;
+      const heal = this.healAmounts[this.level - 1];
+
+      for (let i = 0; i < healTicks; i++) {
+        _player.healthManager.heal(heal);
+      }
     }
   }
 }

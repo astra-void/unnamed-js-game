@@ -52,6 +52,8 @@ export abstract class Weapon {
 
   abstract attack(): void;
 
+  update?(_dt: number): void;
+
   levelUp(player: Player) {
     if (!this.isMaxLevel) {
       this.level++;

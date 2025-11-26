@@ -3,8 +3,8 @@ import { Game } from '../scenes/Game';
 import { Item } from './Item';
 
 export class CreamCloak extends Item {
-  private slowRates = [0.05, 0.07, 0.1, 0.15, 0.2];
-  private radius = 120;
+  private slowRates = [0.25, 0.3, 0.35, 0.4, 0.5];
+  private radius = 160;
 
   constructor() {
     super('슈크림 망토', '주변 적의 속도를 감소시킨다', 'cream_cloak_icon');
