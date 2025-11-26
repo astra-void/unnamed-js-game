@@ -1,12 +1,10 @@
-import { Knife } from '../weapons';
-import { Player } from '../entities/living/Player';
-import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
-import { UIManager } from '../managers/UIManager';
+import { EventBus } from '../EventBus';
+import { Player } from '../entities/living/Player';
 import { EnemyManager } from '../managers/EnemyManager';
+import { InstanceManager } from '../managers/InstanceManager';
 import { ProjectileManager } from '../managers/ProjectileManager';
-import { FusionManager } from '../fusion';
-import { FUSION_RECIPES } from '../constants/FusionRecipes';
+import { UIManager } from '../managers/UIManager';
 
 export class Game extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;
@@ -15,11 +13,8 @@ export class Game extends Scene {
 
   enemyManager: EnemyManager;
   projectileManager: ProjectileManager;
-  fusionManager: FusionManager;
   uiManager: UIManager;
-
-  spawnTimer: number = 0;
-  spawnInterval: number = 2000;
+  instanceManager: InstanceManager;
 
   paused: boolean = false;
 
@@ -28,31 +23,52 @@ export class Game extends Scene {
   }
 
   preload() {
+    const ensureTexture = (
+      key: string,
+      drawer: (graphics: Phaser.GameObjects.Graphics) => void,
+      width: number = 64,
+      height: number = 64
+    ) => {
+      if (this.textures.exists(key)) return;
+
+      const graphics = this.add.graphics();
+      drawer(graphics);
+      graphics.generateTexture(key, width, height);
+      graphics.destroy();
+    };
+
     /** Placeholder test graphics */
-    this.add
-      .graphics()
-      .fillStyle(0xffffff, 1)
-      .fillCircle(8, 8, 8)
-      .generateTexture('player', 16, 16)
-      .destroy();
-    this.add
-      .graphics()
-      .fillStyle(0xff0000, 1)
-      .fillCircle(8, 8, 8)
-      .generateTexture('enemy', 16, 16)
-      .destroy();
-    this.add
-      .graphics()
-      .fillStyle(0xffffff, 0.5)
-      .fillCircle(6, 6, 6)
-      .generateTexture('knife_projectile', 12, 12)
-      .destroy();
-    this.add
-      .graphics()
-      .fillStyle(0x00ff00, 0.5)
-      .fillCircle(6, 6, 6)
-      .generateTexture('projectile', 12, 12)
-      .destroy();
+    ensureTexture(
+      'player',
+      (g) => g.fillStyle(0xffffff).fillCircle(8, 8, 8),
+      16,
+      16
+    );
+    ensureTexture(
+      'enemy',
+      (g) => g.fillStyle(0xff0000).fillCircle(8, 8, 8),
+      16,
+      16
+    );
+    ensureTexture(
+      'projectile',
+      (g) => g.fillStyle(0x00ff00, 0.7).fillCircle(6, 6, 6),
+      12,
+      12
+    );
+    ensureTexture(
+      'test_object',
+      (g) => g.fillStyle(0xffffff).fillRect(0, 0, 64, 64),
+      64,
+      64
+    );
+    ensureTexture(
+      'healing_chocolate',
+      (g) => g.fillStyle(0x00ffff, 1).fillCircle(6, 6, 4),
+      12,
+      12
+    );
+    /** End of placeholder test graphics */
   }
 
   create() {
@@ -66,12 +82,10 @@ export class Game extends Scene {
       import.meta.env.VITE_WIDTH / 2,
       import.meta.env.VITE_HEIGHT / 2
     );
-    this.player.weaponManager.addWeapon(new Knife(this, this.player)); // PLACEHOLDER
-    this.player.weaponManager.weapons.forEach((w) => w.levelUp(this.player)); // PLACEHOLDER
 
     this.enemyManager = new EnemyManager(this);
     this.projectileManager = new ProjectileManager(this);
-    this.fusionManager = new FusionManager(this.player, FUSION_RECIPES);
+    this.instanceManager = new InstanceManager(this);
 
     this.physics.world.setBounds(0, 0, this.scale.width, this.scale.height);
 
@@ -88,6 +102,7 @@ export class Game extends Scene {
 
     this.enemyManager.update(time, delta);
     this.projectileManager.update(time, delta);
+    this.instanceManager.update(time, delta);
   }
 
   pauseGame() {

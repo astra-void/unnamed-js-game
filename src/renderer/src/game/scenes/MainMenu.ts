@@ -37,7 +37,26 @@ export class MainMenu extends Scene {
       },
       {
         hoverColor: '#e6e6e6',
-        onClick: () => this.changeScene()
+        onClick: () => this.changeScene(),
+        responsive: true
+      }
+    );
+
+    this.start = new TextButton(
+      this,
+      this.scale.width / 2,
+      this.scale.height / 2 + 200,
+      'Settings',
+      {
+        fontFamily: 'Arial',
+        fontSize: '32px',
+        color: '#ffffff',
+        align: 'center'
+      },
+      {
+        hoverColor: '#e6e6e6',
+        onClick: () => this.scene.start('Settings'),
+        responsive: true
       }
     );
 

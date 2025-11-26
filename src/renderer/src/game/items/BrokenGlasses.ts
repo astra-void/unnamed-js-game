@@ -2,22 +2,18 @@ import { Player } from '../entities/living';
 import { Item } from './Item';
 
 export class BrokenGlasses extends Item {
-  private sizeBonuses = [0.05, 0.1, 0.125, 0.15, 0.2];
-
   constructor() {
-    super('부러진 안경', '투사체 크기가 증가한다', 'broken_glasses_icon');
+    super('부러진 안경', '공격범위 5/10/12.5/15/20% 증가', [
+      'broken_glasses_1',
+      'broken_glasses_2',
+      'broken_glasses_3',
+      'broken_glasses_4',
+      'broken_glasses_5'
+    ]);
   }
 
-  applyEffect(player: Player): void {
-    this.recalc(player);
-  }
+  applyEffect(_player: Player): void {}
+  removeEffect(_player: Player): void {}
 
-  protected onLevelUp(player: Player): void {
-    this.recalc(player);
-  }
-
-  private recalc(player: Player) {
-    player.projectileScaleBonus = this.sizeBonuses[this.level - 1];
-  }
+  update(_player: Player, _time: number, _delta: number): void {}
 }
-

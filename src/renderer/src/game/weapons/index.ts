@@ -1,10 +1,7 @@
-export * from './Weapon';
-
-export * from './Knife';
-export * from './Test';
-export * from './Test2';
+export * from './GummySoul';
+export * from './GummyStaff';
+export * from './JellyBombard';
+export * from './JellyFlame';
 export * from './MorningStar';
-export * from './JellySpirit';
-export * from './JellyStaff';
-export * from './JellyBombardment';
 export * from './Needle';
+export * from './Weapon';

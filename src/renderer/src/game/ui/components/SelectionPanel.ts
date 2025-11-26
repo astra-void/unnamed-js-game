@@ -1,344 +1,272 @@
-import { GameObjects, Scene } from 'phaser';
-import { Weapon } from '../../weapons';
-import { Item } from '../../items';
-import { Player } from '../../entities/living';
-import { TextButton } from './TextButton';
-import { toNumber } from '../../utils/color';
-import { GAME_CONFIG } from '../../constants';
-import { WeaponConstructor, ItemConstructor } from '../../types/constructors';
-import { FusionRecipe } from '../../fusion';
-import { UIComponent } from '../../types/ui';
-import { EventBus } from '../../EventBus';
+import { UIConfig, UIScale } from '../UIConfig';
+import { CardContent, InfoCard } from './InfoCard';
 
-interface Choice {
-  kind: 'weapon' | 'item' | 'fusion';
-  ctor: WeaponConstructor | ItemConstructor | null;
-  recipe?: FusionRecipe;
-  name: string;
-  button: TextButton;
+export interface SelectionPanelOptions {
+  title?: string;
+  maxChoices?: number;
+  backgroundColor?: number;
+  onSelect?: (index: number) => void;
+  onClose?: () => void;
 }
 
-export class SelectionPanel
-  extends GameObjects.Container
-  implements UIComponent
-{
-  id = 'selectionPanel';
-  object: GameObjects.Container;
-  player: Player;
-  choices: Choice[] = [];
-  bg: GameObjects.Rectangle;
+export class SelectionPanel extends Phaser.GameObjects.Container {
+  private overlay: Phaser.GameObjects.Rectangle;
+  private panelBg: Phaser.GameObjects.Rectangle;
+  private titleText?: Phaser.GameObjects.Text;
+  private cards: InfoCard[] = [];
 
-  selectedCount = 0;
-  maxSelect = 3;
+  private panelWidth: number;
+  private panelHeight: number;
+  private options: Required<SelectionPanelOptions>;
 
   constructor(
-    scene: Scene,
-    player: Player,
-    weaponClasses: WeaponConstructor[],
-    itemClasses: ItemConstructor[],
-    fusionRecipes: FusionRecipe[]
+    scene: Phaser.Scene,
+    choices: CardContent[],
+    options: SelectionPanelOptions = {}
   ) {
-    super(scene);
-    this.player = player;
-    this.object = this;
+    super(scene, 0, 0);
 
-    const { PANEL_WIDTH, PANEL_HEIGHT, CARD_WIDTH, CARD_HEIGHT, CARD_SPACING } =
-      GAME_CONFIG.SELECTION_PANEL;
-    const { BACKGROUND_OVERLAY, PANEL_BACKGROUND, PANEL_BORDER } =
-      GAME_CONFIG.COLORS;
-    const { BACKGROUND_OVERLAY: BG_ALPHA, PANEL: PANEL_ALPHA } =
-      GAME_CONFIG.ALPHA;
-
-    this.bg = scene.add
-      .rectangle(
-        scene.scale.width / 2,
-        scene.scale.height / 2,
-        scene.scale.width,
-        scene.scale.height,
-        BACKGROUND_OVERLAY,
-        BG_ALPHA
-      )
-      .setDepth(9999);
-    this.add(this.bg);
-
-    const panel = scene.add
-      .rectangle(
-        scene.scale.width / 2,
-        scene.scale.height / 2,
-        PANEL_WIDTH,
-        PANEL_HEIGHT,
-        PANEL_BACKGROUND,
-        PANEL_ALPHA
-      )
-      .setStrokeStyle(3, PANEL_BORDER)
-      .setDepth(10000);
-    this.add(panel);
-
-    const total =
-      weaponClasses.length + itemClasses.length + fusionRecipes.length;
-    const cols = Math.min(3, total);
-    const rows = Math.ceil(total / cols);
-
-    const cardWidth = CARD_WIDTH;
-    const cardHeight = CARD_HEIGHT;
-    const spacing = CARD_SPACING;
-
-    const startX =
-      scene.scale.width / 2 -
-      (cols * cardWidth + (cols - 1) * spacing) / 2 +
-      cardWidth / 2;
-    const startY =
-      scene.scale.height / 2 -
-      (rows * cardHeight + (rows - 1) * spacing) / 2 +
-      cardHeight / 2;
-
-    let index = 0;
-
-    const handleSelection = (
-      kind: 'weapon' | 'item' | 'fusion',
-      payload: Weapon | Item | FusionRecipe
-    ) => {
-      if (this.selectedCount >= this.maxSelect) return;
-      this.selectedCount++;
-      EventBus.emit(`selection:${kind}`, payload);
-
-      if (this.selectedCount >= this.maxSelect) {
-        this.destroy();
-      }
+    this.options = {
+      title: options.title ?? '선택하세요',
+      maxChoices: options.maxChoices ?? 3,
+      backgroundColor: options.backgroundColor ?? 0x1a1a1a,
+      onSelect: options.onSelect ?? (() => {}),
+      onClose: options.onClose ?? (() => {})
     };
 
-    const makeChoice = (
-      ctor: WeaponConstructor | ItemConstructor | null,
-      kind: 'weapon' | 'item' | 'fusion',
-      instance: Weapon | Item | null,
-      recipe: FusionRecipe | null
-    ) => {
-      const col = index % cols;
-      const row = Math.floor(index / cols);
-      const x = startX + col * (cardWidth + spacing);
-      const y = startY + row * (cardHeight + spacing);
+    const uiScale = UIConfig.getScale(scene.scale.width, scene.scale.height);
+    this.panelWidth = uiScale.panelWidth;
+    this.panelHeight = uiScale.panelHeight;
 
-      let card: TextButton;
-      let name: string;
+    this.setPosition(scene.scale.width / 2, scene.scale.height / 2);
+    this.setDepth(1000);
 
-      if (kind === 'fusion' && recipe) {
-        card = this.createFusionCard(scene, x, y, recipe, handleSelection);
-        name = recipe.name;
-      } else if (instance) {
-        card = this.createCard(
-          scene,
-          x,
-          y,
-          instance,
-          kind as 'weapon' | 'item',
-          handleSelection
-        );
-        name = instance.name;
-      } else {
-        return;
-      }
+    this.overlay = scene.add.rectangle(
+      0,
+      0,
+      scene.scale.width,
+      scene.scale.height,
+      0x000000,
+      0.7
+    );
+    this.overlay.setOrigin(0.5);
+    this.overlay.setPosition(0, 0);
+    this.add(this.overlay);
 
-      this.choices.push({
-        kind,
-        ctor,
-        recipe: recipe || undefined,
-        name,
-        button: card
-      });
-      index++;
-    };
+    this.panelBg = scene.add.rectangle(0, 0, this.panelWidth, this.panelHeight);
+    this.panelBg.setFillStyle(this.options.backgroundColor, 0.95);
+    this.panelBg.setStrokeStyle(3, 0xffffff, 0.3);
+    this.panelBg.setOrigin(0.5);
+    this.add(this.panelBg);
 
-    weaponClasses.forEach((W) => {
-      let instance = this.player.weaponManager.findWeapon(W.name);
-      if (!instance) instance = new W(this.scene, this.player);
-      makeChoice(W, 'weapon', instance, null);
-    });
+    if (this.options.title) {
+      this.titleText = scene.add.text(
+        0,
+        -this.panelHeight / 2 + 30,
+        this.options.title,
+        {
+          fontSize: `${uiScale.fontSize.xl}px`,
+          fontFamily: 'sans-serif',
+          fontStyle: 'bold',
+          color: '#ffffff'
+        }
+      );
+      this.titleText.setOrigin(0.5);
+      this.add(this.titleText);
+    }
 
-    itemClasses.forEach((I) => {
-      let instance = this.player.itemManager.findItem(I.name);
-      if (!instance) instance = new I();
-      makeChoice(I, 'item', instance, null);
-    });
+    this.createCards(choices, uiScale);
 
-    fusionRecipes.forEach((recipe) => makeChoice(null, 'fusion', null, recipe));
+    this.animateIn();
 
     scene.add.existing(this);
+  }
 
-    this.setScale(0.8);
-    this.setAlpha(0);
-    scene.tweens.add({
-      targets: this,
+  private createCards(choices: CardContent[], uiScale: UIScale): void {
+    const cardWidth = uiScale.cardWidth;
+    const cardHeight = uiScale.cardHeight;
+    const spacing = uiScale.spacing.lg;
+
+    const titleHeight = this.titleText ? this.titleText.height + 40 : 40;
+    const availableHeight = this.panelHeight - titleHeight - 40;
+    const availableWidth = this.panelWidth - 40;
+
+    const positions = UIConfig.calculateCardGrid(
+      availableWidth,
+      availableHeight,
+      cardWidth,
+      cardHeight,
+      spacing,
+      Math.min(choices.length, this.options.maxChoices)
+    );
+
+    const yOffset = titleHeight / 2;
+
+    choices.slice(0, this.options.maxChoices).forEach((choice, index) => {
+      const pos = positions[index];
+
+      const card = new InfoCard(
+        this.scene,
+        pos.x - availableWidth / 2,
+        pos.y - availableHeight / 2 + yOffset,
+        choice,
+        {
+          width: cardWidth,
+          height: cardHeight,
+          responsive: true
+        }
+      );
+
+      card.enableHover(undefined, undefined, () =>
+        this.handleCardSelect(index)
+      );
+
+      this.cards.push(card);
+      this.add(card);
+
+      card.setAlpha(0);
+      card.setScale(0.8);
+      this.scene.tweens.add({
+        targets: card,
+        alpha: 1,
+        scale: 1,
+        duration: 300,
+        delay: 100 + index * 100,
+        ease: 'Back.easeOut'
+      });
+    });
+  }
+
+  private handleCardSelect(index: number): void {
+    this.scene.time.delayedCall(150, () => {
+      this.options.onSelect(index);
+      this.close();
+    });
+  }
+
+  private animateIn(): void {
+    this.overlay.setAlpha(0);
+    this.panelBg.setScale(0.8);
+    this.panelBg.setAlpha(0);
+
+    if (this.titleText) {
+      this.titleText.setAlpha(0);
+      this.titleText.setY(this.titleText.y - 20);
+    }
+
+    this.scene.tweens.add({
+      targets: this.overlay,
+      alpha: 0.7,
+      duration: 200
+    });
+
+    this.scene.tweens.add({
+      targets: this.panelBg,
       scale: 1,
       alpha: 1,
+      duration: 300,
+      ease: 'Back.easeOut'
+    });
+
+    if (this.titleText) {
+      this.scene.tweens.add({
+        targets: this.titleText,
+        alpha: 1,
+        y: this.titleText.y + 20,
+        duration: 300,
+        delay: 100,
+        ease: 'Quad.easeOut'
+      });
+    }
+  }
+
+  close(): void {
+    this.cards.forEach((card, index) => {
+      this.scene.tweens.add({
+        targets: card,
+        alpha: 0,
+        scale: 0.8,
+        duration: 200,
+        delay: index * 50,
+        ease: 'Back.easeIn'
+      });
+    });
+
+    if (this.titleText) {
+      this.scene.tweens.add({
+        targets: this.titleText,
+        alpha: 0,
+        y: this.titleText.y - 20,
+        duration: 200
+      });
+    }
+
+    this.scene.tweens.add({
+      targets: this.panelBg,
+      scale: 0.8,
+      alpha: 0,
       duration: 200,
-      ease: 'Back'
+      delay: 100
+    });
+
+    this.scene.tweens.add({
+      targets: this.overlay,
+      alpha: 0,
+      duration: 200,
+      delay: 100,
+      onComplete: () => {
+        this.options.onClose();
+        this.destroy();
+      }
     });
   }
 
-  private createCard(
-    scene: Scene,
-    x: number,
-    y: number,
-    instance: Weapon | Item,
-    kind: 'weapon' | 'item',
-    onSelect: (
-      kind: 'weapon' | 'item' | 'fusion',
-      payload: Weapon | Item | FusionRecipe
-    ) => void
-  ) {
-    const cardWidth = GAME_CONFIG.SELECTION_PANEL.CARD_WIDTH;
-    const cardHeight = GAME_CONFIG.SELECTION_PANEL.CARD_HEIGHT;
+  private repositionCards(uiScale: UIScale): void {
+    const cardWidth = uiScale.cardWidth;
+    const cardHeight = uiScale.cardHeight;
+    const spacing = uiScale.spacing.lg;
 
-    const cardBg = scene.add
-      .rectangle(x, y, cardWidth, cardHeight, toNumber('#2b2b2b'), 1)
-      .setStrokeStyle(2, toNumber('#ffffff'))
-      .setDepth(10001)
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true })
-      .on('pointerdown', () => {
-        onSelect(kind, instance);
-      });
+    const titleHeight = this.titleText ? this.titleText.height + 40 : 40;
+    const availableHeight = this.panelHeight - titleHeight - 40;
+    const availableWidth = this.panelWidth - 40;
 
-    cardBg.on('pointerover', () => {
-      scene.tweens.add({ targets: cardBg, scale: 1.05, duration: 100 });
+    const positions = UIConfig.calculateCardGrid(
+      availableWidth,
+      availableHeight,
+      cardWidth,
+      cardHeight,
+      spacing,
+      this.cards.length
+    );
+
+    const yOffset = titleHeight / 2;
+
+    this.cards.forEach((card, index) => {
+      const pos = positions[index];
+
+      card.setPosition(
+        pos.x - availableWidth / 2,
+        pos.y - availableHeight / 2 + yOffset
+      );
     });
-    cardBg.on('pointerout', () => {
-      scene.tweens.add({ targets: cardBg, scale: 1, duration: 100 });
-    });
-
-    const icon = scene.add
-      .circle(x - cardWidth / 2 + 20, y, 20, toNumber('#999999'))
-      .setDepth(10002);
-
-    const nameText = scene.add
-      .text(x - cardWidth / 2 + 50, y - 15, instance.name, {
-        fontSize: '14px',
-        fontStyle: 'bold',
-        color: '#ffffff'
-      })
-      .setOrigin(0, 0);
-
-    const levelText = scene.add
-      .text(
-        x - cardWidth / 2 + 50,
-        y,
-        instance.level === 0 ? 'New Item' : `Lv. ${instance.level}`,
-        {
-          fontSize: '12px',
-          color: '#aaaaaa'
-        }
-      )
-      .setOrigin(0, 0);
-
-    const descText = scene.add
-      .text(x - cardWidth / 2 + 50, y + 15, instance.description, {
-        fontSize: '12px',
-        color: '#cccccc',
-        wordWrap: { width: cardWidth - 60 }
-      })
-      .setOrigin(0, 0);
-
-    const container = scene.add
-      .container(0, 0, [cardBg, icon, nameText, levelText, descText])
-      .setSize(cardWidth, cardHeight);
-
-    this.add(container);
-    return container as unknown as TextButton;
   }
 
-  private createFusionCard(
-    scene: Scene,
-    x: number,
-    y: number,
-    recipe: FusionRecipe,
-    onSelect: (
-      kind: 'weapon' | 'item' | 'fusion',
-      payload: Weapon | Item | FusionRecipe
-    ) => void
-  ) {
-    const cardWidth = GAME_CONFIG.SELECTION_PANEL.CARD_WIDTH;
-    const cardHeight = GAME_CONFIG.SELECTION_PANEL.CARD_HEIGHT;
+  onResize(width: number, height: number): void {
+    const uiScale = UIConfig.getScale(width, height);
 
-    const cardBg = scene.add
-      .rectangle(x, y, cardWidth, cardHeight, 0x6a1b9a, 1)
-      .setStrokeStyle(3, 0xffd700)
-      .setDepth(10001)
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true })
-      .on('pointerdown', () => {
-        onSelect('fusion', recipe);
-      });
+    this.overlay.setSize(width, height);
+    this.panelWidth = uiScale.panelWidth;
+    this.panelHeight = uiScale.panelHeight;
+    this.panelBg.setSize(this.panelWidth, this.panelHeight);
+    this.setPosition(width / 2, height / 2);
 
-    cardBg.on('pointerover', () => {
-      scene.tweens.add({
-        targets: cardBg,
-        scale: 1.05,
-        tint: 0xffff99,
-        duration: 100
-      });
-    });
-    cardBg.on('pointerout', () => {
-      scene.tweens.add({
-        targets: cardBg,
-        scale: 1,
-        tint: 0xffffff,
-        duration: 100
-      });
-    });
+    if (this.titleText) {
+      this.titleText.setFontSize(`${uiScale.fontSize.xl}px`);
+      this.titleText.setY(-this.panelHeight / 2 + 30);
+    }
 
-    const icon = scene.add
-      .text(x - cardWidth / 2 + 20, y - 20, '🔧', { fontSize: '24px' })
-      .setOrigin(0.5)
-      .setDepth(10002);
+    this.cards.forEach((card) => card.onResize(width, height));
 
-    const nameText = scene.add
-      .text(x - cardWidth / 2 + 50, y - 25, `⚡ ${recipe.name}`, {
-        fontSize: '14px',
-        fontStyle: 'bold',
-        color: '#ffd700'
-      })
-      .setOrigin(0, 0.5)
-      .setDepth(10002);
-
-    const ingredients = recipe.ingredients
-      .map((ing) => ing.ctor.prototype.name || 'Unknown')
-      .join(' + ');
-
-    const ingredientsText = scene.add
-      .text(x - cardWidth / 2 + 50, y - 5, `Materials: ${ingredients}`, {
-        fontSize: '10px',
-        color: '#e1bee7',
-        wordWrap: { width: cardWidth - 60 }
-      })
-      .setOrigin(0, 0.5)
-      .setDepth(10002);
-
-    const resultText = scene.add
-      .text(
-        x - cardWidth / 2 + 50,
-        y + 15,
-        `→ ${recipe.result.name || 'Legendary Item'}`,
-        {
-          fontSize: '12px',
-          color: '#ffffff',
-          fontStyle: 'bold'
-        }
-      )
-      .setOrigin(0, 0.5)
-      .setDepth(10002);
-
-    const container = scene.add
-      .container(0, 0, [cardBg, icon, nameText, ingredientsText, resultText])
-      .setSize(cardWidth, cardHeight);
-
-    this.add(container);
-    return container as unknown as TextButton;
-  }
-
-  destroy(fromScene?: boolean) {
-    this.bg?.destroy();
-    this.choices.forEach((c) => c.button.destroy());
-    this.choices = [];
-    super.destroy(fromScene);
+    this.repositionCards(uiScale);
   }
 }

@@ -1,13 +1,17 @@
+import { Needle } from '../weapons';
+
 export const GAME_CONFIG = {
-  EXP_MULTIPLIER: 2, // 다음 레벨까지 필요한 경험치 배수 (level * EXP_MULTIPLIER)
+  EXP_MULTIPLIER: 2, // 다음 레벨까지 필요한 경험치 배수 (level * EXP_MULTIPLIER) DEBUG
   MAX_ITEM_LEVEL: 5, // 아이템 최대 레벨
   MAX_WEAPON_LEVEL: 5, // 무기 최대 레벨
+
+  DEFAULT_WEAPON: Needle, // 기본 무기
 
   SELECTION_PANEL: {
     PANEL_WIDTH: 650, // 아이템 선택 패널 폭
     PANEL_HEIGHT: 350, // 아이템 선택 패널 높이
-    CARD_WIDTH: 180, // 카드 폭
-    CARD_HEIGHT: 80, // 카드 높이
+    CARD_WIDTH: 200, // 카드 폭
+    CARD_HEIGHT: 120, // 카드 높이
     CARD_SPACING: 20, // 카드 간격
     MAX_CHOICES: 3, // 최대 선택 가능 개수
     ANIMATION_DURATION: 200 // 애니메이션 시간 (ms)
@@ -35,12 +39,14 @@ export const GAME_CONFIG = {
   },
 
   PLAYER: {
-    DEFAULT_SPEED: 200, // 기본 이동속도
+    DEFAULT_SPEED: 240, // 기본 이동속도
     DEFAULT_MAX_HP: 100, // 기본 최대체력
     HEALTH_BAR_OFFSET: 40 // 체력바 오프셋
   },
 
   ENEMY: {
+    DEFAULT_SPEED: 220, // 기본 이동속도
+    DEFAULT_DAMAGE: 10, // 기본 공격력
     SPAWN_INTERVAL: 2000, // (ms)
     MIN_SPAWN_INTERVAL: 500 // (ms)
   }

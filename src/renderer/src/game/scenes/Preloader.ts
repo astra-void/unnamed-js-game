@@ -23,7 +23,36 @@ export class Preloader extends Scene {
   }
 
   preload() {
-    //  Load the assets for the game - Replace with your own assets
+    // Load weapons image
+    this.load.setPath('assets/weapons');
+
+    this.load.image('needle', 'needle.png');
+    this.load.image('gummy_soul', 'gummy_soul.png');
+    this.load.image('gummy_staff', 'gummy_staff.png');
+    this.load.image('jelly_bombard', 'jelly_bombard.png');
+    this.load.image('jelly_flame', 'jelly_flame.png');
+    this.load.image('morning_star', 'morning_star.png');
+
+    // Load items image
+    this.load.setPath('assets/items');
+
+    const loadItem = (name: string, start: number = 1, end: number = 5) => {
+      for (let i = start; i <= end; i++) {
+        this.load.image(`${name}_${i}`, `${name}_${i}.png`);
+      }
+    };
+
+    loadItem('blessed_necklace', 1, 5);
+    loadItem('broken_glasses', 1, 5);
+    loadItem('cape', 1, 5);
+    loadItem('chocolate_chip', 1, 5);
+    loadItem('crown', 1, 5);
+    loadItem('martial_codex', 0, 5);
+
+    // Load projectiles image
+    this.load.setPath('assets/projectiles');
+
+    this.load.image('needle_projectile', 'needle.png');
   }
 
   create() {

@@ -1,15 +1,16 @@
-import { Game } from '../scenes/Game';
-import { Enemy } from '../entities/living/Enemy';
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../constants';
-import { EnemySprite, isEnemySprite } from '../types/typeGuards';
 import { EventBus } from '../EventBus';
+import { Enemy } from '../entities/living/Enemy';
+import { Game } from '../scenes/Game';
+import { EnemySprite, isEnemySprite } from '../types/typeGuards';
 
 export class EnemyManager {
   private scene: Game;
   private spawnTimer: Phaser.Time.TimerEvent | null = null;
   private spawnInterval: number;
   private enemies: Phaser.GameObjects.Group;
+  private nextEnemyId: number = 0;
   wave: number = 1;
 
   constructor(scene: Game) {
@@ -131,7 +132,17 @@ export class EnemyManager {
         break;
     }
 
-    const enemy = new Enemy(this.scene, x, y, 100, 10, 200, this.scene.player);
+    const enemy = new Enemy(
+      this.scene,
+      this.nextEnemyId.toString(),
+      x,
+      y,
+      100,
+      10,
+      GAME_CONFIG.ENEMY.DEFAULT_SPEED,
+      this.scene.player
+    );
+    this.nextEnemyId++;
     (enemy.sprite as EnemySprite).entity = enemy;
     this.enemies.add(enemy.sprite);
   }

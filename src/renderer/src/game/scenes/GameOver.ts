@@ -1,5 +1,5 @@
-import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
+import { EventBus } from '../EventBus';
 
 export class GameOver extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;
@@ -18,7 +18,7 @@ export class GameOver extends Scene {
     this.background.setAlpha(0.5);
 
     this.gameOverText = this.add
-      .text(512, 384, 'you died bruh', {
+      .text(512, 384, 'you died bruh so suck', {
         fontFamily: 'Arial',
         fontSize: 64,
         color: '#ffffff',

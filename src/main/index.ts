@@ -1,7 +1,7 @@
 import 'dotenv/config';
-import { app, shell, BrowserWindow } from 'electron';
+import { electronApp, is, optimizer } from '@electron-toolkit/utils';
+import { app, BrowserWindow, shell } from 'electron';
 import { join } from 'path';
-import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -12,7 +12,8 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? {} : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      nodeIntegrationInWorker: true
     }
   });
 

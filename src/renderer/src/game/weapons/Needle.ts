@@ -1,50 +1,55 @@
 import { Scene } from 'phaser';
 import { Player } from '../entities/living';
-import { Weapon } from './Weapon';
-import { NeedleProjectile } from '../entities/projectiles';
+import { NeedleProjectile } from '../projectiles';
 import { Game } from '../scenes/Game';
+import { Weapon } from './Weapon';
 
 export class Needle extends Weapon {
-  private damages = [35, 40, 50, 50, 50];
-  private cooldowns = [0.5, 0.666, 1, 1.2, 1.2];
+  player: Player;
 
   constructor(scene: Scene, player: Player) {
-    super(scene, '바늘', '짧은 사거리 투척', player, 0, 0, 0.5, 35, 300, 2);
+    super(scene, '바늘', '바늘임', 'needle', player, 1, 10, 300, 1);
+    this.player = player;
   }
 
+  use?(): void {}
+
   attack(): void {
-    if (!(this.scene instanceof Game)) return;
+    if (!this.speed || !this.lifetime) return;
 
     const pointer = this.scene.input.activePointer;
-    const dx = pointer.worldX - this.player.x;
-    const dy = pointer.worldY - this.player.y;
-    const len = Math.sqrt(dx * dx + dy * dy) || 1;
 
-    const speed = 300;
-    const vx = (dx / len) * speed;
-    const vy = (dy / len) * speed;
+    const baseDx = pointer.worldX - this.player.x;
+    const baseDy = pointer.worldY - this.player.y;
 
-    const damageMultiplier = 1 + (this.player.damageBonus ?? 0);
-    const damage = this.damages[this.level - 1] * damageMultiplier;
-    const projectileCount = this.level >= 5 ? 2 : 1;
+    const baseAngle = Math.atan2(baseDy, baseDx);
 
-    for (let i = 0; i < projectileCount; i++) {
+    const count = this.level;
+
+    const spread = Phaser.Math.DegToRad(12);
+
+    const start = -(count - 1) / 2;
+
+    for (let i = 0; i < count; i++) {
+      const offset = start + i;
+      const angle = baseAngle + offset * spread;
+
+      const vx = Math.cos(angle) * this.speed;
+      const vy = Math.sin(angle) * this.speed;
+
       const proj = new NeedleProjectile(
         this.scene,
         this.player.x,
         this.player.y,
         vx,
         vy,
-        damage,
-        1.5
+        this.damage,
+        this.speed,
+        this.lifetime
       );
-      proj.sprite.setScale(1 + (this.player.projectileScaleBonus ?? 0));
-      this.scene.projectileManager.add(proj.sprite);
+
+      if (this.scene instanceof Game)
+        this.scene.projectileManager.add(proj.sprite);
     }
   }
-
-  protected onLevelUp(_player: Player): void {
-    this.cooldown = this.cooldowns[this.level - 1];
-  }
 }
-

@@ -5,7 +5,13 @@ export class JellyCrown extends Item {
   private bonusRates = [0.05, 0.1, 0.15, 0.2, 0.25];
 
   constructor() {
-    super('곰젤리 왕관', '최대 체력이 증가한다', 'jelly_crown_icon');
+    super('곰젤리 왕관', '최대 체력이 증가한다', [
+      'crown_1',
+      'crown_2',
+      'crown_3',
+      'crown_4',
+      'crown_5'
+    ]);
   }
 
   applyEffect(player: Player): void {
@@ -19,9 +25,11 @@ export class JellyCrown extends Item {
 
   private recalc(player: Player) {
     const bonus = this.bonusRates[this.level - 1];
-    player.healthManager.maxHp = Math.floor(
-      player.healthManager.maxHp * (1 + bonus)
-    );
+
+    const newMaxHp = Math.floor(player.healthManager.baseMaxHp * (1 + bonus));
+
+    player.healthManager.maxHp = newMaxHp;
+
     player.healthManager.heal(Number.POSITIVE_INFINITY);
   }
 }
