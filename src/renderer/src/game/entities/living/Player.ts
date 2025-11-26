@@ -35,6 +35,10 @@ export class Player extends LivingEntity {
   levelManager: LevelManager;
   uiManager: UIManager;
 
+  attackSpeedBonus = 0;
+  damageBonus = 0;
+  projectileScaleBonus = 0;
+
   constructor(scene: Game, x: number, y: number) {
     super(scene, x, y, 'player', 'player', 'player');
     this.speed = GAME_CONFIG.PLAYER.DEFAULT_SPEED;
