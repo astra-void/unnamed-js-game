@@ -6,6 +6,7 @@ import { Weapon } from './Weapon';
 
 export class Needle extends Weapon {
   player: Player;
+  stunEnabled?: boolean = false;
 
   constructor(scene: Scene, player: Player) {
     super(scene, '바늘', '바늘임', 'needle', player, 1, 10, 300, 1);
@@ -14,6 +15,31 @@ export class Needle extends Weapon {
 
   use?(): void {}
 
+protected onLevelUp(): void {
+  switch (this.level) {
+    case 1:
+      this.cooldown = 0.5;
+      break;
+
+    case 2:
+      this.damage = 40;
+      break;
+
+    case 3:
+      this.damage = 50;
+      break;
+
+    case 4:
+      this.stunEnabled = true;
+      this.cooldown = 0.66;
+      break;
+
+    case 5:
+      this.cooldown = 1.0;
+      break;
+  }
+}
+
   attack(): void {
     if (!this.speed || !this.lifetime) return;
 
@@ -21,13 +47,11 @@ export class Needle extends Weapon {
 
     const baseDx = pointer.worldX - this.player.x;
     const baseDy = pointer.worldY - this.player.y;
-
     const baseAngle = Math.atan2(baseDy, baseDx);
 
-    const count = this.level;
+    const count = this.level === 5 ? 2 : 1;
 
     const spread = Phaser.Math.DegToRad(12);
-
     const start = -(count - 1) / 2;
 
     for (let i = 0; i < count; i++) {
@@ -45,7 +69,8 @@ export class Needle extends Weapon {
         vy,
         this.damage,
         this.speed,
-        this.lifetime
+        this.lifetime,
+        this
       );
 
       if (this.scene instanceof Game)

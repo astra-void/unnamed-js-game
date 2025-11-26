@@ -59,5 +59,6 @@ export abstract class Projectile extends LivingEntity {
   destroy() {
     if (this.destroyed) return;
     this.destroyed = true;
+    this.sprite.destroy();
   }
 }

@@ -1,8 +1,11 @@
 import { Scene } from 'phaser';
 import { Enemy, LivingEntity } from '../entities/living';
 import { Projectile } from './Projectile';
+import { Needle } from '../weapons';
 
 export class NeedleProjectile extends Projectile {
+  weapon: Needle
+
   constructor(
     scene: Scene,
     x: number,
@@ -11,7 +14,8 @@ export class NeedleProjectile extends Projectile {
     vy: number,
     damage: number,
     speed: number = 300,
-    lifetime: number
+    lifetime: number,
+    weapon: Needle
   ) {
     super(
       scene,
@@ -26,6 +30,7 @@ export class NeedleProjectile extends Projectile {
       'needle_projectile',
       0.15
     );
+    this.weapon = weapon;
 
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
     body.allowRotation = true;
@@ -38,7 +43,7 @@ export class NeedleProjectile extends Projectile {
   onHit(target: LivingEntity): void {
     target.healthManager.takeDamage(this.damage);
 
-    if ('applyStun' in target) {
+    if (this.weapon.stunEnabled && 'applyStun' in target) {
       (target as Enemy).applyStun(1000);
     }
 
