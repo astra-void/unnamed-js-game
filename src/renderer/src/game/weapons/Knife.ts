@@ -25,16 +25,18 @@ export class Knife extends Weapon {
     const vx = (dx / len) * this.speed;
     const vy = (dy / len) * this.speed;
 
+    const damageMultiplier = 1 + (this.player.damageBonus ?? 0);
     const proj = new KnifeProjectile(
       this.scene,
       this.player.x,
       this.player.y,
       vx,
       vy,
-      this.damage,
+      this.damage * damageMultiplier,
       this.speed,
       this.lifetime
     );
+    proj.sprite.setScale(1 + (this.player.projectileScaleBonus ?? 0));
     if (this.scene instanceof Game)
       this.scene.projectileManager.add(proj.sprite);
   }
