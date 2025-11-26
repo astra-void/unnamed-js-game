@@ -1,11 +1,16 @@
 import { Scene } from 'phaser';
 import { Player } from '../entities/living';
-import { TestProjectile } from '../projectiles';
 import { Game } from '../scenes/Game';
+import { isEnemySprite } from '../types/typeGuards';
 import { Weapon } from './Weapon';
 
 export class GummyStaff extends Weapon {
   player: Player;
+  private headCount = 3;
+  private orbitRadius = 90;
+  private rotationTime = 3;
+  private currentAngle = 0;
+  private headHitRadius = 28;
 
   constructor(scene: Scene, player: Player) {
     super(
@@ -14,38 +19,61 @@ export class GummyStaff extends Weapon {
       '주변에 곰젤리 머리를 소환하여 주변을 돔',
       'gummy_staff',
       player,
-      0.1,
-      10,
-      300,
-      3
+      0.15,
+      50
     );
     this.player = player;
   }
 
-  use?(): void {}
+  protected onLevelUp(): void {
+    switch (this.level) {
+      case 1:
+        this.cooldown = this.rotationTime / 20;
+        this.damage = 50;
+        break;
+      case 2:
+        this.damage = 75;
+        break;
+      case 3:
+        this.rotationTime = 2;
+        this.cooldown = this.rotationTime / 20;
+        break;
+      case 4:
+        this.headCount = 4;
+        break;
+      case 5:
+        this.damage = 100;
+        this.rotationTime = 1.5;
+        this.cooldown = this.rotationTime / 20;
+        break;
+    }
+  }
 
   attack(): void {
-    if (!this.speed || !this.lifetime) return;
+    if (!(this.scene instanceof Game)) return;
 
-    const pointer = this.scene.input.activePointer;
-    const dx = pointer.worldX - this.player.x;
-    const dy = pointer.worldY - this.player.y;
-    const len = Math.hypot(dx, dy) || 1;
+    const step = (2 * Math.PI * this.cooldown) / this.rotationTime;
+    this.currentAngle = (this.currentAngle + step) % (Math.PI * 2);
 
-    const vx = (dx / len) * this.speed;
-    const vy = (dy / len) * this.speed;
+    const damage = this.getDamage();
+    const radiusSq = this.headHitRadius * this.headHitRadius;
+    const enemies = this.scene.enemyManager.enemiesGroup
+      .getChildren()
+      .filter(isEnemySprite);
 
-    const proj = new TestProjectile(
-      this.scene,
-      this.player.x,
-      this.player.y,
-      vx,
-      vy,
-      this.damage,
-      this.speed,
-      this.lifetime
-    );
-    if (this.scene instanceof Game)
-      this.scene.projectileManager.add(proj.sprite);
+    for (let i = 0; i < this.headCount; i++) {
+      const angle = this.currentAngle + (i * (Math.PI * 2)) / this.headCount;
+      const hx = this.player.x + Math.cos(angle) * this.orbitRadius;
+      const hy = this.player.y + Math.sin(angle) * this.orbitRadius;
+
+      enemies.forEach((enemySprite) => {
+        const dx = enemySprite.x - hx;
+        const dy = enemySprite.y - hy;
+
+        if (dx * dx + dy * dy <= radiusSq) {
+          enemySprite.entity.healthManager.takeDamage(damage);
+        }
+      });
+    }
   }
 }

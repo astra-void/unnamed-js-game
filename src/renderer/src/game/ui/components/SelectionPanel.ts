@@ -17,6 +17,10 @@ export class SelectionPanel extends Phaser.GameObjects.Container {
 
   private panelWidth: number;
   private panelHeight: number;
+  private panelPadding: number;
+  private cardWidth: number;
+  private cardHeight: number;
+  private cardSpacing: number;
   private options: Required<SelectionPanelOptions>;
 
   constructor(
@@ -27,7 +31,7 @@ export class SelectionPanel extends Phaser.GameObjects.Container {
     super(scene, 0, 0);
 
     this.options = {
-      title: options.title ?? '선택하세요',
+      title: options.title ?? '',
       maxChoices: options.maxChoices ?? 3,
       backgroundColor: options.backgroundColor ?? 0x1a1a1a,
       onSelect: options.onSelect ?? (() => {}),
@@ -35,8 +39,37 @@ export class SelectionPanel extends Phaser.GameObjects.Container {
     };
 
     const uiScale = UIConfig.getScale(scene.scale.width, scene.scale.height);
-    this.panelWidth = uiScale.panelWidth;
-    this.panelHeight = uiScale.panelHeight;
+    this.panelPadding = uiScale.spacing.xl;
+    this.cardWidth = Math.min(
+      Math.max(uiScale.cardWidth, 320),
+      scene.scale.width * 0.75
+    );
+    this.cardHeight = Math.min(
+      Math.max(uiScale.cardHeight, 240),
+      scene.scale.height * 0.35
+    );
+    this.cardSpacing = uiScale.spacing.lg;
+
+    const cardCount = Math.min(choices.length, this.options.maxChoices);
+    const estimatedTitleHeight = this.options.title
+      ? uiScale.fontSize.xl * 2
+      : this.panelPadding;
+    const estimatedContentHeight =
+      cardCount * this.cardHeight + (cardCount - 1) * this.cardSpacing;
+
+    this.panelWidth = Phaser.Math.Clamp(
+      Math.max(uiScale.panelWidth, this.cardWidth + this.panelPadding * 2),
+      uiScale.panelWidth,
+      scene.scale.width * 0.9
+    );
+    this.panelHeight = Phaser.Math.Clamp(
+      Math.max(
+        uiScale.panelHeight,
+        estimatedContentHeight + estimatedTitleHeight + this.panelPadding
+      ),
+      uiScale.panelHeight,
+      scene.scale.height * 0.9
+    );
 
     this.setPosition(scene.scale.width / 2, scene.scale.height / 2);
     this.setDepth(1000);
@@ -62,7 +95,7 @@ export class SelectionPanel extends Phaser.GameObjects.Container {
     if (this.options.title) {
       this.titleText = scene.add.text(
         0,
-        -this.panelHeight / 2 + 30,
+        -this.panelHeight / 2 + this.panelPadding,
         this.options.title,
         {
           fontSize: `${uiScale.fontSize.xl}px`,
@@ -75,47 +108,24 @@ export class SelectionPanel extends Phaser.GameObjects.Container {
       this.add(this.titleText);
     }
 
-    this.createCards(choices, uiScale);
+    this.createCards(choices);
+    this.resizePanelForContent(uiScale);
 
     this.animateIn();
 
     scene.add.existing(this);
   }
 
-  private createCards(choices: CardContent[], uiScale: UIScale): void {
-    const cardWidth = uiScale.cardWidth;
-    const cardHeight = uiScale.cardHeight;
-    const spacing = uiScale.spacing.lg;
-
-    const titleHeight = this.titleText ? this.titleText.height + 40 : 40;
-    const availableHeight = this.panelHeight - titleHeight - 40;
-    const availableWidth = this.panelWidth - 40;
-
-    const positions = UIConfig.calculateCardGrid(
-      availableWidth,
-      availableHeight,
-      cardWidth,
-      cardHeight,
-      spacing,
-      Math.min(choices.length, this.options.maxChoices)
-    );
-
-    const yOffset = titleHeight / 2;
+  private createCards(choices: CardContent[]): void {
+    const cardWidth = this.cardWidth;
+    const cardHeight = this.cardHeight;
 
     choices.slice(0, this.options.maxChoices).forEach((choice, index) => {
-      const pos = positions[index];
-
-      const card = new InfoCard(
-        this.scene,
-        pos.x - availableWidth / 2,
-        pos.y - availableHeight / 2 + yOffset,
-        choice,
-        {
-          width: cardWidth,
-          height: cardHeight,
-          responsive: true
-        }
-      );
+      const card = new InfoCard(this.scene, 0, 0, choice, {
+        width: cardWidth,
+        height: cardHeight,
+        responsive: true
+      });
 
       card.enableHover(undefined, undefined, () =>
         this.handleCardSelect(index)
@@ -221,52 +231,99 @@ export class SelectionPanel extends Phaser.GameObjects.Container {
     });
   }
 
-  private repositionCards(uiScale: UIScale): void {
-    const cardWidth = uiScale.cardWidth;
-    const cardHeight = uiScale.cardHeight;
-    const spacing = uiScale.spacing.lg;
+  private repositionCards(): void {
+    const cardHeight = this.cardHeight;
+    const spacing = this.cardSpacing;
 
-    const titleHeight = this.titleText ? this.titleText.height + 40 : 40;
-    const availableHeight = this.panelHeight - titleHeight - 40;
-    const availableWidth = this.panelWidth - 40;
-
-    const positions = UIConfig.calculateCardGrid(
-      availableWidth,
-      availableHeight,
-      cardWidth,
-      cardHeight,
-      spacing,
-      this.cards.length
-    );
-
-    const yOffset = titleHeight / 2;
+    const titleHeight = this.titleText
+      ? this.titleText.height + this.panelPadding * 1.5
+      : this.panelPadding;
+    const availableHeight = this.panelHeight - titleHeight - this.panelPadding;
+    const cardCount = this.cards.length;
+    const totalHeight = cardCount * cardHeight + (cardCount - 1) * spacing;
+    const centeredOffset = Math.max(0, (availableHeight - totalHeight) / 2);
+    const startY =
+      -this.panelHeight / 2 + titleHeight + centeredOffset + cardHeight / 2;
 
     this.cards.forEach((card, index) => {
-      const pos = positions[index];
-
-      card.setPosition(
-        pos.x - availableWidth / 2,
-        pos.y - availableHeight / 2 + yOffset
-      );
+      card.setPosition(0, startY + index * (cardHeight + spacing));
     });
+  }
+
+  private resizePanelForContent(uiScale: UIScale): void {
+    const cardCount = this.cards.length || this.options.maxChoices;
+    const totalCardHeight =
+      cardCount * this.cardHeight +
+      Math.max(0, cardCount - 1) * this.cardSpacing;
+    const titleHeight = this.titleText
+      ? this.titleText.height + this.panelPadding
+      : this.panelPadding;
+
+    const targetWidth = Math.max(
+      uiScale.panelWidth,
+      this.cardWidth + this.panelPadding * 2
+    );
+    const targetHeight = Math.max(
+      uiScale.panelHeight,
+      totalCardHeight + titleHeight + this.panelPadding
+    );
+
+    this.panelWidth = Phaser.Math.Clamp(
+      targetWidth,
+      uiScale.panelWidth,
+      this.scene.scale.width * 0.9
+    );
+    this.panelHeight = Phaser.Math.Clamp(
+      targetHeight,
+      uiScale.panelHeight,
+      this.scene.scale.height * 0.9
+    );
+
+    this.panelBg.setSize(this.panelWidth, this.panelHeight);
+
+    if (this.titleText) {
+      this.titleText.setY(-this.panelHeight / 2 + this.panelPadding);
+    }
+
+    this.repositionCards();
   }
 
   onResize(width: number, height: number): void {
     const uiScale = UIConfig.getScale(width, height);
 
     this.overlay.setSize(width, height);
-    this.panelWidth = uiScale.panelWidth;
-    this.panelHeight = uiScale.panelHeight;
+    this.panelPadding = uiScale.spacing.xl;
+    this.cardWidth = Math.min(Math.max(uiScale.cardWidth, 320), width * 0.75);
+    this.cardHeight = Math.min(
+      Math.max(uiScale.cardHeight, 240),
+      height * 0.35
+    );
+    this.cardSpacing = uiScale.spacing.lg;
+
+    this.panelWidth = Math.max(
+      uiScale.panelWidth,
+      this.cardWidth + this.panelPadding * 2
+    );
+    this.panelHeight = Math.max(
+      uiScale.panelHeight,
+      this.cardHeight * this.cards.length +
+        this.cardSpacing * Math.max(0, this.cards.length - 1) +
+        (this.titleText
+          ? this.titleText.height + this.panelPadding * 2
+          : this.panelPadding * 2)
+    );
+    this.panelWidth = Math.min(this.panelWidth, width * 0.9);
+    this.panelHeight = Math.min(this.panelHeight, height * 0.9);
     this.panelBg.setSize(this.panelWidth, this.panelHeight);
     this.setPosition(width / 2, height / 2);
 
     if (this.titleText) {
       this.titleText.setFontSize(`${uiScale.fontSize.xl}px`);
-      this.titleText.setY(-this.panelHeight / 2 + 30);
+      this.titleText.setY(-this.panelHeight / 2 + this.panelPadding);
     }
 
     this.cards.forEach((card) => card.onResize(width, height));
 
-    this.repositionCards(uiScale);
+    this.resizePanelForContent(uiScale);
   }
 }

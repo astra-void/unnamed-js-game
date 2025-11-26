@@ -4,7 +4,8 @@ import { Game } from '../scenes/Game';
 import { Item } from './Item';
 
 export class ChocolateChip extends Item {
-  private cooldowns = [5, 45, 40, 35, 30];
+  private cooldowns = [16, 14, 12, 10, 10];
+  private healAmounts = [10, 14, 18, 21, 20];
   private timer = 0;
 
   constructor() {
@@ -29,11 +30,21 @@ export class ChocolateChip extends Item {
       this.timer = 0;
 
       const scene = player.scene as Game;
-      const x = player.x + Phaser.Math.Between(-80, 80);
-      const y = player.y + Phaser.Math.Between(-80, 80);
+      const count = this.level === 5 ? 2 : 1;
 
-      const healObj = new HealingChocolate(scene, x, y);
-      scene.instanceManager.add(healObj.sprite);
+      for (let i = 0; i < count; i++) {
+        const x = player.x + Phaser.Math.Between(-400, 400);
+        const y = player.y + Phaser.Math.Between(-400, 400);
+
+        const healObj = new HealingChocolate(
+          scene,
+          x,
+          y,
+          this.healAmounts[this.level - 1],
+          15000
+        );
+        scene.instanceManager.add(healObj.sprite);
+      }
     }
   }
 }

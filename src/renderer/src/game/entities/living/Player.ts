@@ -35,6 +35,10 @@ export class Player extends LivingEntity {
   levelManager: LevelManager;
   uiManager: UIManager;
 
+  attackSpeedMultiplier = 1;
+  damageMultiplier = 1;
+  projectileSizeMultiplier = 1;
+
   constructor(scene: Game, x: number, y: number) {
     super(scene, x, y, 'player', 'player', 'player');
     this.speed = GAME_CONFIG.PLAYER.DEFAULT_SPEED;
@@ -180,11 +184,13 @@ export class Player extends LivingEntity {
         const WpnCtor = candidate.value as WeaponConstructor;
         const tempWeapon = new WpnCtor(this.scene, this);
         const existing = this.weaponManager.find(tempWeapon.name);
+        const baseDescription = tempWeapon.description;
+        const progressDescription = existing
+          ? `레벨업! (Lv.${existing.level} -> Lv.${existing.level + 1})`
+          : '새로운 무기';
         const card: CardContent = {
           title: tempWeapon.name,
-          description: existing
-            ? `레벨업! (Lv.${existing.level} -> Lv.${existing.level + 1})`
-            : '새로운 무기',
+          description: `${baseDescription}\n\n${progressDescription}`,
           icon: tempWeapon.texture
         };
         tempWeapon.destroy();
@@ -195,12 +201,13 @@ export class Player extends LivingEntity {
       const tempItem = new ItmCtor();
       const existing = this.itemManager.find(tempItem.name);
       const nextLevel = (existing ?? tempItem).level + 1;
+      const progressDescription = existing
+        ? `레벨업! (Lv.${existing.level} -> Lv.${existing.level + 1})`
+        : '새로운 아이템';
 
       return {
         title: tempItem.name,
-        description: existing
-          ? `레벨업! (Lv.${existing.level} -> Lv.${existing.level + 1})`
-          : '새로운 아이템',
+        description: `${tempItem.description}\n\n${progressDescription}`,
         icon: (existing ?? tempItem).getTextureForLevel(nextLevel)
       };
     });

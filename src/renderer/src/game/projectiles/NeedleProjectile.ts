@@ -1,10 +1,10 @@
 import { Scene } from 'phaser';
 import { Enemy, LivingEntity } from '../entities/living';
-import { Projectile } from './Projectile';
 import { Needle } from '../weapons';
+import { Projectile } from './Projectile';
 
 export class NeedleProjectile extends Projectile {
-  weapon: Needle
+  weapon: Needle;
 
   constructor(
     scene: Scene,
@@ -15,7 +15,8 @@ export class NeedleProjectile extends Projectile {
     damage: number,
     speed: number = 300,
     lifetime: number,
-    weapon: Needle
+    weapon: Needle,
+    sizeMultipler = 1
   ) {
     super(
       scene,
@@ -28,7 +29,7 @@ export class NeedleProjectile extends Projectile {
       lifetime,
       speed,
       'needle_projectile',
-      0.15
+      0.15 * sizeMultipler
     );
     this.weapon = weapon;
 

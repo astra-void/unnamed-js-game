@@ -1,3 +1,4 @@
+export * from './BlessedNecklace';
 export * from './BrokenGlasses';
 export * from './Cape';
 export * from './ChocolateChip';

@@ -22,7 +22,6 @@ export class ProjectileManager {
         const enemy = enemySprite.entity;
 
         projectile.onHit(enemy);
-        enemy.healthManager.takeDamage(projectile.damage);
 
         projectile.destroy();
       }

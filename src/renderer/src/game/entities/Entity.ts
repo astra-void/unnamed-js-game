@@ -7,6 +7,9 @@ export abstract class Entity {
   constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
     this.scene = scene;
     this.sprite = scene.add.sprite(x, y, texture);
+
+    (this.sprite as Phaser.GameObjects.Sprite & { entity?: Entity }).entity =
+      this;
   }
 
   get x() {

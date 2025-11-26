@@ -3,14 +3,22 @@ import { Player } from '../entities/living/Player';
 import { Game } from '../scenes/Game';
 
 export class HealingChocolate extends Entity {
-  private lifetime = 8000;
+  private lifetime: number;
   private elapsed = 0;
-  private healAmount = 30;
+  private healAmount: number;
   private pickupRadius = 32;
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    healAmount: number,
+    lifetime = 15000
+  ) {
     super(scene, x, y, 'healing_chocolate');
     this.sprite.setScale(0.8);
+    this.healAmount = healAmount;
+    this.lifetime = lifetime;
   }
 
   update(_time: number, delta: number) {

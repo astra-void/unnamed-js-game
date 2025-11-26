@@ -50,10 +50,10 @@ export class UIConfig {
         lg: Math.max(16, Math.round(24 * scale)),
         xl: Math.max(24, Math.round(32 * scale))
       },
-      cardWidth: Math.max(150, Math.round(220 * scale)),
-      cardHeight: Math.max(100, Math.round(240 * scale)),
-      panelWidth: Math.max(500, Math.round(720 * scale)),
-      panelHeight: Math.max(400, Math.round(720 * scale))
+      cardWidth: Math.max(220, Math.round(320 * scale)),
+      cardHeight: Math.max(160, Math.round(260 * scale)),
+      panelWidth: Math.max(560, Math.round(780 * scale)),
+      panelHeight: Math.max(460, Math.round(760 * scale))
     };
   }
 

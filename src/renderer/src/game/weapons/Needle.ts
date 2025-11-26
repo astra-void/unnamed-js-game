@@ -9,36 +9,38 @@ export class Needle extends Weapon {
   stunEnabled?: boolean = false;
 
   constructor(scene: Scene, player: Player) {
-    super(scene, '바늘', '바늘임', 'needle', player, 1, 10, 300, 1);
+    super(scene, '바늘', '바늘임', 'needle', player, 1, 35, 300, 1);
     this.player = player;
   }
 
   use?(): void {}
 
-protected onLevelUp(): void {
-  switch (this.level) {
-    case 1:
-      this.cooldown = 0.5;
-      break;
+  protected onLevelUp(): void {
+    switch (this.level) {
+      case 1:
+        this.cooldown = 2;
+        break;
 
-    case 2:
-      this.damage = 40;
-      break;
+      case 2:
+        this.damage = 40;
+        this.cooldown = 1.5;
+        break;
 
-    case 3:
-      this.damage = 50;
-      break;
+      case 3:
+        this.damage = 50;
+        this.cooldown = 1;
+        break;
 
-    case 4:
-      this.stunEnabled = true;
-      this.cooldown = 0.66;
-      break;
+      case 4:
+        this.stunEnabled = true;
+        this.cooldown = 1.5;
+        break;
 
-    case 5:
-      this.cooldown = 1.0;
-      break;
+      case 5:
+        this.cooldown = 2;
+        break;
+    }
   }
-}
 
   attack(): void {
     if (!this.speed || !this.lifetime) return;
@@ -50,6 +52,8 @@ protected onLevelUp(): void {
     const baseAngle = Math.atan2(baseDy, baseDx);
 
     const count = this.level === 5 ? 2 : 1;
+    const damage = this.getDamage();
+    const size = this.getProjectileScale();
 
     const spread = Phaser.Math.DegToRad(12);
     const start = -(count - 1) / 2;
@@ -67,10 +71,11 @@ protected onLevelUp(): void {
         this.player.y,
         vx,
         vy,
-        this.damage,
+        damage,
         this.speed,
         this.lifetime,
-        this
+        this,
+        size
       );
 
       if (this.scene instanceof Game)

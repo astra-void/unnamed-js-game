@@ -33,10 +33,13 @@ export class WeaponManager {
 
   attack(dt: number) {
     for (const weapon of this.weapons.values()) {
+      const attackSpeed = Math.max(this.player.attackSpeedMultiplier, 0.01);
+      const effectiveCooldown = weapon.cooldown / attackSpeed;
+
       weapon.currentCooldown -= dt;
 
       if (weapon.currentCooldown <= 0) {
-        weapon.currentCooldown += weapon.cooldown;
+        weapon.currentCooldown += effectiveCooldown;
 
         weapon.attack();
       }

@@ -57,10 +57,26 @@ export class Game extends Scene {
       12
     );
     ensureTexture(
-      'test_object',
-      (g) => g.fillStyle(0xffffff).fillRect(0, 0, 64, 64),
-      64,
-      64
+      'gummy_soul_bomb',
+      (g) =>
+        g
+          .fillStyle(0x7a3eb1, 0.9)
+          .fillCircle(8, 8, 8)
+          .lineStyle(2, 0xffffff)
+          .strokeCircle(8, 8, 8),
+      16,
+      16
+    );
+    ensureTexture(
+      'bombard_fire_zone',
+      (g) =>
+        g
+          .fillStyle(0xff6600, 0.25)
+          .fillCircle(16, 16, 16)
+          .lineStyle(2, 0xffcc33, 0.7)
+          .strokeCircle(16, 16, 16),
+      32,
+      32
     );
     ensureTexture(
       'healing_chocolate',

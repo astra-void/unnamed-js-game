@@ -62,6 +62,14 @@ export abstract class Weapon {
 
   protected onLevelUp(): void {}
 
+  protected getDamage(): number {
+    return Math.floor(this.damage * (this.player.damageMultiplier ?? 1));
+  }
+
+  protected getProjectileScale(): number {
+    return this.player.projectileSizeMultiplier ?? 1;
+  }
+
   destroy() {
     this.sprite.destroy();
   }

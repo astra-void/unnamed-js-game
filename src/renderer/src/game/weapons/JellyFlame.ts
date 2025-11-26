@@ -1,11 +1,12 @@
 import { Scene } from 'phaser';
 import { Player } from '../entities/living';
-import { TestProjectile } from '../projectiles';
 import { Game } from '../scenes/Game';
+import { isEnemySprite } from '../types/typeGuards';
 import { Weapon } from './Weapon';
 
-export class Test extends Weapon {
+export class JellyFlame extends Weapon {
   player: Player;
+  private radius = 110;
 
   constructor(scene: Scene, player: Player) {
     super(
@@ -14,38 +15,43 @@ export class Test extends Weapon {
       '자신을 중심으로하여 원형태의 도트딜지대 형성',
       'jelly_flame',
       player,
-      0.1,
-      10,
-      300,
-      3
+      0.5,
+      30
     );
     this.player = player;
   }
 
-  use?(): void {}
+  protected onLevelUp(): void {
+    switch (this.level) {
+      case 1:
+        this.damage = 30;
+        this.cooldown = 0.5;
+        break;
+      case 3:
+        this.damage = 40;
+        break;
+      case 5:
+        this.damage = 50;
+        this.radius = 130;
+        break;
+    }
+  }
 
   attack(): void {
-    if (!this.speed || !this.lifetime) return;
+    if (!(this.scene instanceof Game)) return;
 
-    const pointer = this.scene.input.activePointer;
-    const dx = pointer.worldX - this.player.x;
-    const dy = pointer.worldY - this.player.y;
-    const len = Math.hypot(dx, dy) || 1;
+    const radiusSq = this.radius * this.radius;
 
-    const vx = (dx / len) * this.speed;
-    const vy = (dy / len) * this.speed;
+    this.scene.enemyManager.enemiesGroup
+      .getChildren()
+      .filter(isEnemySprite)
+      .forEach((enemy) => {
+        const dx = enemy.x - this.player.x;
+        const dy = enemy.y - this.player.y;
 
-    const proj = new TestProjectile(
-      this.scene,
-      this.player.x,
-      this.player.y,
-      vx,
-      vy,
-      this.damage,
-      this.speed,
-      this.lifetime
-    );
-    if (this.scene instanceof Game)
-      this.scene.projectileManager.add(proj.sprite);
+        if (dx * dx + dy * dy <= radiusSq) {
+          enemy.entity.healthManager.takeDamage(this.damage);
+        }
+      });
   }
 }
