@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { EventBus } from '../EventBus';
 import { Player } from '../entities/living/Player';
+import { TimerManager } from '../managers';
 import { EnemyManager } from '../managers/EnemyManager';
 import { InstanceManager } from '../managers/InstanceManager';
 import { ProjectileManager } from '../managers/ProjectileManager';
@@ -13,6 +14,7 @@ export class Game extends Scene {
 
   enemyManager: EnemyManager;
   projectileManager: ProjectileManager;
+  timerManager: TimerManager;
   uiManager: UIManager;
   instanceManager: InstanceManager;
 
@@ -92,6 +94,7 @@ export class Game extends Scene {
     this.camera.setBackgroundColor(0x000000);
 
     this.uiManager = new UIManager(this);
+    this.timerManager = new TimerManager();
 
     this.player = new Player(
       this,
@@ -106,6 +109,7 @@ export class Game extends Scene {
     this.physics.world.setBounds(0, 0, this.scale.width, this.scale.height);
 
     this.enemyManager.startSpawning();
+    this.timerManager.start();
 
     EventBus.emit('current-scene-ready', this);
   }
@@ -114,6 +118,7 @@ export class Game extends Scene {
     if (this.paused) return;
 
     this.uiManager.update(time, delta);
+    this.timerManager.update(time, delta);
     this.player.update(time, delta);
 
     this.enemyManager.update(time, delta);
@@ -124,12 +129,14 @@ export class Game extends Scene {
   pauseGame() {
     if (this.paused) return;
     this.paused = true;
+    this.timerManager.pause();
     this.physics.world.pause();
   }
 
   resumeGame() {
     if (!this.paused) return;
     this.paused = false;
+    this.timerManager.resume();
     this.physics.world.resume();
   }
 

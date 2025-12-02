@@ -41,7 +41,6 @@ export class HUDPanel
   private currentExp: number = 0;
   private currentMaxExp: number = 50;
   private currentLevel: number = 1;
-  private currentScore: number = 0;
   private currentTime: number = 0;
 
   private playerId: string;
@@ -295,13 +294,6 @@ export class HUDPanel
     if (data.level !== undefined) {
       this.currentLevel = data.level;
       this.levelText.setText(`Lv.${this.currentLevel}`);
-    }
-
-    if (data.score !== undefined) {
-      this.currentScore = data.score;
-      if (this.scoreText) {
-        this.scoreText.setText(`Score: ${this.currentScore.toLocaleString()}`);
-      }
     }
 
     if (data.time !== undefined) {
