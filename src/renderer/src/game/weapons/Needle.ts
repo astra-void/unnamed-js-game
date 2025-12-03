@@ -9,7 +9,17 @@ export class Needle extends Weapon {
   stunEnabled?: boolean = false;
 
   constructor(scene: Scene, player: Player) {
-    super(scene, '바늘', '바늘임', 'needle', player, 1, 35, 300, 1);
+    super(
+      scene,
+      '바늘',
+      '바늘을 날려 짧은 범위에 일반 데미지와 스턴을 부여한다',
+      'needle',
+      player,
+      0.5,
+      35,
+      300,
+      1
+    );
     this.player = player;
   }
 
@@ -18,7 +28,7 @@ export class Needle extends Weapon {
   protected onLevelUp(): void {
     switch (this.level) {
       case 1:
-        this.cooldown = 2;
+        this.cooldown = 0.5;
         break;
 
       case 2:
@@ -33,11 +43,11 @@ export class Needle extends Weapon {
 
       case 4:
         this.stunEnabled = true;
-        this.cooldown = 1.5;
+        this.cooldown = 1.25;
         break;
 
       case 5:
-        this.cooldown = 2;
+        this.cooldown = 1.5;
         break;
     }
   }

@@ -5,6 +5,10 @@ export class TimerManager {
   private isRunning = false;
   private lastEmittedSeconds = -1;
 
+  getElapsedSeconds(): number {
+    return Math.floor(this.elapsedTime);
+  }
+
   start(): void {
     this.reset();
     this.isRunning = true;
