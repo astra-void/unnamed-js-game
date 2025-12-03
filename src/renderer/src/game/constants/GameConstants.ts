@@ -45,6 +45,7 @@ export const GAME_CONFIG = {
   },
 
   ENEMY: {
+    DEFAULT_MAX_HP: 50, // 기본 최대체력
     DEFAULT_SPEED: 220, // 기본 이동속도
     DEFAULT_DAMAGE: 10, // 기본 공격력
     SPAWN_INTERVAL: 2000, // (ms)

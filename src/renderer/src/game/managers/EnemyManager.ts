@@ -158,8 +158,8 @@ export class EnemyManager {
       this.nextEnemyId.toString(),
       x,
       y,
-      100,
-      10,
+      GAME_CONFIG.ENEMY.DEFAULT_MAX_HP + (this.wave - 1) * 10,
+      GAME_CONFIG.ENEMY.DEFAULT_DAMAGE,
       GAME_CONFIG.ENEMY.DEFAULT_SPEED,
       this.scene.player
     );
