@@ -13,6 +13,7 @@ export class Enemy extends LivingEntity {
 
   stunned: boolean = false;
   stunTimer: number = 0;
+  private knockbackTimer: number = 0;
 
   constructor(
     scene: Phaser.Scene,
@@ -57,7 +58,26 @@ export class Enemy extends LivingEntity {
     this.sprite.setTint(0x87cefa);
   }
 
+  applyKnockbackFrom(
+    source: Phaser.GameObjects.Sprite,
+    force: number,
+    duration: number
+  ) {
+    const enemyBody = this.sprite.body as Phaser.Physics.Arcade.Body;
+    const dx = this.x - source.x;
+    const dy = this.y - source.y;
+    const dist = Math.hypot(dx, dy) || 1;
+
+    enemyBody.setVelocity((dx / dist) * force, (dy / dist) * force);
+    this.knockbackTimer = duration;
+  }
+
   update(_time: number, delta: number): void {
+    if (this.knockbackTimer > 0) {
+      this.knockbackTimer -= delta;
+      return;
+    }
+
     if (this.stunned) {
       this.stunTimer -= delta;
       (this.sprite.body as Phaser.Physics.Arcade.Body).setVelocity(0, 0);

@@ -21,6 +21,20 @@ export class EnemyManager {
 
     this.spawnInterval = GAME_CONFIG.ENEMY.SPAWN_INTERVAL;
 
+    const handlePlayerCollision: Phaser.Types.Physics.Arcade.ArcadePhysicsCallback =
+      (playerSprite, enemySprite) => {
+        if (!isEnemySprite(enemySprite)) return;
+
+        const enemy = enemySprite.entity;
+        if (!enemy) return;
+
+        enemy.applyKnockbackFrom(
+          playerSprite as Phaser.GameObjects.Sprite,
+          300,
+          150
+        );
+      };
+
     scene.physics.add.overlap(
       scene.player.sprite,
       this.enemies,
@@ -30,6 +44,12 @@ export class EnemyManager {
         scene.player.healthManager.takeDamage(enemy.damage);
         enemy.healthManager.takeDamage(enemy.healthManager.maxHp);
       }
+    );
+
+    scene.physics.add.collider(
+      scene.player.sprite,
+      this.enemies,
+      handlePlayerCollision
     );
 
     EventBus.on('enemyManager:waveUp', () => {
