@@ -1,5 +1,6 @@
 import Phaser, { Scene } from 'phaser';
 import { Player } from '../entities/living';
+import { BombardFireZone } from '../instances';
 import { JellyBombardMissile } from '../projectiles';
 import { Game } from '../scenes/Game';
 import { isEnemySprite } from '../types/typeGuards';
