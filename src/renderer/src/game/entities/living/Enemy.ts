@@ -11,9 +11,13 @@ export class Enemy extends LivingEntity {
   target: LivingEntity;
   speedMultiplier: number = 1;
 
+  private knockbackTimer: number = 0;
+  private knockbackVelocity: Phaser.Math.Vector2 = new Phaser.Math.Vector2();
+  private knockbackDuration: number = 0;
+  private knockbackStunDuration: number = 0;
+
   stunned: boolean = false;
   stunTimer: number = 0;
-  private knockbackTimer: number = 0;
 
   constructor(
     scene: Phaser.Scene,
@@ -68,13 +72,36 @@ export class Enemy extends LivingEntity {
     const dy = this.y - source.y;
     const dist = Math.hypot(dx, dy) || 1;
 
-    enemyBody.setVelocity((dx / dist) * force, (dy / dist) * force);
+    this.knockbackVelocity.set((dx / dist) * force, (dy / dist) * force);
+    enemyBody.setVelocity(this.knockbackVelocity.x, this.knockbackVelocity.y);
     this.knockbackTimer = duration;
+    this.knockbackDuration = duration;
+    this.knockbackStunDuration = 500;
   }
 
   update(_time: number, delta: number): void {
     if (this.knockbackTimer > 0) {
       this.knockbackTimer -= delta;
+
+      const remainingRatio = Math.max(this.knockbackTimer, 0) /
+        Math.max(this.knockbackDuration, 1);
+      const eased = Phaser.Math.Easing.Cubic.Out(remainingRatio);
+
+      (this.sprite.body as Phaser.Physics.Arcade.Body).setVelocity(
+        this.knockbackVelocity.x * eased,
+        this.knockbackVelocity.y * eased
+      );
+
+      if (this.knockbackTimer <= 0) {
+        this.knockbackTimer = 0;
+        this.knockbackDuration = 0;
+        (this.sprite.body as Phaser.Physics.Arcade.Body).setVelocity(0, 0);
+
+        if (this.knockbackStunDuration > 0) {
+          this.applyStun(this.knockbackStunDuration);
+          this.knockbackStunDuration = 0;
+        }
+      }
       return;
     }
 

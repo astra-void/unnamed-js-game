@@ -30,8 +30,8 @@ export class EnemyManager {
 
         enemy.applyKnockbackFrom(
           playerSprite as Phaser.GameObjects.Sprite,
-          300,
-          150
+          220,
+          400
         );
       };
 
@@ -42,7 +42,6 @@ export class EnemyManager {
         if (!isEnemySprite(enemySprite)) return;
         const enemy = enemySprite.entity;
         scene.player.healthManager.takeDamage(enemy.damage);
-        enemy.healthManager.takeDamage(enemy.healthManager.maxHp);
       }
     );
 
