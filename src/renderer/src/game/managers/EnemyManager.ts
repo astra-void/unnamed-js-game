@@ -41,7 +41,9 @@ export class EnemyManager {
       (_playerSprite: unknown, enemySprite: unknown) => {
         if (!isEnemySprite(enemySprite)) return;
         const enemy = enemySprite.entity;
-        scene.player.healthManager.takeDamage(enemy.damage);
+        if (!enemy) return;
+
+        enemy.tryAttack(scene.player);
       }
     );
 

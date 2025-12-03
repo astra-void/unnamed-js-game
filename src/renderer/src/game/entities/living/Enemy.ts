@@ -8,6 +8,7 @@ export class Enemy extends LivingEntity {
   baseSpeed: number;
   speed: number;
   damage: number;
+  attackCooldown: number;
   target: LivingEntity;
   speedMultiplier: number = 1;
 
@@ -15,6 +16,7 @@ export class Enemy extends LivingEntity {
   private knockbackVelocity: Phaser.Math.Vector2 = new Phaser.Math.Vector2();
   private knockbackDuration: number = 0;
   private knockbackStunDuration: number = 0;
+  private attackCooldownTimer: number = 0;
 
   stunned: boolean = false;
   stunTimer: number = 0;
@@ -33,6 +35,7 @@ export class Enemy extends LivingEntity {
     this.damage = damage;
     this.baseSpeed = speed;
     this.speed = speed;
+    this.attackCooldown = GAME_CONFIG.ENEMY.ATTACK_COOLDOWN;
     this.target = target;
 
     this.healthManager = new HealthManager(this, maxHp);
@@ -54,6 +57,25 @@ export class Enemy extends LivingEntity {
       }
     );
   }
+
+  private reduceAttackCooldown(delta: number) {
+    if (this.attackCooldownTimer > 0) {
+      this.attackCooldownTimer = Math.max(0, this.attackCooldownTimer - delta);
+    }
+  }
+
+  private canAttack() {
+    return this.attackCooldownTimer <= 0;
+  }
+
+  tryAttack(target: LivingEntity) {
+    if (!this.canAttack()) return false;
+
+    target.healthManager.takeDamage(this.damage);
+    this.attackCooldownTimer = this.attackCooldown;
+    return true;
+  }
+
 
   applyStun(duration: number) {
     this.stunned = true;
@@ -80,11 +102,13 @@ export class Enemy extends LivingEntity {
   }
 
   update(_time: number, delta: number): void {
+    this.reduceAttackCooldown(delta);
+
     if (this.knockbackTimer > 0) {
       this.knockbackTimer -= delta;
 
-      const remainingRatio = Math.max(this.knockbackTimer, 0) /
-        Math.max(this.knockbackDuration, 1);
+      const remainingRatio =
+        Math.max(this.knockbackTimer, 0) / Math.max(this.knockbackDuration, 1);
       const eased = Phaser.Math.Easing.Cubic.Out(remainingRatio);
 
       (this.sprite.body as Phaser.Physics.Arcade.Body).setVelocity(

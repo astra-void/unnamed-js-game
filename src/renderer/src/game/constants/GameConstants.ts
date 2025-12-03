@@ -48,6 +48,7 @@ export const GAME_CONFIG = {
     DEFAULT_SPEED: 220, // 기본 이동속도
     DEFAULT_DAMAGE: 10, // 기본 공격력
     SPAWN_INTERVAL: 2000, // (ms)
-    MIN_SPAWN_INTERVAL: 500 // (ms)
+    MIN_SPAWN_INTERVAL: 500, // (ms)
+    ATTACK_COOLDOWN: 500 // (ms)
   }
 } as const;
