@@ -28,8 +28,6 @@ export class JellyCrown extends Item {
 
     const newMaxHp = Math.floor(player.healthManager.baseMaxHp * (1 + bonus));
 
-    player.healthManager.maxHp = newMaxHp;
-
-    player.healthManager.heal(Number.POSITIVE_INFINITY);
+    player.healthManager.setMaxHp(newMaxHp);
   }
 }
