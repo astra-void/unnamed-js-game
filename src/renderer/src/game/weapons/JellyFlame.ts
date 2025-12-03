@@ -7,6 +7,7 @@ import { Weapon } from './Weapon';
 export class JellyFlame extends Weapon {
   player: Player;
   private radius = 110;
+  private aura?: Phaser.GameObjects.Sprite;
 
   constructor(scene: Scene, player: Player) {
     super(
@@ -19,6 +20,11 @@ export class JellyFlame extends Weapon {
       30
     );
     this.player = player;
+
+    this.createAura();
+    this.updateAuraVisual();
+
+    this.scene.events.on('update', this.handleUpdate, this);
   }
 
   protected onLevelUp(): void {
@@ -35,12 +41,16 @@ export class JellyFlame extends Weapon {
         this.radius = 130;
         break;
     }
+
+    this.updateAuraVisual();
   }
 
   attack(): void {
     if (!(this.scene instanceof Game)) return;
 
     const radiusSq = this.radius * this.radius;
+
+    this.updateAuraVisual();
 
     this.scene.enemyManager.enemiesGroup
       .getChildren()
@@ -53,5 +63,31 @@ export class JellyFlame extends Weapon {
           enemy.entity.healthManager.takeDamage(this.damage);
         }
       });
+  }
+
+  private createAura() {
+    this.aura = this.scene.add
+      .sprite(this.player.x, this.player.y, 'jelly_flame_zone')
+      .setAlpha(0.4)
+      .setDepth(0.5);
+
+    this.updateAuraVisual();
+  }
+
+  private updateAuraVisual() {
+    if (!this.aura) return;
+
+    this.aura.setDisplaySize(this.radius * 2, this.radius * 2);
+    this.aura.setPosition(this.player.x, this.player.y);
+  }
+
+  private handleUpdate() {
+    this.updateAuraVisual();
+  }
+
+  destroy(): void {
+    this.aura?.destroy();
+    this.scene.events.off('update', this.handleUpdate, this);
+    super.destroy();
   }
 }

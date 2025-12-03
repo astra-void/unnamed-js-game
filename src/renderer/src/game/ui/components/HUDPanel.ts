@@ -9,7 +9,6 @@ interface HUDData {
   nextExperience?: number;
   maxExperience?: number;
   level?: number;
-  score?: number;
   time?: number;
 }
 
@@ -28,7 +27,6 @@ export class HUDPanel
   private expBarFill: Phaser.GameObjects.Rectangle;
   private levelText: Phaser.GameObjects.Text;
 
-  private scoreText?: Phaser.GameObjects.Text;
   private timeText?: Phaser.GameObjects.Text;
 
   private barWidth: number;
@@ -61,7 +59,7 @@ export class HUDPanel
 
     this.createHealthBar();
     this.createExpBar();
-    this.createScoreAndTime();
+    this.createTime();
     this.setupEventListeners();
 
     scene.add.existing(this);
@@ -100,10 +98,6 @@ export class HUDPanel
         this.updateData({ level });
       }
     );
-
-    EventBus.on('game:scoreChanged', ({ score }: { score: number }) => {
-      this.updateData({ score });
-    });
 
     EventBus.on('game:timeChanged', ({ time }: { time: number }) => {
       this.updateData({ time });
@@ -195,23 +189,13 @@ export class HUDPanel
     this.add([this.expBarBg, this.expBarFill, this.levelText]);
   }
 
-  private createScoreAndTime(): void {
+  private createTime(): void {
     const rightX = this.scene.scale.width - this.padding - this.x;
     const topY = -this.barHeight;
 
-    this.scoreText = this.scene.add.text(rightX, topY, 'Score: 0', {
-      fontSize: `${this.uiScale.fontSize.lg}px`,
-      fontFamily: 'sans-serif',
-      fontStyle: 'bold',
-      color: '#ffff00',
-      stroke: '#000000',
-      strokeThickness: 4
-    });
-    this.scoreText.setOrigin(1, 0);
-
     this.timeText = this.scene.add.text(
       rightX,
-      topY + this.scoreText.height + this.uiScale.spacing.xs,
+      topY + this.uiScale.spacing.xs,
       'Time: 00:00',
       {
         fontSize: `${this.uiScale.fontSize.md}px`,
@@ -223,7 +207,7 @@ export class HUDPanel
     );
     this.timeText.setOrigin(1, 0);
 
-    this.add([this.scoreText, this.timeText]);
+    this.add(this.timeText);
   }
 
   updateData(data: HUDData): void {
@@ -369,11 +353,9 @@ export class HUDPanel
     this.expBarBg.width = this.barWidth;
     this.levelText.setFontSize(this.uiScale.fontSize.md);
 
-    if (this.scoreText && this.timeText) {
+    if (this.timeText) {
       const rightX = width - this.padding - this.x;
-      this.scoreText.x = rightX;
       this.timeText.x = rightX;
-      this.scoreText.setFontSize(this.uiScale.fontSize.lg);
       this.timeText.setFontSize(this.uiScale.fontSize.md);
     }
   }
@@ -383,7 +365,6 @@ export class HUDPanel
     EventBus.off(`player:${this.playerId}:maxHealthChanged`);
     EventBus.off(`player:${this.playerId}:expChanged`);
     EventBus.off(`player:${this.playerId}:levelChanged`);
-    EventBus.off('game:scoreChanged');
     EventBus.off('game:timeChanged');
 
     super.destroy(fromScene);

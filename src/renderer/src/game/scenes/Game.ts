@@ -86,6 +86,28 @@ export class Game extends Scene {
       12,
       12
     );
+    ensureTexture(
+      'head',
+      (g) =>
+        g
+          .fillStyle(0xffcc00)
+          .fillCircle(8, 8, 8)
+          .lineStyle(2, 0x000000)
+          .strokeCircle(8, 8, 8),
+      16,
+      16
+    );
+    ensureTexture(
+      'jelly_flame_zone',
+      (g) =>
+        g
+          .fillStyle(0xff6600, 0.2)
+          .fillCircle(128, 128, 120)
+          .lineStyle(3, 0xffcc33, 0.8)
+          .strokeCircle(128, 128, 120),
+      256,
+      256
+    );
     /** End of placeholder test graphics */
   }
 
