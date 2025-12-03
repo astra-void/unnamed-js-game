@@ -108,7 +108,9 @@ export class Player extends LivingEntity {
     this.scene.uiManager.clear();
     this.destroy();
 
-    const elapsedSeconds = (this.scene as Game).timerManager.getElapsedSeconds();
+    const elapsedSeconds = (
+      this.scene as Game
+    ).timerManager.getElapsedSeconds();
 
     this.scene.scene.start('GameOver', {
       survivedTime: elapsedSeconds
