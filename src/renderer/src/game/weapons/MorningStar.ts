@@ -10,6 +10,69 @@ export class MorningStar extends Weapon {
   private shockwaveRadius = 140;
   private shockwaveDamage = 40;
   private reach = 110;
+  private swingArc = Math.PI / 2.2;
+
+  private createSwingEffect(
+    angle: number,
+    duration: number,
+    impactX: number,
+    impactY: number
+  ) {
+    const swing = this.scene.add.graphics();
+    swing.setDepth(10);
+    swing.lineStyle(14, 0xffd166, 0.85);
+    swing.beginPath();
+    swing.arc(
+      this.player.x,
+      this.player.y,
+      this.reach,
+      angle - this.swingArc / 2,
+      angle + this.swingArc / 2
+    );
+    swing.strokePath();
+    swing.closePath();
+
+    swing.lineStyle(6, 0xffffff, 0.9);
+    swing.beginPath();
+    swing.arc(
+      this.player.x,
+      this.player.y,
+      this.reach * 0.9,
+      angle - this.swingArc / 2.3,
+      angle + this.swingArc / 2.3
+    );
+    swing.strokePath();
+    swing.closePath();
+
+    swing.setAlpha(0.95);
+
+    this.scene.tweens.add({
+      targets: swing,
+      alpha: { from: 0.95, to: 0 },
+      scale: 1.05,
+      duration,
+      ease: 'Cubic.easeOut',
+      onComplete: () => swing.destroy()
+    });
+
+    const slamFlash = this.scene.add.graphics({ x: impactX, y: impactY });
+    slamFlash.setDepth(11);
+    slamFlash.fillStyle(0xfff6cf, 0.95);
+    slamFlash.fillCircle(0, 0, this.slamRadius * 0.2);
+    slamFlash.lineStyle(4, 0xffffff, 0.9);
+    slamFlash.strokeCircle(0, 0, this.slamRadius * 0.25);
+    slamFlash.setAlpha(0);
+
+    this.scene.tweens.add({
+      targets: slamFlash,
+      alpha: { from: 0.8, to: 0 },
+      scale: { from: 0.6, to: 1.4 },
+      duration: duration * 0.7,
+      ease: 'Quad.easeOut',
+      delay: duration * 0.65,
+      onComplete: () => slamFlash.destroy()
+    });
+  }
 
   constructor(scene: Scene, player: Player) {
     super(
@@ -56,17 +119,23 @@ export class MorningStar extends Weapon {
 
     const impactX = this.player.x + (dx / len) * this.reach;
     const impactY = this.player.y + (dy / len) * this.reach;
+    const attackAngle = Math.atan2(dy, dx);
+    const swingDuration = Math.min(Math.max(this.cooldown * 600, 140), 320);
 
-    this.dealAreaDamage(impactX, impactY, this.slamRadius, this.damage);
+    this.createSwingEffect(attackAngle, swingDuration, impactX, impactY);
 
-    if (this.level >= 5) {
-      this.dealAreaDamage(
-        impactX,
-        impactY,
-        this.shockwaveRadius,
-        Math.floor(this.shockwaveDamage * (this.player.damageMultiplier ?? 1))
-      );
-    }
+    this.scene.time.delayedCall(swingDuration * 0.6, () => {
+      this.dealAreaDamage(impactX, impactY, this.slamRadius, this.damage);
+
+      if (this.level >= 5) {
+        this.dealAreaDamage(
+          impactX,
+          impactY,
+          this.shockwaveRadius,
+          Math.floor(this.shockwaveDamage * (this.player.damageMultiplier ?? 1))
+        );
+      }
+    });
   }
 
   private dealAreaDamage(x: number, y: number, radius: number, damage: number) {
