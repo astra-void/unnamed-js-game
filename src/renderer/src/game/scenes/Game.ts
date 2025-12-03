@@ -110,16 +110,16 @@ export class Game extends Scene {
     );
     ensureTexture(
       'jelly_bombard_explosion',
-      (g) =>
-        g
-          .fillStyle(0x9ed8ff, 0.35)
-          .fillCircle(32, 32, 28)
-          .lineStyle(4, 0xffffff, 0.9)
-          .strokeCircle(32, 32, 24)
-          .lineStyle(3, 0x4fa4d9, 0.8)
-          .strokeCircle(32, 32, 16),
-      64,
-      64
+      (g) => {
+        g.fillStyle(0xff3300, 0.4).fillCircle(128, 128, 110);
+        g.fillStyle(0xff9900, 0.6).fillCircle(128, 128, 80);
+        g.fillStyle(0xffff66, 0.8).fillCircle(128, 128, 50);
+        g.fillStyle(0xffffff, 0.9).fillCircle(128, 128, 25);
+        g.lineStyle(8, 0xffcc00, 0.7).strokeCircle(128, 128, 90);
+        g.lineStyle(5, 0xff6600, 0.5).strokeCircle(128, 128, 110);
+      },
+      256,
+      256
     );
     ensureTexture(
       'healing_chocolate',
