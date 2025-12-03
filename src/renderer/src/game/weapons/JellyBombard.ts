@@ -4,6 +4,7 @@ import { BombardFireZone } from '../instances';
 import { Game } from '../scenes/Game';
 import { isEnemySprite } from '../types/typeGuards';
 import { Weapon } from './Weapon';
+import { JellyBombardMissile } from '../projectiles';
 
 export class JellyBombard extends Weapon {
   player: Player;
@@ -54,47 +55,34 @@ export class JellyBombard extends Weapon {
 
     if (enemies.length === 0) return;
 
+    const damage = this.getDamage();
+
     for (let i = 0; i < 3; i++) {
       const target = enemies[i % enemies.length];
       const impactX = target.x + Phaser.Math.Between(-15, 15);
       const impactY = target.y + Phaser.Math.Between(-15, 15);
 
-      this.applyExplosion(impactX, impactY, this.damage);
+      const missile = new JellyBombardMissile(
+        this.scene,
+        this.player.x,
+        this.player.y,
+        impactX,
+        impactY,
+        damage,
+        this.explosionRadius,
+        340,
+        4,
+        this.level >= 5
+          ? {
+              damagePerTick: Math.floor(
+                this.burnDamage * (this.player.damageMultiplier ?? 1)
+              ),
+              duration: this.burnDuration
+            }
+          : undefined
+      );
 
-      if (this.level >= 5) {
-        const burnDamage = Math.floor(
-          this.burnDamage * (this.player.damageMultiplier ?? 1)
-        );
-
-        const zone = new BombardFireZone(
-          this.scene,
-          impactX,
-          impactY,
-          this.explosionRadius,
-          burnDamage,
-          this.burnDuration
-        );
-
-        this.scene.instanceManager.add(zone.sprite);
-      }
+      this.scene.projectileManager.add(missile.sprite);
     }
-  }
-
-  private applyExplosion(x: number, y: number, damage: number) {
-    if (!(this.scene instanceof Game)) return;
-
-    const radiusSq = this.explosionRadius * this.explosionRadius;
-
-    this.scene.enemyManager.enemiesGroup
-      .getChildren()
-      .filter(isEnemySprite)
-      .forEach((enemy) => {
-        const dx = enemy.x - x;
-        const dy = enemy.y - y;
-
-        if (dx * dx + dy * dy <= radiusSq) {
-          enemy.entity.healthManager.takeDamage(damage);
-        }
-      });
   }
 }

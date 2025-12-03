@@ -81,6 +81,47 @@ export class Game extends Scene {
       32
     );
     ensureTexture(
+      'jelly_bombard_missile',
+      (g) =>
+        g
+          .fillStyle(0x6fd3ff, 0.95)
+          .fillCircle(10, 14, 6)
+          .fillStyle(0xffffff)
+          .fillTriangle(10, 2, 4, 14, 16, 14)
+          .lineStyle(2, 0x0a5a8a, 0.9)
+          .strokeCircle(10, 14, 6),
+      20,
+      20
+    );
+    ensureTexture(
+      'jelly_bombard_reticle',
+      (g) =>
+        g
+          .lineStyle(2, 0x9ed8ff, 0.9)
+          .strokeCircle(12, 12, 10)
+          .lineStyle(2, 0xffffff, 0.7)
+          .strokeCircle(12, 12, 5)
+          .lineBetween(2, 12, 7, 12)
+          .lineBetween(17, 12, 22, 12)
+          .lineBetween(12, 2, 12, 7)
+          .lineBetween(12, 17, 12, 22),
+      24,
+      24
+    );
+    ensureTexture(
+      'jelly_bombard_explosion',
+      (g) =>
+        g
+          .fillStyle(0x9ed8ff, 0.35)
+          .fillCircle(32, 32, 28)
+          .lineStyle(4, 0xffffff, 0.9)
+          .strokeCircle(32, 32, 24)
+          .lineStyle(3, 0x4fa4d9, 0.8)
+          .strokeCircle(32, 32, 16),
+      64,
+      64
+    );
+    ensureTexture(
       'healing_chocolate',
       (g) => g.fillStyle(0x00ffff, 1).fillCircle(6, 6, 4),
       12,
