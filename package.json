@@ -53,5 +53,6 @@
       "electron-winstaller",
       "esbuild"
     ]
-  }
+  },
+  "packageManager": "pnpm@10.24.0"
 }
