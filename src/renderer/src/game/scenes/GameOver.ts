@@ -14,18 +14,27 @@ export class GameOver extends Scene {
     this.camera = this.cameras.main;
     this.camera.setBackgroundColor(0x000000);
 
-    this.background = this.add.image(512, 384, 'background');
+    this.background = this.add.image(
+      this.scale.width / 2,
+      this.scale.height / 2,
+      'background'
+    );
     this.background.setAlpha(0.5);
 
     this.gameOverText = this.add
-      .text(512, 384, 'you died bruh so suck', {
-        fontFamily: 'Arial',
-        fontSize: 64,
-        color: '#ffffff',
-        stroke: '#000000',
-        strokeThickness: 8,
-        align: 'center'
-      })
+      .text(
+        this.scale.width / 2,
+        this.scale.height / 2,
+        'you died bruh so suck',
+        {
+          fontFamily: 'Arial',
+          fontSize: 64,
+          color: '#ffffff',
+          stroke: '#000000',
+          strokeThickness: 8,
+          align: 'center'
+        }
+      )
       .setOrigin(0.5)
       .setDepth(100);
 
