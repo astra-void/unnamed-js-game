@@ -1,10 +1,10 @@
 import Phaser, { Scene } from 'phaser';
 import { Player } from '../entities/living';
 import { BombardFireZone } from '../instances';
+import { JellyBombardMissile } from '../projectiles';
 import { Game } from '../scenes/Game';
 import { isEnemySprite } from '../types/typeGuards';
 import { Weapon } from './Weapon';
-import { JellyBombardMissile } from '../projectiles';
 
 export class JellyBombard extends Weapon {
   player: Player;

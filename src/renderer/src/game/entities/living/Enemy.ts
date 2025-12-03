@@ -76,7 +76,6 @@ export class Enemy extends LivingEntity {
     return true;
   }
 
-
   applyStun(duration: number) {
     this.stunned = true;
     this.stunTimer = duration;

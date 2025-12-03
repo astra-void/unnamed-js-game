@@ -28,7 +28,10 @@ export class JellyBombardMissile extends Projectile {
     lifetime = 4,
     burnOptions?: BurnOptions
   ) {
-    const direction = new Phaser.Math.Vector2(targetX - startX, targetY - startY)
+    const direction = new Phaser.Math.Vector2(
+      targetX - startX,
+      targetY - startY
+    )
       .normalize()
       .scale(speed);
 
@@ -93,7 +96,10 @@ export class JellyBombardMissile extends Projectile {
       this.y,
       'jelly_bombard_explosion'
     );
-    explosion.setScale(this.explosionRadius / 64).setAlpha(0.9).setDepth(0.6);
+    explosion
+      .setScale(this.explosionRadius / 64)
+      .setAlpha(0.9)
+      .setDepth(0.6);
 
     this.scene.tweens.add({
       targets: explosion,
