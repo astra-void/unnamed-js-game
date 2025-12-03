@@ -21,6 +21,8 @@ export class EnemyManager {
 
     this.spawnInterval = GAME_CONFIG.ENEMY.SPAWN_INTERVAL;
 
+    scene.physics.add.collider(this.enemies, this.enemies);
+
     const handlePlayerCollision: Phaser.Types.Physics.Arcade.ArcadePhysicsCallback =
       (playerSprite, enemySprite) => {
         if (!isEnemySprite(enemySprite)) return;
