@@ -66,7 +66,7 @@ export class Settings extends Scene {
     const title = this.add.text(
       this.scale.width / 2,
       this.panel.y - this.panel.height / 2 + this.uiScale.spacing.lg,
-      'Settings',
+      'Settings(장식임)',
       {
         fontFamily: 'Arial Black',
         fontSize: `${this.uiScale.fontSize.xl}px`,
