@@ -54,11 +54,14 @@ export class Needle extends Weapon {
 
   attack(): void {
     if (!this.speed || !this.lifetime) return;
+    const game = this.scene as Game;
+    const target = game.inputManager.getAimWorldPoint(
+      this.player.x,
+      this.player.y
+    );
 
-    const pointer = this.scene.input.activePointer;
-
-    const baseDx = pointer.worldX - this.player.x;
-    const baseDy = pointer.worldY - this.player.y;
+    const baseDx = target.x - this.player.x;
+    const baseDy = target.y - this.player.y;
     const baseAngle = Math.atan2(baseDy, baseDx);
 
     const count = this.level === 5 ? 2 : 1;
