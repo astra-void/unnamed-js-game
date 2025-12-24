@@ -48,7 +48,7 @@ export class VirtualJoystick {
   private rawValue: Vector = { x: 0, y: 0 };
 
   private enabled = true;
-  private visible = true;
+  visible = true;
 
   private resizeHandler = (gameSize: Phaser.Structs.Size) =>
     this.onResize(gameSize.width, gameSize.height);

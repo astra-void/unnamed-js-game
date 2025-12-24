@@ -3,7 +3,7 @@ import {
   JoystickUIBlocker,
   VirtualJoystick,
   VirtualJoystickConfig
-} from './VirtualJoystick';
+} from '../input/VirtualJoystick';
 
 type Vector = { x: number; y: number };
 
@@ -32,7 +32,7 @@ export class InputManager {
       const uiBlocker: JoystickUIBlocker = (currentlyOver, joystickObjects) => {
         return currentlyOver.some(
           (obj) =>
-            (obj as any).input?.enabled === true && !joystickObjects.has(obj)
+            obj.input?.enabled === true && !joystickObjects.has(obj)
         );
       };
 

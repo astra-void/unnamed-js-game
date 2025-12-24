@@ -6,7 +6,7 @@ import { EnemyManager } from '../managers/EnemyManager';
 import { InstanceManager } from '../managers/InstanceManager';
 import { ProjectileManager } from '../managers/ProjectileManager';
 import { UIManager } from '../managers/UIManager';
-import { InputManager } from '../input/InputManager';
+import { InputManager } from '../managers/InputManager';
 
 export class Game extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;
