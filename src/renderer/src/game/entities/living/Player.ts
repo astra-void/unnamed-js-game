@@ -275,13 +275,16 @@ export class Player extends LivingEntity {
   }
 
   private handleMovement() {
-    let vx = 0,
-      vy = 0;
+    const input = (this.scene as Game).inputManager;
+    const move = input.getMoveVector(this.keys, this.cursors);
+    let vx = move.x * this.speed;
+    let vy = move.y * this.speed;
 
-    if (this.keys.w.isDown || this.cursors.up.isDown) vy = -this.speed;
-    if (this.keys.s.isDown || this.cursors.down.isDown) vy = this.speed;
-    if (this.keys.a.isDown || this.cursors.left.isDown) vx = -this.speed;
-    if (this.keys.d.isDown || this.cursors.right.isDown) vx = this.speed;
+    const length = Math.hypot(vx, vy);
+    if (length > this.speed) {
+      vx = (vx / length) * this.speed;
+      vy = (vy / length) * this.speed;
+    }
 
     if (this.sprite.body instanceof Phaser.Physics.Arcade.Body) {
       this.sprite.body.setVelocity(vx, vy);

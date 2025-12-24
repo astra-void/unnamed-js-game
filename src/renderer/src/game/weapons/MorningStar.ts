@@ -112,9 +112,12 @@ export class MorningStar extends Weapon {
   attack(): void {
     if (!(this.scene instanceof Game)) return;
 
-    const pointer = this.scene.input.activePointer;
-    const dx = pointer.worldX - this.player.x;
-    const dy = pointer.worldY - this.player.y;
+    const target = this.scene.inputManager.getAimWorldPoint(
+      this.player.x,
+      this.player.y
+    );
+    const dx = target.x - this.player.x;
+    const dy = target.y - this.player.y;
     const len = Math.hypot(dx, dy) || 1;
 
     const impactX = this.player.x + (dx / len) * this.reach;

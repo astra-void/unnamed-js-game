@@ -1,4 +1,4 @@
-import { Scene } from 'phaser';
+import Phaser, { Scene } from 'phaser';
 import { EventBus } from '../EventBus';
 import { Player } from '../entities/living/Player';
 import { TimerManager } from '../managers';
@@ -6,11 +6,13 @@ import { EnemyManager } from '../managers/EnemyManager';
 import { InstanceManager } from '../managers/InstanceManager';
 import { ProjectileManager } from '../managers/ProjectileManager';
 import { UIManager } from '../managers/UIManager';
+import { InputManager } from '../input/InputManager';
 
 export class Game extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;
   gameText: Phaser.GameObjects.Text;
   player: Player;
+  inputManager: InputManager;
 
   enemyManager: EnemyManager;
   projectileManager: ProjectileManager;
@@ -156,6 +158,7 @@ export class Game extends Scene {
     this.camera = this.cameras.main;
     this.camera.setBackgroundColor(0x000000);
 
+    this.inputManager = new InputManager(this);
     this.uiManager = new UIManager(this);
     this.timerManager = new TimerManager();
 
@@ -174,12 +177,15 @@ export class Game extends Scene {
     this.enemyManager.startSpawning();
     this.timerManager.start();
 
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.shutdown());
+
     EventBus.emit('current-scene-ready', this);
   }
 
   update(time: number, delta: number): void {
     if (this.paused) return;
 
+    this.inputManager.update(time, delta);
     this.uiManager.update(time, delta);
     this.timerManager.update(time, delta);
     this.player.update(time, delta);
@@ -192,6 +198,9 @@ export class Game extends Scene {
   pauseGame() {
     if (this.paused) return;
     this.paused = true;
+    this.inputManager.setEnabled(false);
+    this.inputManager.reset({ keepLastAim: true });
+    this.inputManager.setVisible(false);
     this.timerManager.pause();
     this.physics.world.pause();
   }
@@ -199,11 +208,15 @@ export class Game extends Scene {
   resumeGame() {
     if (!this.paused) return;
     this.paused = false;
+    this.inputManager.reset({ keepLastAim: true });
+    this.inputManager.setEnabled(true);
+    this.inputManager.setVisible(true);
     this.timerManager.resume();
     this.physics.world.resume();
   }
 
   shutdown() {
+    if (this.inputManager) this.inputManager.destroy();
     if (this.enemyManager) this.enemyManager.destroy();
     if (this.projectileManager) this.projectileManager.destroy();
     this.game.events.shutdown();

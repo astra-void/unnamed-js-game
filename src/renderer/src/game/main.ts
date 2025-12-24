@@ -20,7 +20,10 @@ const config: Phaser.Types.Core.GameConfig = {
   },
   parent: 'game-container',
   backgroundColor: '#000000',
-  scene: [Boot, Preloader, MainMenu, Game, GameOver, Settings]
+  scene: [Boot, Preloader, MainMenu, Game, GameOver, Settings],
+  input: {
+    activePointers: 3
+  }
 };
 
 const StartGame = (parent: string) => {
