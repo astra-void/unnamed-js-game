@@ -177,8 +177,6 @@ export class Game extends Scene {
     this.enemyManager.startSpawning();
     this.timerManager.start();
 
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.shutdown());
-
     EventBus.emit('current-scene-ready', this);
   }
 
