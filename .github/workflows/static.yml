@@ -16,12 +16,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,17 +36,26 @@ jobs:
 
       - name: Build (electron-vite)
         run: pnpm build
-        # 만약 "renderer만" 따로 빌드하는 스크립트를 만들어놨다면 여기만 바꾸면 됨:
+        # renderer만 따로면:
         # run: pnpm build:renderer
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Upload artifact (renderer output only)
         uses: actions/upload-pages-artifact@v3
         with:
           path: out/renderer
 
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
