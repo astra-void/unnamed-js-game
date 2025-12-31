@@ -23,16 +23,14 @@ export class InputManager {
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
     this.isTouchDevice =
-      !scene.sys.game.device.os.desktop ||
-      scene.sys.game.device.input.touch;
+      !scene.sys.game.device.os.desktop || scene.sys.game.device.input.touch;
 
     if (this.isTouchDevice) {
       this.ensurePointers();
 
       const uiBlocker: JoystickUIBlocker = (currentlyOver, joystickObjects) => {
         return currentlyOver.some(
-          (obj) =>
-            obj.input?.enabled === true && !joystickObjects.has(obj)
+          (obj) => obj.input?.enabled === true && !joystickObjects.has(obj)
         );
       };
 

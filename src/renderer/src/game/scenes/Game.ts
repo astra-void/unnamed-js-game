@@ -3,10 +3,10 @@ import { EventBus } from '../EventBus';
 import { Player } from '../entities/living/Player';
 import { TimerManager } from '../managers';
 import { EnemyManager } from '../managers/EnemyManager';
+import { InputManager } from '../managers/InputManager';
 import { InstanceManager } from '../managers/InstanceManager';
 import { ProjectileManager } from '../managers/ProjectileManager';
 import { UIManager } from '../managers/UIManager';
-import { InputManager } from '../managers/InputManager';
 
 export class Game extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;

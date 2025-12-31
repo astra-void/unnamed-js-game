@@ -24,10 +24,7 @@ export class GameOver extends Scene {
     'sucks to be you lol'
   ];
   */
- private insults: string[] = [
-  'you died bruh',
-  'how did you died?'
- ];
+  private insults: string[] = ['you died bruh'];
 
   private textChangeTimer: number = 0;
   private textChangeInterval: number = 60;

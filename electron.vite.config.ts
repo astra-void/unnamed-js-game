@@ -1,17 +1,25 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import { defineConfig, externalizeDepsPlugin } from 'electron-vite';
+import { defineConfig } from 'electron-vite';
 import { resolve } from 'path';
+import { viteSingleFile } from 'vite-plugin-singlefile';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   main: {
-    plugins: [externalizeDepsPlugin(), tsconfigPaths()]
+    plugins: [tsconfigPaths()],
+    build: {
+      externalizeDeps: true
+    }
   },
   preload: {
-    plugins: [externalizeDepsPlugin(), tsconfigPaths()]
+    plugins: [tsconfigPaths()],
+    build: {
+      externalizeDeps: true
+    }
   },
   renderer: {
+    base: './',
     publicDir: resolve(__dirname, 'public'),
     resolve: {
       alias: {
@@ -21,8 +29,14 @@ export default defineConfig({
         '@': resolve(__dirname, 'src/renderer/src')
       }
     },
-    plugins: [react(), tailwindcss(), tsconfigPaths()],
+    plugins: [
+      react(),
+      tailwindcss(),
+      tsconfigPaths(),
+      ...(command === 'build' ? [viteSingleFile()] : [])
+    ],
     build: {
+      /*
       rollupOptions: {
         output: {
           manualChunks: {
@@ -30,6 +44,8 @@ export default defineConfig({
           }
         }
       },
+      */
+      cssCodeSplit: false,
       minify: 'terser',
       terserOptions: {
         compress: {
@@ -39,7 +55,8 @@ export default defineConfig({
         format: {
           comments: false
         }
-      }
+      },
+      assetsInlineLimit: 10_000_000_000
     }
   }
-});
+}));
